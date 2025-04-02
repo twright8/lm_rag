@@ -338,7 +338,7 @@ def create_topic_model(embeddings, texts, config=None):
             # Create BERTopic model
             _topic_model_instance = BERTopic(
                 umap_model=umap_model,
-                embedding_model="intfloat/multilingual-e5-base",
+                embedding_model="intfloat/multilingual-e5-large-instruct",
                 hdbscan_model=hdbscan_model,
                 vectorizer_model=vectorizer_model,
                 ctfidf_model=ctfidf_model,
@@ -732,7 +732,7 @@ def create_datamap_visualization(vis_embeddings, docs_df, texts, metadata, topic
         cvd_safer = config.get("cvd_safer", True)
         cluster_boundaries = config.get("cluster_boundary_polygons", True)  # Enable by default
         color_label_text = config.get("color_label_text", True)
-        polygon_alpha = float(config.get("polygon_alpha", 1.5))  # Slightly more visible
+        polygon_alpha = float(config.get("polygon_alpha", 2.5))  # Slightly more visible
         font_family = config.get("font_family", "Arial")
 
         # Customize tooltip using HTML template

@@ -12,16 +12,15 @@ from src.utils.resource_monitor import get_gpu_info, log_memory_usage
 from src.utils.logger import setup_logger
 # Import get_service carefully
 import sys
-import os
 from pathlib import Path
 import yaml
+
 import time
 import json
 import gc
 import torch
 import traceback
 from typing import List, Dict, Any, Union, Optional
-
 # Add project root to sys.path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(ROOT_DIR))
@@ -244,8 +243,8 @@ def render_sidebar():
         # Navigation links
         page = st.radio(
             "Select Page",
-            options=["Upload & Process", "Explore Data", "Query System", "Cluster Map", "Settings"],
-            index=["Upload & Process", "Explore Data", "Query System", "Cluster Map", "Settings"].index(CONFIG["ui"]["default_page"])
+            options=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"],
+            index=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"].index(CONFIG["ui"]["default_page"] if CONFIG["ui"]["default_page"] in ["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"] else "Upload & Process")
         )
 
         st.markdown("---")
@@ -2165,7 +2164,7 @@ def process_documents(uploaded_files, selected_llm_name, vl_pages, vl_process_al
         try:
             collection_info = query_engine.get_collection_info()
             if collection_info.get("exists", False):
-                 expected_dim = 768 # Make dynamic based on embedding model if needed
+                 expected_dim = 1024 # Make dynamic based on embedding model if needed
                  vector_size = collection_info.get("vector_size", 0)
                  if vector_size != 0 and vector_size != expected_dim:
                     logger.warning(f"Clearing collection due to dimension mismatch ({vector_size} vs {expected_dim}).")
@@ -2494,8 +2493,8 @@ def render_cluster_map_page():
                     polygon_alpha = st.slider(
                         "Cluster Boundary Opacity",
                         min_value=0.05,
-                        max_value=2.5,
-                        value=CONFIG["clustering"].get("datamapplot", {}).get("polygon_alpha", 1.5),
+                        max_value=5.00,
+                        value=CONFIG["clustering"].get("datamapplot", {}).get("polygon_alpha", 2.5),
                         step=0.05,
                         help="Opacity of the cluster boundary polygons (higher values make clusters more prominent)"
                     )
@@ -2650,6 +2649,179 @@ def render_cluster_map_page():
                     }
                 )
 
+
+def render_topic_filter_page():
+    """
+    Render the topic filtering page.
+    """
+    st.header("🧮 Topic Filter")
+
+    # Import the embedding filter module
+    try:
+        from src.core.filtering.embedding_filter import EmbeddingFilter
+        # Get query engine
+        query_engine = get_or_create_query_engine()
+        # Create embedding filter
+        embedding_filter = EmbeddingFilter(query_engine)
+    except ImportError as e:
+        st.error(f"Embedding filter module not available: {e}")
+        st.warning("Make sure the embedding_filter.py module is installed in the src/core/filtering directory.")
+        return
+    except Exception as e:
+        st.error(f"Error initializing embedding filter: {e}")
+        return
+
+    # Check if there's data to filter
+    collection_info = query_engine.get_collection_info()
+    if not collection_info.get("exists", False) or collection_info.get("points_count", 0) == 0:
+        st.warning("No indexed documents found. Please upload and process documents first.")
+        return
+
+    # Create form for filter parameters
+    with st.form("topic_filter_form"):
+        # Topic input
+        topic_query = st.text_area(
+            "Enter topic description or query",
+            placeholder="Describe the topic you want to filter for...",
+            height=100
+        )
+
+        # Get document names
+        try:
+            document_names = embedding_filter.get_document_names()
+        except Exception as e:
+            st.error(f"Error getting document names: {e}")
+            document_names = []
+
+        # Document selection
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Default to all documents selected
+            selected_docs = st.multiselect(
+                "Filter by Documents (select none for all)",
+                options=document_names,
+                default=[],
+                help="Select specific documents to include (leave empty to include all)"
+            )
+
+        with col2:
+            # Parameters
+            top_k = st.slider(
+                "Number of results",
+                min_value=10,
+                max_value=50000,
+                value=1000,
+                step=10,
+                help="Maximum number of chunks to retrieve"
+            )
+
+        # Run filter button
+        submit_button = st.form_submit_button("Run Topic Filter", type="primary")
+
+    # Store results in session state to preserve across page reloads
+    if "topic_filter_results" not in st.session_state:
+        st.session_state.topic_filter_results = None
+
+    # Process form submission
+    if submit_button and topic_query:
+        with st.spinner("Filtering chunks by topic..."):
+            # Determine included/excluded documents
+            included_docs = set(selected_docs) if selected_docs else None
+
+            # Run the filter
+            results = embedding_filter.filter_by_topic(
+                topic_query=topic_query,
+                top_k=top_k,
+                included_docs=included_docs,
+                excluded_docs=None
+            )
+
+            # Store results in session state
+            st.session_state.topic_filter_results = results
+
+            if results:
+                st.success(f"Found {len(results)} relevant chunks!")
+            else:
+                st.warning("No relevant chunks found. Try a different topic query or filter settings.")
+
+    # Display results if available
+    if st.session_state.topic_filter_results:
+        results = st.session_state.topic_filter_results
+
+        # Create a DataFrame for display
+        import pandas as pd
+
+        # Create a list of rows for the DataFrame
+        rows = []
+        for result in results:
+            row = {
+                'Score': f"{result['score']:.4f}",
+                'Document': result['metadata'].get('file_name', 'Unknown'),
+                'Page': result['metadata'].get('page_num', 'N/A'),
+                'Text': result.get('original_text', result.get('text', ''))[:200] + "..."  # Truncate text for display
+            }
+            rows.append(row)
+
+        # Create DataFrame
+        df = pd.DataFrame(rows)
+
+        # Show results count and export option
+        col1, col2 = st.columns([3, 1])
+
+        with col1:
+            st.subheader(f"Results ({len(results)} chunks)")
+
+        with col2:
+            # Export button
+            if st.button("Export to CSV", key="export_results"):
+                # Create a temporary file for download
+                csv_path = ROOT_DIR / "temp" / f"topic_filter_results_{int(time.time())}.csv"
+
+                # Export results
+                success = embedding_filter.export_results_to_csv(results, str(csv_path))
+
+                if success:
+                    # Read the CSV file for download
+                    with open(csv_path, "r") as f:
+                        csv_data = f.read()
+
+                    # Create download button
+                    import base64
+                    b64 = base64.b64encode(csv_data.encode()).decode()
+                    href = f'<a href="data:text/csv;base64,{b64}" download="topic_filter_results.csv">Download CSV</a>'
+                    st.markdown(href, unsafe_allow_html=True)
+                else:
+                    st.error("Failed to export results to CSV.")
+
+        # Show results
+        st.dataframe(
+            df,
+            use_container_width=True,
+            column_config={
+                "Score": st.column_config.NumberColumn("Score", format="%.4f", width="small"),
+                "Document": st.column_config.TextColumn("Document", width="medium"),
+                "Page": st.column_config.TextColumn("Page", width="small"),
+                "Text": st.column_config.TextColumn("Text", width="large")
+            }
+        )
+
+        # Text view of selected result
+        st.subheader("Text View")
+        selected_index = st.selectbox("Select chunk to view", options=range(len(results)))
+
+        if selected_index is not None:
+            selected_result = results[selected_index]
+
+            # Show metadata
+            meta = selected_result['metadata']
+            st.markdown(f"**Document:** {meta.get('file_name', 'Unknown')}")
+            st.markdown(f"**Page:** {meta.get('page_num', 'N/A')}")
+            st.markdown(f"**Score:** {selected_result['score']:.4f}")
+
+            # Show full text
+            st.markdown("**Full Text:**")
+            st.markdown(selected_result.get('original_text', selected_result.get('text', '')))
 def main():
     """
     Main application entry point.
@@ -2675,6 +2847,8 @@ def main():
         render_query_page()
     elif page == "Cluster Map":
         render_cluster_map_page()
+    elif page == "Topic Filter":
+        render_topic_filter_page()
     elif page == "Settings":
         render_settings_page()
 
