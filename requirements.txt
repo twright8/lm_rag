@@ -1,0 +1,60 @@
+# Core libraries
+streamlit>=1.32.0
+pydantic>=2.4.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+loguru>=0.7.2
+pyvis>=0.3.2
+networkx>=3.1
+
+# Document processing
+PyMuPDF>=1.23.4  # For PDF processing
+python-docx>=0.8.11  # For DOCX files
+pytesseract>=0.3.10  # For OCR (requires Tesseract to be installed separately)
+Pillow>=10.0.0  # For image processing
+
+# NLP/Chunking
+nltk>=3.8.1
+langchain>=0.1.0
+langchain-experimental>=0.0.42
+langchain-huggingface
+thefuzz>=0.19.0  # For fuzzy string matching
+
+# Embedding and inference
+embed>=0.1.2  # Infinity (BatchedInference)
+sentence-transformers>=2.2.2
+
+
+# Vector DB
+qdrant-client>=1.6.0
+
+# Indexing and retrieval
+rank-bm25>=0.2.2
+
+# Resource monitoring
+psutil>=5.9.5
+
+# For handling data
+pandas>=2.0.0
+outlines==0.0.43
+# For UI components in Streamlit
+plotly>=5.15.0
+tqdm>=4.66.1
+bertopic
+datamapplot
+
+
+--extra-index-url https://downloads.pygmalion.chat/whl
+aphrodite-engine>=0.6.3
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.4.0
+torchvision==0.19.0
+torchaudio==2.4.0
+
+
+--extra-index-url=https://pypi.nvidia.com
+"cudf-cu12==25.2.*"
+"cuml-cu12==25.2.*"
+"dask-cudf-cu12==25.2.*"
+"cugraph-cu12==25.2.*"
+"nx-cugraph-cu12==25.2.*"

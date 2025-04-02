@@ -1,0 +1,10 @@
+{
+  "timestamp": 1743419553.389043,
+  "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "original_entities": 143,
+  "deduped_entities": 135,
+  "original_relationships": 31,
+  "deduped_relationships": 31,
+  "modified_chunks": 77,
+  "deduplication_threshold": 85
+}
