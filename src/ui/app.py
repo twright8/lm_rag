@@ -14,7 +14,7 @@ from src.utils.logger import setup_logger
 import sys
 from pathlib import Path
 import yaml
-
+import pandas as pd
 import time
 import json
 import gc
@@ -67,7 +67,7 @@ def initialize_app():
     """
     # Set page config early
     st.set_page_config(
-        page_title="Anti-Corruption RAG System",
+        page_title="Tomni AI - NLP toolset",
         page_icon="🔍",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -223,7 +223,7 @@ def render_header():
     """
     Render the application header. (No changes needed here)
     """
-    st.title("🔍 Anti-Corruption RAG System")
+    st.title("🔍 Tomni AI - Anti-corruption toolset")
     st.markdown("""
     A semantic search and analysis system for anti-corruption investigations.
     Upload documents, extract entities and relationships, and query using natural language.
@@ -241,11 +241,23 @@ def render_sidebar():
         st.title("Navigation")
 
         # Navigation links
+        # Navigation links
+        # --- Add to app.py in the list of pages in render_sidebar function ---
         page = st.radio(
             "Select Page",
-            options=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"],
-            index=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"].index(CONFIG["ui"]["default_page"] if CONFIG["ui"]["default_page"] in ["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Cluster Map", "Settings"] else "Upload & Process")
+            options=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Information Extraction",
+                     "Cluster Map", "Document Classification", "Settings"],
+            index=["Upload & Process", "Explore Data", "Query System", "Topic Filter", "Information Extraction",
+                   "Cluster Map", "Document Classification", "Settings"].index(
+                CONFIG["ui"]["default_page"] if CONFIG["ui"]["default_page"] in ["Upload & Process", "Explore Data",
+                                                                                 "Query System", "Topic Filter",
+                                                                                 "Information Extraction",
+                                                                                 "Cluster Map",
+                                                                                 "Document Classification",
+                                                                                 "Settings"] else "Upload & Process")
         )
+
+        # --- Add to main() function's page selection logic ---
 
         st.markdown("---")
 
@@ -565,7 +577,6 @@ def render_document_explorer():
          except Exception as e:
               logger.error(f"Failed to get document names for filter: {e}")
               doc_filter = st.selectbox("Filter by document", options=["All Documents", "Error loading names"])
-
 
     # Get chunks from DB based on filter
     doc_filter_value = doc_filter if doc_filter != "All Documents" else None
@@ -2772,27 +2783,7 @@ def render_topic_filter_page():
         with col1:
             st.subheader(f"Results ({len(results)} chunks)")
 
-        with col2:
-            # Export button
-            if st.button("Export to CSV", key="export_results"):
-                # Create a temporary file for download
-                csv_path = ROOT_DIR / "temp" / f"topic_filter_results_{int(time.time())}.csv"
 
-                # Export results
-                success = embedding_filter.export_results_to_csv(results, str(csv_path))
-
-                if success:
-                    # Read the CSV file for download
-                    with open(csv_path, "r") as f:
-                        csv_data = f.read()
-
-                    # Create download button
-                    import base64
-                    b64 = base64.b64encode(csv_data.encode()).decode()
-                    href = f'<a href="data:text/csv;base64,{b64}" download="topic_filter_results.csv">Download CSV</a>'
-                    st.markdown(href, unsafe_allow_html=True)
-                else:
-                    st.error("Failed to export results to CSV.")
 
         # Show results
         st.dataframe(
@@ -2822,6 +2813,850 @@ def render_topic_filter_page():
             # Show full text
             st.markdown("**Full Text:**")
             st.markdown(selected_result.get('original_text', selected_result.get('text', '')))
+
+
+def render_info_extraction_page():
+    """
+    Render the information extraction page.
+    """
+    st.header("📊 Information Extraction")
+
+    # Import the info extractor
+    try:
+        from src.core.extraction.info_extractor import InfoExtractor
+        # Get query engine for document retrieval
+        query_engine = get_or_create_query_engine()
+    except ImportError as e:
+        st.error(f"Information extraction module not available: {e}")
+        st.warning("Make sure the info_extractor.py module is installed in the src/core/extraction directory.")
+        return
+    except Exception as e:
+        st.error(f"Error initializing information extractor: {e}")
+        return
+
+    # Check if there's data to extract from
+    collection_info = query_engine.get_collection_info()
+    if not collection_info.get("exists", False) or collection_info.get("points_count", 0) == 0:
+        st.warning("No indexed documents found. Please upload and process documents first.")
+        return
+
+    # Check Aphrodite service status
+    if not APHRODITE_SERVICE_AVAILABLE:
+        st.error("Aphrodite service module is not available. Cannot perform extraction.")
+        return
+
+    service = get_service()
+    if not service.is_running():
+        st.warning("LLM service is not running. Please start it from the sidebar.")
+        if st.button("Start LLM Service Now"):
+            start_aphrodite_service()
+            st.rerun()
+        return
+
+    # Create tabs for schema definition and extraction
+    schema_tab, extract_tab, results_tab = st.tabs(["Define Schema", "Extract Information", "View Results"])
+
+    # Store schema in session state
+    if "info_extraction_schema" not in st.session_state:
+        st.session_state.info_extraction_schema = {
+            "fields": [{"name": "entity", "type": "string", "description": "Name of the primary entity"}],
+            "primary_key": "entity",
+            "primary_key_description": "entities mentioned in the text",
+            "user_query": "Extract all entities mentioned in the text"
+        }
+
+    # Store extraction results in session state
+    if "info_extraction_results" not in st.session_state:
+        st.session_state.info_extraction_results = None
+
+    # Schema definition tab
+    with schema_tab:
+        st.subheader("Define Extraction Schema")
+
+        # Description of what this does
+        st.markdown("""
+        This feature allows you to extract structured information from documents using a custom schema.
+        Define the fields you want to extract, and the system will use AI to identify and organize this information.
+
+        **Instructions:**
+        1. Define your schema fields (name, type, description)
+        2. Specify the primary key field (the main entity being extracted)
+        3. Provide a description of what you're extracting
+        4. Go to the Extract Information tab to run the extraction
+        """)
+
+        # Primary key field (simplified)
+        primary_key_options = [field["name"] for field in st.session_state.info_extraction_schema["fields"]]
+        # Check if current primary key exists in options, if not set to first field
+        current_primary_key = st.session_state.info_extraction_schema["primary_key"]
+        if current_primary_key not in primary_key_options and primary_key_options:
+            current_primary_key = primary_key_options[0]
+            st.session_state.info_extraction_schema["primary_key"] = current_primary_key
+
+        primary_key_index = 0
+        if primary_key_options:
+            try:
+                primary_key_index = primary_key_options.index(current_primary_key)
+            except ValueError:
+                pass
+
+        # A single combined field for selecting the primary entity
+        primary_key = st.selectbox(
+            "Primary Entity Field",
+            options=primary_key_options,
+            index=primary_key_index,
+            help="This field defines the main entity that each row in your results will represent (e.g., 'person', 'company', 'transaction')"
+        )
+
+        # We'll generate the description automatically from the field name
+        # This will be used in the prompt (e.g., "entity" → "entities")
+        primary_key_description = f"{primary_key}s" if primary_key else "entities"
+
+        # User query
+        user_query = st.text_area(
+            "Extraction Query",
+            value=st.session_state.info_extraction_schema["user_query"],
+            help="Describe in detail what information you want to extract",
+            height=100
+        )
+
+        # Schema fields
+        st.subheader("Schema Fields")
+
+        # Available field types
+        field_types = ["string", "number", "integer", "boolean", "date"]
+
+        # Create a container for the fields
+        fields_container = st.container()
+
+        # Add field button
+        if st.button("Add Field"):
+            st.session_state.info_extraction_schema["fields"].append({
+                "name": f"field_{len(st.session_state.info_extraction_schema['fields'])}",
+                "type": "string",
+                "description": "Description of the field"
+            })
+
+        # Display and edit fields
+        with fields_container:
+            updated_fields = []
+
+            for i, field in enumerate(st.session_state.info_extraction_schema["fields"]):
+                col1, col2, col3, col4 = st.columns([2, 2, 5, 1])
+
+                with col1:
+                    field_name = st.text_input(
+                        "Field Name",
+                        value=field["name"],
+                        key=f"field_name_{i}"
+                    )
+
+                with col2:
+                    field_type = st.selectbox(
+                        "Type",
+                        options=field_types,
+                        index=field_types.index(field["type"]) if field["type"] in field_types else 0,
+                        key=f"field_type_{i}"
+                    )
+
+                with col3:
+                    field_description = st.text_input(
+                        "Description",
+                        value=field["description"],
+                        key=f"field_desc_{i}"
+                    )
+
+                with col4:
+                    # Don't allow removing the last field
+                    if len(st.session_state.info_extraction_schema["fields"]) > 1:
+                        remove = st.button("🗑️", key=f"remove_{i}")
+                    else:
+                        remove = False
+
+                if not remove:
+                    updated_fields.append({
+                        "name": field_name,
+                        "type": field_type,
+                        "description": field_description
+                    })
+
+            # Update fields in session state
+            st.session_state.info_extraction_schema["fields"] = updated_fields
+
+        # Save schema button
+        if st.button("Save Schema", type="primary"):
+            # Update primary key and description
+            st.session_state.info_extraction_schema["primary_key"] = primary_key
+            st.session_state.info_extraction_schema["primary_key_description"] = primary_key_description
+            st.session_state.info_extraction_schema["user_query"] = user_query
+
+            # Check field name uniqueness
+            field_names = [field["name"] for field in st.session_state.info_extraction_schema["fields"]]
+            if len(field_names) != len(set(field_names)):
+                st.error("Field names must be unique!")
+            else:
+                st.success("Schema saved successfully!")
+
+    # Extraction tab
+    with extract_tab:
+        st.subheader("Extract Information")
+
+        # Show current schema
+        with st.expander("Current Schema", expanded=True):
+            # Display field information in a table
+            field_data = []
+            for field in st.session_state.info_extraction_schema["fields"]:
+                field_data.append({
+                    "Name": field["name"],
+                    "Type": field["type"],
+                    "Description": field["description"],
+                    "Primary Key": "✓" if field["name"] == st.session_state.info_extraction_schema[
+                        "primary_key"] else ""
+                })
+
+            st.dataframe(field_data)
+            st.caption(f"Primary Key Description: {st.session_state.info_extraction_schema['primary_key_description']}")
+            st.caption(f"Extraction Query: {st.session_state.info_extraction_schema['user_query']}")
+
+        # Document selection for extraction
+        st.subheader("Select Documents")
+
+        # Fetch all document names
+        try:
+            max_chunks_for_names = CONFIG.get("extraction", {}).get("information_extraction", {}).get("max_chunks",
+                                                                                                      1000)
+            all_chunks = query_engine.get_chunks(limit=max_chunks_for_names)
+            doc_names = sorted(list(set(c['metadata'].get('file_name', 'Unknown')
+                                        for c in all_chunks
+                                        if c['metadata'].get('file_name'))))
+        except Exception as e:
+            logger.error(f"Failed to get document names: {e}")
+            doc_names = []
+
+        # Allow user to select documents
+        selected_docs = st.multiselect(
+            "Select documents to extract from",
+            options=doc_names,
+            default=[],
+            help="Leave empty to extract from all documents"
+        )
+
+        # Model selection
+        extraction_model_options = {
+            "Small Text (Faster)": CONFIG["models"]["extraction_models"]["text_small"],
+            "Standard Text": CONFIG["models"]["extraction_models"]["text_standard"],
+        }
+
+        selected_model_display_name = st.selectbox(
+            "Select LLM for Extraction",
+            options=list(extraction_model_options.keys()),
+            index=1  # Default to Standard
+        )
+
+        # Get the actual model name
+        selected_model_name = extraction_model_options[selected_model_display_name]
+
+        # Run extraction button
+        extract_btn = st.button(
+            "Run Extraction",
+            type="primary",
+            help="Extract information from selected documents"
+        )
+
+        # Show extraction progress
+        extraction_progress = st.empty()
+
+        # Run extraction when button is clicked
+        if extract_btn:
+            # Create info extractor with selected model
+            info_extractor = InfoExtractor(model_name=selected_model_name)
+
+            # Fetch chunks
+            # Fetch chunks
+            # Fetch chunks
+            with extraction_progress.container():
+                with st.spinner("Fetching document chunks..."):
+                    # Get the max chunks limit from config
+                    max_chunks = CONFIG.get("extraction", {}).get("information_extraction", {}).get("max_chunks", 10000)
+
+                    # Process based on document selection
+                    if selected_docs:
+                        # Get chunks from selected documents only
+                        chunks = []
+                        for doc_name in selected_docs:
+                            doc_chunks = query_engine.get_chunks(limit=max_chunks // len(selected_docs),
+                                                                 document_filter=doc_name)
+                            chunks.extend(doc_chunks)
+                            # Limit total chunks
+                            if len(chunks) >= max_chunks:
+                                st.warning(
+                                    f"Reached maximum chunk limit ({max_chunks}). Some documents may be partially processed.")
+                                chunks = chunks[:max_chunks]
+                                break
+                    else:
+                        # Get all chunks when no documents are selected
+                        chunks = query_engine.get_chunks(limit=max_chunks)
+
+                    st.info(
+                        f"Processing {len(chunks)} chunks from {len(selected_docs) if selected_docs else 'all'} documents")
+
+            # Prepare schema for extraction
+            schema_dict = {
+                field["name"]: {
+                    "type": field["type"],
+                    "description": field["description"]
+                }
+                for field in st.session_state.info_extraction_schema["fields"]
+            }
+
+            # Run extraction
+            with extraction_progress.container():
+                with st.spinner("Extracting information..."):
+                    # Run extraction
+                    results = info_extractor.extract_information(
+                        chunks=chunks,
+                        schema_dict=schema_dict,
+                        primary_key_field=st.session_state.info_extraction_schema["primary_key"],
+                        primary_key_description=st.session_state.info_extraction_schema["primary_key_description"],
+                        user_query=st.session_state.info_extraction_schema["user_query"]
+                    )
+
+                    # Store results in session state
+                    st.session_state.info_extraction_results = results
+
+                    if results:
+                        st.success(f"Successfully extracted {len(results)} items!")
+                    else:
+                        st.warning("No information was extracted. Try adjusting your schema or query.")
+
+    # Results tab
+    # Results tab
+    # In the Results tab of the render_info_extraction_page function
+
+    # Results tab
+    with results_tab:
+        st.subheader("Extraction Results")
+
+        # Check if results exist
+        if not st.session_state.info_extraction_results:
+            st.info("No extraction results available. Run an extraction first.")
+            return
+
+        # Display results
+        results = st.session_state.info_extraction_results
+
+        # Create flattened data for display
+        flattened_rows = []
+
+        for item in results:
+            # Extract the main content fields
+            row_data = {k: v for k, v in item.items() if k != '_source'}
+
+            # Add source fields with prefixes
+            if '_source' in item and isinstance(item['_source'], dict):
+                for src_key, src_value in item['_source'].items():
+                    row_data[f'source_{src_key}'] = src_value
+
+            flattened_rows.append(row_data)
+
+        # Create DataFrame for display
+        if flattened_rows:
+            df = pd.DataFrame(flattened_rows)
+
+            # Reorder columns to put source fields at the end
+            source_cols = [col for col in df.columns if col.startswith('source_')]
+            other_cols = [col for col in df.columns if not col.startswith('source_')]
+
+            if other_cols and source_cols:
+                df = df[other_cols + source_cols]
+        else:
+            df = pd.DataFrame()
+
+        # Show statistics
+        unique_docs = set()
+        for item in results:
+            if '_source' in item and isinstance(item['_source'], dict) and 'file_name' in item['_source']:
+                unique_docs.add(item['_source']['file_name'])
+
+        st.info(f"Found {len(results)} items from {len(unique_docs)} documents")
+
+        # Export options
+        col1, col2 = st.columns([1, 3])
+
+        with col1:
+            # Export to CSV
+            if st.button("Export to CSV"):
+                # Create filename
+                export_time = int(time.time())
+                export_path = str(ROOT_DIR / "temp" / f"extraction_results_{export_time}.csv")
+
+                # Export
+                info_extractor = InfoExtractor()
+                success = info_extractor.export_to_csv(results, export_path)
+
+                if success:
+                    # Create download link
+                    with open(export_path, "r") as f:
+                        csv_data = f.read()
+
+                    import base64
+                    b64 = base64.b64encode(csv_data.encode()).decode()
+                    href = f'<a href="data:text/csv;base64,{b64}" download="extraction_results.csv">Download CSV</a>'
+                    st.markdown(href, unsafe_allow_html=True)
+                else:
+                    st.error("Failed to export results")
+
+        # Display results table
+        if not df.empty:
+            st.dataframe(df)
+        else:
+            st.warning("No data to display. Extraction results might be empty or malformed.")
+
+
+def render_classification_page():
+    """
+    Render the document classification page.
+    """
+    st.header("🏷️ Document Classification")
+
+    # Import the document classifier
+    try:
+        from src.core.classification.document_classifier import DocumentClassifier
+        # Get query engine for document retrieval
+        query_engine = get_or_create_query_engine()
+    except ImportError as e:
+        st.error(f"Document classification module not available: {e}")
+        st.warning("Make sure the document_classifier.py module is installed in the src/core/classification directory.")
+        return
+    except Exception as e:
+        st.error(f"Error initializing document classifier: {e}")
+        return
+
+    # Check if there's data to classify
+    collection_info = query_engine.get_collection_info()
+    if not collection_info.get("exists", False) or collection_info.get("points_count", 0) == 0:
+        st.warning("No indexed documents found. Please upload and process documents first.")
+        return
+
+    # Check Aphrodite service status
+    if not APHRODITE_SERVICE_AVAILABLE:
+        st.error("Aphrodite service module is not available. Cannot perform classification.")
+        return
+
+    service = get_service()
+    if not service.is_running():
+        st.warning("LLM service is not running. Please start it from the sidebar.")
+        if st.button("Start LLM Service Now"):
+            start_aphrodite_service()
+            st.rerun()
+        return
+
+    # Create tabs for schema definition and classification
+    schema_tab, classify_tab, results_tab = st.tabs(["Define Schema", "Classify Documents", "View Results"])
+
+    # Store schema in session state
+    if "classification_schema" not in st.session_state:
+        st.session_state.classification_schema = {
+            "fields": [{"name": "category", "type": "string", "values": ["General", "Legal", "Financial", "Personal"],
+                        "description": "Document category"}],
+            "multi_label_fields": ["category"],
+            "user_instructions": "Classify the document by its main topic"
+        }
+
+    # Store classification results in session state
+    if "classification_results" not in st.session_state:
+        st.session_state.classification_results = None
+
+    # Schema definition tab
+    with schema_tab:
+        st.subheader("Define Classification Schema")
+
+        # Description of what this does
+        st.markdown("""
+        This feature allows you to classify documents using custom categories.
+        Define the fields and values you want to use for classification, and the system will
+        use AI to categorize your documents according to your schema.
+
+        **Instructions:**
+        1. Define your classification fields, allowed values, and descriptions
+        2. Specify if each field should support multiple values
+        3. Provide instructions for the classification
+        4. Go to the Classify Documents tab to run the classification
+        """)
+
+        # Schema fields
+        st.subheader("Classification Fields")
+
+        # Create a container for the fields
+        fields_container = st.container()
+
+        # Add field button
+        if st.button("Add Field"):
+            st.session_state.classification_schema["fields"].append({
+                "name": f"field_{len(st.session_state.classification_schema['fields'])}",
+                "type": "string",
+                "values": ["Value1", "Value2", "Value3"],
+                "description": "Description of the field"
+            })
+
+        # Display and edit fields
+        with fields_container:
+            updated_fields = []
+            updated_multi_label = []
+
+            for i, field in enumerate(st.session_state.classification_schema["fields"]):
+                st.markdown(f"### Field {i + 1}")
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    field_name = st.text_input(
+                        "Field Name",
+                        value=field["name"],
+                        key=f"field_name_{i}"
+                    )
+
+                with col2:
+                    field_description = st.text_input(
+                        "Description",
+                        value=field["description"],
+                        key=f"field_desc_{i}"
+                    )
+
+                # Allowed values as a text area for easier editing
+                current_values = field.get("values", [])
+                values_str = ", ".join(current_values)
+                values_input = st.text_area(
+                    "Allowed Values (comma-separated)",
+                    value=values_str,
+                    key=f"field_values_{i}",
+                    help="Enter allowed values separated by commas"
+                )
+
+                # Parse values from input
+                values_list = [v.strip() for v in values_input.split(",") if v.strip()]
+
+                # Multi-label option
+                is_multi_label = st.checkbox(
+                    "Allow multiple values",
+                    value=field["name"] in st.session_state.classification_schema.get("multi_label_fields", []),
+                    key=f"field_multi_{i}",
+                    help="Check this if multiple values can be assigned to this field"
+                )
+
+                # Option to remove field
+                remove = st.button("Remove Field", key=f"remove_{i}")
+
+                if not remove:
+                    updated_field = {
+                        "name": field_name,
+                        "type": "string",  # Always string for classification
+                        "values": values_list,
+                        "description": field_description
+                    }
+                    updated_fields.append(updated_field)
+
+                    if is_multi_label:
+                        updated_multi_label.append(field_name)
+
+                st.markdown("---")
+
+        # User instructions for classification
+        st.subheader("Classification Instructions")
+        user_instructions = st.text_area(
+            "Instructions",
+            value=st.session_state.classification_schema.get("user_instructions", ""),
+            height=100,
+            help="Provide specific instructions for how to classify documents"
+        )
+
+        # Save schema button
+        if st.button("Save Schema", type="primary"):
+            # Update schema in session state
+            st.session_state.classification_schema["fields"] = updated_fields
+            st.session_state.classification_schema["multi_label_fields"] = updated_multi_label
+            st.session_state.classification_schema["user_instructions"] = user_instructions
+
+            # Check field name uniqueness
+            field_names = [field["name"] for field in updated_fields]
+            if len(field_names) != len(set(field_names)):
+                st.error("Field names must be unique!")
+            else:
+                st.success("Schema saved successfully!")
+
+                # Generate example output
+                example = {}
+                for field in updated_fields:
+                    field_name = field["name"]
+                    values = field.get("values", [])
+                    if values:
+                        if field_name in updated_multi_label:
+                            # Multi-label example with 1-2 values
+                            num_values = min(2, len(values))
+                            example[field_name] = random.sample(values, num_values) if num_values > 0 else []
+                        else:
+                            # Single label example
+                            example[field_name] = values[0] if values else ""
+
+                # Show the example output
+                st.subheader("Example Output")
+                st.json(example)
+
+    # Classification tab
+    with classify_tab:
+        st.subheader("Classify Documents")
+
+        # Show current schema
+        with st.expander("Current Schema", expanded=True):
+            # Display field information in a table
+            field_data = []
+            for field in st.session_state.classification_schema["fields"]:
+                field_data.append({
+                    "Name": field["name"],
+                    "Description": field["description"],
+                    "Allowed Values": ", ".join(field.get("values", [])),
+                    "Multi-label": "✓" if field["name"] in st.session_state.classification_schema.get(
+                        "multi_label_fields", []) else ""
+                })
+
+            st.dataframe(field_data)
+            st.caption(f"Instructions: {st.session_state.classification_schema.get('user_instructions', '')}")
+
+        # Document selection for classification
+        st.subheader("Select Documents")
+
+        # Fetch all document names
+        try:
+            # Get the max documents limit from config
+            max_chunks_for_names = CONFIG.get("classification", {}).get("max_chunks_for_listing", 1000)
+            all_chunks = query_engine.get_chunks(limit=max_chunks_for_names)
+            doc_names = sorted(list(set(c['metadata'].get('file_name', 'Unknown')
+                                        for c in all_chunks
+                                        if c['metadata'].get('file_name'))))
+        except Exception as e:
+            logger.error(f"Failed to get document names: {e}")
+            doc_names = []
+
+        # Allow user to select documents
+        selected_docs = st.multiselect(
+            "Select documents to classify",
+            options=doc_names,
+            default=[],
+            help="Leave empty to classify all documents"
+        )
+
+        # Model selection
+        classification_model_options = {
+            "Small Text (Faster)": CONFIG["models"]["extraction_models"]["text_small"],
+            "Standard Text": CONFIG["models"]["extraction_models"]["text_standard"],
+        }
+
+        selected_model_display_name = st.selectbox(
+            "Select LLM for Classification",
+            options=list(classification_model_options.keys()),
+            index=1  # Default to Standard
+        )
+
+        # Get the actual model name
+        selected_model_name = classification_model_options[selected_model_display_name]
+
+        # Batch size setting for classification
+        batch_size = st.slider(
+            "Max chunks to classify",
+            min_value=10,
+            max_value=10000,
+            value=1000,
+            step=100,
+            help="Maximum number of chunks to classify"
+        )
+
+        # Run classification button
+        classify_btn = st.button(
+            "Run Classification",
+            type="primary",
+            help="Classify selected documents according to schema"
+        )
+
+        # Show classification progress
+        classification_progress = st.empty()
+
+        # Run classification when button is clicked
+        if classify_btn:
+            # Validate schema
+            if not st.session_state.classification_schema["fields"]:
+                st.error("No classification fields defined. Please define your schema first.")
+                return
+
+            # Check if all fields have values
+            invalid_fields = []
+            for field in st.session_state.classification_schema["fields"]:
+                if not field.get("values", []):
+                    invalid_fields.append(field["name"])
+
+            if invalid_fields:
+                st.error(
+                    f"The following fields have no values defined: {', '.join(invalid_fields)}. Please add values to all fields.")
+                return
+
+            # Create document classifier with selected model
+            document_classifier = DocumentClassifier(model_name=selected_model_name)
+
+            # Get chunks to classify
+            with classification_progress.container():
+                with st.spinner("Fetching document chunks..."):
+                    # Process based on document selection
+                    if selected_docs:
+                        # Get chunks from selected documents only
+                        chunks = []
+                        for doc_name in selected_docs:
+                            doc_chunks = query_engine.get_chunks(limit=batch_size // len(selected_docs),
+                                                                 document_filter=doc_name)
+                            chunks.extend(doc_chunks)
+                            # Limit total chunks
+                            if len(chunks) >= batch_size:
+                                st.warning(
+                                    f"Reached maximum chunk limit ({batch_size}). Some documents may be partially processed.")
+                                chunks = chunks[:batch_size]
+                                break
+                    else:
+                        # Get all chunks when no documents are selected
+                        chunks = query_engine.get_chunks(limit=batch_size)
+
+                    st.info(
+                        f"Processing {len(chunks)} chunks from {len(selected_docs) if selected_docs else 'all'} documents")
+
+            # Prepare schema for classification
+            schema_dict = {}
+            multi_label_fields = set(st.session_state.classification_schema.get("multi_label_fields", []))
+
+            for field in st.session_state.classification_schema["fields"]:
+                schema_dict[field["name"]] = {
+                    "type": field["type"],
+                    "description": field["description"],
+                    "values": field.get("values", [])
+                }
+
+            # Run classification
+            with classification_progress.container():
+                with st.spinner("Classifying documents..."):
+                    # Run classification
+                    results = document_classifier.classify_documents(
+                        chunks=chunks,
+                        schema=schema_dict,
+                        multi_label_fields=multi_label_fields,
+                        user_instructions=st.session_state.classification_schema.get("user_instructions", "")
+                    )
+
+                    # Store results in session state
+                    st.session_state.classification_results = results
+
+                    if results:
+                        st.success(f"Successfully classified {len(results)} chunks!")
+                    else:
+                        st.warning("No documents were classified. Check logs for errors.")
+
+    # Results tab
+    with results_tab:
+        st.subheader("Classification Results")
+
+        # Check if results exist
+        if not st.session_state.classification_results:
+            st.info("No classification results available. Run a classification first.")
+            return
+
+        # Display results
+        results = st.session_state.classification_results
+
+        # Create DataFrame for display
+        if results:
+            # Extract all classification fields
+            class_fields = []
+            for result in results:
+                if "classification" in result:
+                    class_fields.extend(result["classification"].keys())
+            class_fields = sorted(list(set(class_fields)))
+
+            # Create data for display
+            display_data = []
+            for result in results:
+                row = {
+                    "Document": result.get("file_name", "Unknown"),
+                    "Page": result.get("page_num", "N/A"),
+                    "Text": result.get("text", "")[:200] + "..." if len(result.get("text", "")) > 200 else result.get(
+                        "text", ""),
+                }
+
+                # Add classification fields
+                classification = result.get("classification", {})
+                for field in class_fields:
+                    if field in classification:
+                        value = classification[field]
+                        if isinstance(value, list):
+                            row[field] = ", ".join(value)
+                        else:
+                            row[field] = value
+                    else:
+                        row[field] = ""
+
+                display_data.append(row)
+
+            df = pd.DataFrame(display_data)
+
+            # Show statistics
+            unique_docs = set()
+            for result in results:
+                if "file_name" in result and result["file_name"]:
+                    unique_docs.add(result["file_name"])
+
+            st.info(f"Found {len(results)} classified chunks from {len(unique_docs)} documents")
+
+            # Export options
+            col1, col2 = st.columns([1, 3])
+
+            with col1:
+                # Export to CSV
+                if st.button("Export to CSV"):
+                    # Create filename
+                    export_time = int(time.time())
+                    export_path = str(ROOT_DIR / "temp" / f"classification_results_{export_time}.csv")
+
+                    # Export
+                    document_classifier = DocumentClassifier()
+                    success = document_classifier.export_to_csv(results, export_path)
+
+                    if success:
+                        # Create download link
+                        with open(export_path, "r") as f:
+                            csv_data = f.read()
+
+                        import base64
+                        b64 = base64.b64encode(csv_data.encode()).decode()
+                        href = f'<a href="data:text/csv;base64,{b64}" download="classification_results.csv">Download CSV</a>'
+                        st.markdown(href, unsafe_allow_html=True)
+                    else:
+                        st.error("Failed to export results")
+
+            # Display results table
+            if not df.empty:
+                st.dataframe(df)
+            else:
+                st.warning("No data to display. Classification results might be empty or malformed.")
+
+            # Show detailed view of a selected result
+            st.subheader("Detailed View")
+
+            if results:
+                # Select a result to view
+                result_index = st.selectbox("Select result to view", range(len(results)))
+                selected_result = results[result_index]
+
+                # Display full text
+                st.markdown("**Full Text:**")
+                st.text(selected_result.get("text", ""))
+
+                # Display classification
+                st.markdown("**Classification:**")
+                st.json(selected_result.get("classification", {}))
+
 def main():
     """
     Main application entry point.
@@ -2849,9 +3684,12 @@ def main():
         render_cluster_map_page()
     elif page == "Topic Filter":
         render_topic_filter_page()
+    elif page == "Information Extraction":
+        render_info_extraction_page()
+    elif page == "Document Classification":
+        render_classification_page()
     elif page == "Settings":
         render_settings_page()
-
 
 if __name__ == "__main__":
     # Ensure multiprocessing start method is set globally before any processes might be spawned

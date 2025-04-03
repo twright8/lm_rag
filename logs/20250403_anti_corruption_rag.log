@@ -1,0 +1,1266 @@
+2025-04-03 09:39:41,457 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:39:41,495 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 09:39:41,498 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 09:39:41,498 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 09:39:41,498 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 09:39:41,499 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 09:39:41,499 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 09:39:41,499 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 09:39:41,499 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 09:39:41,501 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 09:39:41,919 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 09:39:41,920 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 09:39:42,066 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:44,949 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:39:45,015 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:45,109 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:45,167 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:46,833 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:39:46,895 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:48,707 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:39:48,756 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:48,766 - __main__ - INFO - Clearing all indexed and extracted data...
+2025-04-03 09:39:48,841 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:48,906 - src.core.query_system.query_engine - ERROR - Error clearing Qdrant collection 'anticorruption_rag_e5_instruct': [Errno 111] Connection refused
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api_client.py", line 116, in send_inner
+    response = self._client.send(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 282, in clear_collection
+    collections = client.get_collections().collections
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/qdrant_client.py", line 2140, in get_collections
+    return self._client.get_collections(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/qdrant_remote.py", line 2568, in get_collections
+    self.http.collections_api.get_collections().result
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api/collections_api.py", line 330, in get_collections
+    return self._build_for_get_collections()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api/collections_api.py", line 159, in _build_for_get_collections
+    return self.api_client.request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api_client.py", line 89, in request
+    return self.send(request, type_)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api_client.py", line 106, in send
+    response = self.middleware(request, self.send_inner)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api_client.py", line 215, in __call__
+    return call_next(request)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/qdrant_client/http/api_client.py", line 118, in send_inner
+    raise ResponseHandlingException(e)
+qdrant_client.http.exceptions.ResponseHandlingException: [Errno 111] Connection refused
+2025-04-03 09:39:48,922 - src.core.query_system.query_engine - INFO - BM25 index file deleted: /home/t/lm_rag/data/bm25/index.pkl
+2025-04-03 09:39:48,922 - src.core.query_system.query_engine - INFO - Stopwords file deleted: /home/t/lm_rag/data/bm25/stopwords.pkl
+2025-04-03 09:39:48,922 - src.core.query_system.query_engine - INFO - Entities file deleted: /home/t/lm_rag/data/extracted/entities.json
+2025-04-03 09:39:48,923 - src.core.query_system.query_engine - INFO - Relationships file deleted: /home/t/lm_rag/data/extracted/relationships.json
+2025-04-03 09:39:48,923 - __main__ - INFO - Data clearing successful.
+2025-04-03 09:39:48,991 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:39:48,992 - __main__ - INFO - Collection info after clearing: {'exists': False, 'error': 'Connection error: [Errno 111] Connection refused'}
+2025-04-03 09:39:49,207 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:39:49,268 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-03 09:40:02,410 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:02,411 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 09:40:02,412 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 09:40:02,412 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 09:40:02,413 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 09:40:02,413 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 09:40:02,414 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 09:40:02,414 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 09:40:02,414 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 09:40:02,414 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.68 GB, VMS: 33.21 GB
+2025-04-03 09:40:02,415 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 09:40:02,417 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 09:40:04,880 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:06,797 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:10,298 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 09:40:10,299 - __main__ - INFO - Saved Aphrodite process info: PID=74511
+2025-04-03 09:40:10,470 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:10,471 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:10,472 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:20,775 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:20,775 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:20,776 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:27,296 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:27,297 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:27,297 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:38,479 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:38,480 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:38,480 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:42,369 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:42,369 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:42,370 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:43,477 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 09:40:43,477 - __main__ - INFO - Session state contains Aphrodite process info (PID: 74511). Checking status...
+2025-04-03 09:40:43,478 - __main__ - INFO - Active Aphrodite process (PID: 74511) confirmed running. Restoring session state.
+2025-04-03 09:40:43,717 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-7B-Instruct, debug=False
+2025-04-03 09:40:43,719 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.27 GB
+2025-04-03 09:40:43,719 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 09:40:43,791 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-7B-Instruct
+2025-04-03 09:42:22,660 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-7B-Instruct loaded successfully for information extraction.
+2025-04-03 09:42:22,719 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 1/8)
+2025-04-03 09:46:48,615 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:46:48,616 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:46:48,616 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:46:48,616 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:46:48,616 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:46:48,618 - src.core.extraction.info_extractor - ERROR - Failed to parse JSON from chunk unknown-5: Unterminated string starting at: line 1 column 126 (char 125)
+2025-04-03 09:46:48,618 - src.core.extraction.info_extractor - ERROR - Failed to parse JSON from chunk unknown-6: Unterminated string starting at: line 1 column 125 (char 124)
+2025-04-03 09:46:48,619 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:46:48,619 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:46:48,619 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:46:48,620 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 2/8)
+2025-04-03 09:46:59,718 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:46:59,719 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:46:59,720 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:46:59,720 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:46:59,720 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 3/8)
+2025-04-03 09:52:02,978 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:52:02,981 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:52:02,981 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:52:02,981 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:52:02,981 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:52:02,982 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:52:02,982 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:52:02,982 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:52:02,982 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:52:02,982 - src.core.extraction.info_extractor - ERROR - Failed to parse JSON from chunk unknown-9: Unterminated string starting at: line 1 column 120 (char 119)
+2025-04-03 09:52:02,984 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 4/8)
+2025-04-03 09:53:06,644 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:53:06,645 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:53:06,653 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:53:06,653 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:53:06,654 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 5/8)
+2025-04-03 09:54:08,415 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:54:08,415 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:54:08,416 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:54:08,417 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:54:08,417 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 6/8)
+2025-04-03 09:54:35,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:54:35,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:54:35,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:54:35,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:54:35,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:54:35,219 - src.core.extraction.info_extractor - INFO - Processing batch of 10 chunks (Batch 7/8)
+2025-04-03 09:55:27,650 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 09:55:27,650 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 09:55:27,650 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 09:55:27,650 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 09:55:27,651 - src.core.extraction.info_extractor - INFO - Processing batch of 7 chunks (Batch 8/8)
+2025-04-03 10:00:48,428 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:00:48,460 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:00:48,462 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:00:48,462 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:00:48,463 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 10:00:48,877 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:00:48,878 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:00:53,749 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:00:55,712 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:00:59,781 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:00:59,781 - __main__ - INFO - Saved Aphrodite process info: PID=90752
+2025-04-03 10:00:59,938 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:00:59,939 - __main__ - INFO - Session state contains Aphrodite process info (PID: 90752). Checking status...
+2025-04-03 10:00:59,939 - __main__ - INFO - Active Aphrodite process (PID: 90752) confirmed running. Restoring session state.
+2025-04-03 10:01:19,051 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:01:19,052 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:01:19,053 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:01:19,053 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.69 GB, VMS: 33.27 GB
+2025-04-03 10:01:19,054 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:01:19,055 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:02:00,260 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:02:00,261 - __main__ - INFO - Session state contains Aphrodite process info (PID: 90752). Checking status...
+2025-04-03 10:02:00,262 - __main__ - INFO - Active Aphrodite process (PID: 90752) confirmed running. Restoring session state.
+2025-04-03 10:02:00,388 - __main__ - INFO - User requested Aphrodite service termination
+2025-04-03 10:02:01,523 - __main__ - INFO - Aphrodite service successfully terminated
+2025-04-03 10:02:01,824 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:06:24,972 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:06:25,005 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:06:25,007 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:06:25,007 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:06:25,007 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:06:25,008 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:06:25,008 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:06:25,008 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:06:25,008 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:06:25,008 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 10:06:25,417 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:06:25,417 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:06:33,807 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:06:49,009 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:06:49,045 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:06:49,047 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:06:49,047 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:06:49,048 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 10:06:49,475 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:06:49,475 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:08:54,440 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:08:54,472 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:08:54,474 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:08:54,475 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:08:54,476 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 10:08:54,894 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:08:54,895 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:08:57,227 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:00,393 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:02,152 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:04,665 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:09:04,665 - __main__ - INFO - Saved Aphrodite process info: PID=92321
+2025-04-03 10:09:04,813 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:04,814 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:04,815 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:13,992 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:13,992 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:13,993 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:17,281 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:17,282 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:17,282 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:18,060 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:18,061 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:18,061 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:23,294 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:23,294 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:23,300 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:29,462 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:29,462 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:29,463 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:29,694 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:29,695 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:29,695 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:35,595 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:35,596 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:35,596 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:39,424 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:39,424 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:39,425 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:40,805 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:09:40,805 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:09:40,806 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:09:41,073 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:09:41,074 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.40 GB
+2025-04-03 10:09:41,074 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:09:41,143 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:10:29,430 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:10:29,431 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:10:29,431 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:10:40,310 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:10:41,462 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 10:10:48,443 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:10:49,463 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 10:10:54,783 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:10:58,990 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:10:59,980 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:11:11,946 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 10:11:12,950 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:11:13,939 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:11:14,919 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:11:15,897 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:11:16,883 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:11:17,860 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-13
+2025-04-03 10:11:18,999 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-14
+2025-04-03 10:11:20,209 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-15
+2025-04-03 10:11:21,349 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-16
+2025-04-03 10:11:22,408 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-17
+2025-04-03 10:11:23,412 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-18
+2025-04-03 10:11:24,394 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:11:28,115 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:11:29,110 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:11:30,097 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:11:31,069 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:11:35,083 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-24
+2025-04-03 10:11:36,082 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-25
+2025-04-03 10:11:37,067 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:11:38,048 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:11:39,035 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:11:42,495 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:11:43,493 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:11:44,459 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:11:45,445 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-32
+2025-04-03 10:11:46,441 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-33
+2025-04-03 10:11:47,410 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-34
+2025-04-03 10:12:08,118 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-35
+2025-04-03 10:12:09,095 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-36
+2025-04-03 10:12:10,075 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-37
+2025-04-03 10:12:13,200 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-38
+2025-04-03 10:12:14,342 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-39
+2025-04-03 10:12:17,579 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-40
+2025-04-03 10:12:18,580 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-41
+2025-04-03 10:12:19,616 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-42
+2025-04-03 10:12:20,654 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-43
+2025-04-03 10:12:21,664 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-44
+2025-04-03 10:12:25,802 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-45
+2025-04-03 10:12:26,789 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-46
+2025-04-03 10:12:26,983 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-47
+2025-04-03 10:12:27,963 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-48
+2025-04-03 10:12:39,498 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-49
+2025-04-03 10:12:40,467 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-50
+2025-04-03 10:12:41,431 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-51
+2025-04-03 10:12:42,402 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-52
+2025-04-03 10:12:43,375 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-53
+2025-04-03 10:12:44,355 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-54
+2025-04-03 10:12:48,173 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-55
+2025-04-03 10:12:49,152 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-56
+2025-04-03 10:12:50,126 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-57
+2025-04-03 10:12:51,105 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-58
+2025-04-03 10:12:52,074 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-59
+2025-04-03 10:12:57,093 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-60
+2025-04-03 10:12:58,083 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-61
+2025-04-03 10:12:58,280 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-62
+2025-04-03 10:12:59,261 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-63
+2025-04-03 10:13:02,829 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-64
+2025-04-03 10:13:03,809 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-65
+2025-04-03 10:13:04,789 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-66
+2025-04-03 10:13:09,133 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-67
+2025-04-03 10:13:12,583 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-68
+2025-04-03 10:13:13,566 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-69
+2025-04-03 10:13:14,545 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-70
+2025-04-03 10:13:15,533 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-71
+2025-04-03 10:13:16,520 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-72
+2025-04-03 10:13:17,487 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-73
+2025-04-03 10:13:18,474 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-74
+2025-04-03 10:13:19,485 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-75
+2025-04-03 10:13:20,471 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-76
+2025-04-03 10:14:34,688 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:14:34,688 - __main__ - INFO - Session state contains Aphrodite process info (PID: 92321). Checking status...
+2025-04-03 10:14:34,689 - __main__ - INFO - Active Aphrodite process (PID: 92321) confirmed running. Restoring session state.
+2025-04-03 10:14:35,038 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-7B-Instruct, debug=False
+2025-04-03 10:14:35,040 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.47 GB
+2025-04-03 10:14:35,041 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:14:35,048 - src.core.extraction.info_extractor - INFO - Exported 77 items to /home/t/lm_rag/temp/extraction_results_1743671675.csv
+2025-04-03 10:28:47,561 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:28:47,597 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:28:47,599 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:28:47,599 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:28:47,600 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:28:47,600 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:28:47,600 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:28:47,600 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:28:47,600 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:28:47,601 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.66 GB, VMS: 4.93 GB
+2025-04-03 10:28:48,025 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:28:48,025 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:28:50,910 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:28:52,272 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:28:55,583 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:28:55,583 - __main__ - INFO - Saved Aphrodite process info: PID=94221
+2025-04-03 10:28:55,733 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:28:55,734 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:28:55,735 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:01,801 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:01,801 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:01,802 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:06,008 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:06,008 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:06,009 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:06,104 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:06,105 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:06,105 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:09,830 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:09,830 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:09,831 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:13,783 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:13,784 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:13,784 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:14,016 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:14,017 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:14,023 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:18,930 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:18,930 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:18,931 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:28,665 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:28,665 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:28,666 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:28,748 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:28,749 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:28,749 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:32,809 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:32,810 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:32,810 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:34,817 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:34,818 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:34,818 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:37,430 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:29:37,431 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:29:37,431 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:29:37,713 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:29:37,714 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.40 GB
+2025-04-03 10:29:37,715 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:29:37,773 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:30:21,521 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:30:21,521 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:30:21,522 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:30:27,152 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:30:27,682 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 10:30:30,750 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:30:31,198 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 10:30:33,276 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:30:35,534 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:30:35,997 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:30:39,984 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 10:30:40,479 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:30:40,923 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:30:41,352 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:30:41,780 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:30:42,210 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:30:42,697 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-13
+2025-04-03 10:30:43,119 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-14
+2025-04-03 10:30:43,613 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-15
+2025-04-03 10:30:44,048 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-16
+2025-04-03 10:30:44,488 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-17
+2025-04-03 10:30:44,924 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-18
+2025-04-03 10:30:45,377 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:30:47,682 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:30:47,286 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:30:47,729 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:30:48,160 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:30:50,628 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-24
+2025-04-03 10:30:51,101 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-25
+2025-04-03 10:30:51,533 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:30:51,999 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:30:52,454 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:30:54,329 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:30:54,805 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:30:56,812 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:30:57,269 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-32
+2025-04-03 10:30:57,722 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-33
+2025-04-03 10:30:58,201 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-34
+2025-04-03 10:31:04,822 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-35
+2025-04-03 10:31:05,258 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-36
+2025-04-03 10:31:05,725 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-37
+2025-04-03 10:31:07,023 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-38
+2025-04-03 10:31:07,474 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-39
+2025-04-03 10:31:08,803 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-40
+2025-04-03 10:31:09,255 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-41
+2025-04-03 10:31:09,682 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-42
+2025-04-03 10:31:10,179 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-43
+2025-04-03 10:31:10,612 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-44
+2025-04-03 10:31:12,711 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-45
+2025-04-03 10:31:13,153 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-46
+2025-04-03 10:31:13,586 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-47
+2025-04-03 10:31:14,032 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-48
+2025-04-03 10:31:15,468 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-49
+2025-04-03 10:31:15,920 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-50
+2025-04-03 10:31:16,396 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-51
+2025-04-03 10:31:16,834 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-52
+2025-04-03 10:31:17,325 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-53
+2025-04-03 10:31:17,770 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-54
+2025-04-03 10:31:18,938 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-55
+2025-04-03 10:31:19,387 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-56
+2025-04-03 10:31:19,846 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-57
+2025-04-03 10:31:20,325 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-58
+2025-04-03 10:31:20,794 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-59
+2025-04-03 10:31:22,925 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-60
+2025-04-03 10:31:23,386 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-61
+2025-04-03 10:31:23,847 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-62
+2025-04-03 10:31:24,273 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-63
+2025-04-03 10:31:25,701 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-64
+2025-04-03 10:31:26,202 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-65
+2025-04-03 10:31:26,637 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-66
+2025-04-03 10:31:29,063 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-67
+2025-04-03 10:31:30,411 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-68
+2025-04-03 10:31:30,876 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-69
+2025-04-03 10:31:31,400 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-70
+2025-04-03 10:31:31,857 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-71
+2025-04-03 10:31:32,345 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-72
+2025-04-03 10:31:32,796 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-73
+2025-04-03 10:31:33,283 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-74
+2025-04-03 10:31:33,738 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-75
+2025-04-03 10:31:34,176 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-76
+2025-04-03 10:32:10,703 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:32:10,704 - __main__ - INFO - Session state contains Aphrodite process info (PID: 94221). Checking status...
+2025-04-03 10:32:10,705 - __main__ - INFO - Active Aphrodite process (PID: 94221) confirmed running. Restoring session state.
+2025-04-03 10:32:11,025 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:32:11,027 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.47 GB
+2025-04-03 10:32:11,028 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:32:11,037 - src.core.extraction.info_extractor - INFO - Exported 77 items to /home/t/lm_rag/temp/extraction_results_1743672731.csv
+2025-04-03 10:39:21,880 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:39:21,912 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:39:21,914 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:39:21,914 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:39:21,914 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:39:21,914 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:39:21,914 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:39:21,915 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:39:21,915 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:39:21,915 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.66 GB, VMS: 4.93 GB
+2025-04-03 10:39:22,341 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:39:22,342 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:39:58,143 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:39:59,529 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:02,813 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:40:02,813 - __main__ - INFO - Saved Aphrodite process info: PID=95361
+2025-04-03 10:40:02,960 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:02,961 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:02,963 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:07,572 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:07,573 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:07,573 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:11,352 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:11,353 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:11,354 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:11,440 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:11,441 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:11,442 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:13,634 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:13,634 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:13,635 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:17,333 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:17,333 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:17,334 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:17,418 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:17,420 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:17,420 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:20,335 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:20,335 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:20,336 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:43,270 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:43,271 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:43,271 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:43,368 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:43,369 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:43,369 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:48,438 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:48,439 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:48,444 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:50,895 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:50,896 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:50,896 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:51,334 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:40:51,335 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:40:51,335 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:40:51,571 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:40:51,573 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.40 GB
+2025-04-03 10:40:51,574 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:40:51,634 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:41:28,896 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:41:28,897 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:41:28,897 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:41:34,669 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:41:35,236 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 10:41:37,682 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:41:38,131 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 10:41:40,720 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:41:42,962 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:41:43,452 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:41:46,615 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 10:41:47,111 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:41:47,600 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:41:48,069 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:41:48,494 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:41:48,926 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:41:49,414 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-13
+2025-04-03 10:41:49,840 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-14
+2025-04-03 10:41:50,292 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-15
+2025-04-03 10:41:50,771 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-16
+2025-04-03 10:41:51,194 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-17
+2025-04-03 10:41:51,631 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-18
+2025-04-03 10:41:52,054 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:41:54,071 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:41:54,530 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:41:54,985 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:41:55,457 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:41:57,921 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-24
+2025-04-03 10:41:58,353 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-25
+2025-04-03 10:41:58,782 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:41:59,210 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:41:59,655 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:42:01,586 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:42:02,074 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:42:03,778 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:42:04,218 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-32
+2025-04-03 10:42:04,658 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-33
+2025-04-03 10:42:05,185 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-34
+2025-04-03 10:42:12,603 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-35
+2025-04-03 10:42:13,024 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-36
+2025-04-03 10:42:13,462 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-37
+2025-04-03 10:42:14,668 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-38
+2025-04-03 10:42:17,139 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-39
+2025-04-03 10:42:17,405 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-40
+2025-04-03 10:42:17,847 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-41
+2025-04-03 10:42:18,310 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-42
+2025-04-03 10:42:18,768 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-43
+2025-04-03 10:42:19,200 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-44
+2025-04-03 10:42:21,372 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-45
+2025-04-03 10:42:21,835 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-46
+2025-04-03 10:42:22,279 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-47
+2025-04-03 10:42:22,733 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-48
+2025-04-03 10:42:23,942 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-49
+2025-04-03 10:42:24,367 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-50
+2025-04-03 10:42:24,792 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-51
+2025-04-03 10:42:25,270 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-52
+2025-04-03 10:42:25,735 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-53
+2025-04-03 10:42:26,184 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-54
+2025-04-03 10:42:28,081 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-55
+2025-04-03 10:42:28,539 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-56
+2025-04-03 10:42:28,963 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-57
+2025-04-03 10:42:29,414 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-58
+2025-04-03 10:42:29,883 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-59
+2025-04-03 10:42:31,976 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-60
+2025-04-03 10:42:32,406 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-61
+2025-04-03 10:42:32,878 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-62
+2025-04-03 10:42:33,320 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-63
+2025-04-03 10:42:34,452 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-64
+2025-04-03 10:42:34,880 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-65
+2025-04-03 10:42:35,306 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-66
+2025-04-03 10:42:37,591 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-67
+2025-04-03 10:42:38,905 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-68
+2025-04-03 10:42:39,366 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-69
+2025-04-03 10:42:39,830 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-70
+2025-04-03 10:42:40,289 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-71
+2025-04-03 10:42:40,758 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-72
+2025-04-03 10:42:41,197 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-73
+2025-04-03 10:42:41,627 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-74
+2025-04-03 10:42:42,117 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-75
+2025-04-03 10:42:42,575 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-76
+2025-04-03 10:43:56,285 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:43:56,287 - __main__ - INFO - Session state contains Aphrodite process info (PID: 95361). Checking status...
+2025-04-03 10:43:56,288 - __main__ - INFO - Active Aphrodite process (PID: 95361) confirmed running. Restoring session state.
+2025-04-03 10:43:56,644 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:43:56,646 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.71 GB, VMS: 33.47 GB
+2025-04-03 10:43:56,647 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:43:56,653 - src.core.extraction.info_extractor - INFO - Exported 77 items to /home/t/lm_rag/temp/extraction_results_1743673436.csv
+2025-04-03 10:46:29,793 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:29,793 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:29,793 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:29,793 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:29,833 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:46:29,833 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:46:29,833 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:46:29,833 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:46:29,836 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:46:29,837 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:46:29,836 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:46:29,837 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:46:29,837 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:46:29,837 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:46:29,837 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:29,838 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:46:29,839 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:46:29,839 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:46:29,839 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:46:29,839 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.66 GB, VMS: 4.94 GB
+2025-04-03 10:46:30,235 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.68 GB, VMS: 33.13 GB
+2025-04-03 10:46:30,311 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:46:30,312 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:46:30,312 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:30,312 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:30,312 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:30,312 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:46:32,706 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:33,787 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:37,104 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:46:37,104 - __main__ - INFO - Saved Aphrodite process info: PID=96398
+2025-04-03 10:46:37,253 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:37,255 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:37,255 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:41,469 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:41,469 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:41,470 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:41,899 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:41,900 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:41,901 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:45,108 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:45,108 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:45,109 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:46,518 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:46,518 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:46,518 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:50,398 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:50,399 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:50,399 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:50,481 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:50,481 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:50,482 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:53,496 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:53,497 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:53,497 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:56,981 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:56,982 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:56,982 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:57,068 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:57,070 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:57,070 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:46:58,478 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:46:58,478 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:46:58,479 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:47:00,236 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:47:00,236 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:47:00,237 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:47:00,651 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:47:00,652 - __main__ - INFO - Session state contains Aphrodite process info (PID: 96398). Checking status...
+2025-04-03 10:47:00,652 - __main__ - INFO - Active Aphrodite process (PID: 96398) confirmed running. Restoring session state.
+2025-04-03 10:47:00,891 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:47:00,893 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.34 GB
+2025-04-03 10:47:00,893 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:47:00,958 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:47:44,018 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:47:44,018 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:47:44,018 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:47:50,843 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:50,844 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:51,491 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:51,491 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:53,561 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:53,561 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:53,996 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:53,997 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:55,782 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:55,782 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:58,162 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:58,162 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:47:58,896 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:47:58,897 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:02,088 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:02,089 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:02,580 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:02,580 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:03,087 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:03,088 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:03,561 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:03,561 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:04,073 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:04,073 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:04,552 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:04,552 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:05,034 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:05,035 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:05,582 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:05,582 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:06,098 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:06,099 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:06,582 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:06,582 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:07,064 - src.core.extraction.info_extractor - WARNING - Expected dict item, got <class 'str'>: items
+2025-04-03 10:48:07,064 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:48:25,170 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:25,174 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:25,170 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:25,174 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:25,237 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:48:25,237 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:48:25,237 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:48:25,239 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:48:25,237 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:48:25,239 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:48:25,241 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:48:25,241 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:48:25,241 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:48:25,241 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:48:25,241 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:48:25,241 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:48:25,242 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:48:25,243 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:48:25,243 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:48:25,243 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.94 GB
+2025-04-03 10:48:25,243 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.94 GB
+2025-04-03 10:48:25,687 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:48:25,688 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:48:25,689 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:25,689 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:25,689 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:25,689 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:48:27,924 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:29,052 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:32,284 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:48:32,284 - __main__ - INFO - Saved Aphrodite process info: PID=97053
+2025-04-03 10:48:32,438 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:32,439 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:32,440 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:38,434 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:38,435 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:38,436 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:42,724 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:42,725 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:42,725 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:42,814 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:42,815 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:42,815 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:46,637 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:46,638 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:46,638 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:51,085 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:51,086 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:51,086 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:51,175 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:51,175 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:51,176 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:54,450 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:54,451 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:54,451 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:56,308 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:56,308 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:56,309 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:56,743 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:48:56,744 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97053). Checking status...
+2025-04-03 10:48:56,744 - __main__ - INFO - Active Aphrodite process (PID: 97053) confirmed running. Restoring session state.
+2025-04-03 10:48:56,996 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:48:56,997 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.69 GB, VMS: 33.34 GB
+2025-04-03 10:48:56,997 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:48:57,071 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:49:33,733 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:49:33,734 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:49:33,734 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:49:37,471 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:49:37,960 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-1
+2025-04-03 10:49:39,873 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:49:40,378 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-3
+2025-04-03 10:49:42,169 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:49:44,383 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:49:44,800 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:49:47,595 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-7
+2025-04-03 10:49:48,018 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:49:48,461 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:49:48,902 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:49:49,349 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:49:49,768 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:49:50,195 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-13
+2025-04-03 10:49:50,619 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-14
+2025-04-03 10:49:51,042 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-15
+2025-04-03 10:49:51,504 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-16
+2025-04-03 10:49:51,924 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-17
+2025-04-03 10:49:52,398 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-18
+2025-04-03 10:49:52,866 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:49:54,878 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:49:55,311 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:49:55,729 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:49:56,151 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:49:58,130 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-24
+2025-04-03 10:49:58,600 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-25
+2025-04-03 10:49:59,093 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:49:59,529 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:49:59,953 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:50:01,303 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:50:01,739 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:50:03,275 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:50:03,733 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-32
+2025-04-03 10:50:04,162 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-33
+2025-04-03 10:50:04,643 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-34
+2025-04-03 10:50:11,225 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-35
+2025-04-03 10:50:11,692 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-36
+2025-04-03 10:50:12,134 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-37
+2025-04-03 10:50:13,158 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-38
+2025-04-03 10:52:06,258 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:06,290 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:52:06,292 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:52:06,292 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:52:06,293 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 10:52:06,728 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:52:06,728 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:52:10,134 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:11,384 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:12,787 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:12,788 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:52:12,789 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:52:12,789 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:52:12,789 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:52:12,789 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:52:12,789 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:52:12,790 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:52:12,790 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:52:12,790 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.69 GB, VMS: 33.27 GB
+2025-04-03 10:52:12,790 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:52:12,790 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:52:13,725 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:52:13,725 - __main__ - INFO - Saved Aphrodite process info: PID=97735
+2025-04-03 10:52:13,880 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:13,881 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:13,882 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:18,796 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:18,796 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:18,797 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:22,300 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:22,301 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:22,302 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:22,390 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:22,390 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:22,391 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:24,667 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:24,668 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:24,668 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:31,889 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:31,890 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:31,890 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:31,941 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:31,942 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:31,943 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:37,946 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:37,946 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:37,947 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:39,637 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:39,637 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:39,637 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:40,079 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:52:40,081 - __main__ - INFO - Session state contains Aphrodite process info (PID: 97735). Checking status...
+2025-04-03 10:52:40,081 - __main__ - INFO - Active Aphrodite process (PID: 97735) confirmed running. Restoring session state.
+2025-04-03 10:52:40,343 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:52:40,343 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.70 GB, VMS: 33.40 GB
+2025-04-03 10:52:40,344 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:52:40,406 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:53:23,855 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:53:23,855 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:53:23,855 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:53:28,262 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:53:28,714 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:53:30,781 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:53:31,232 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:53:32,984 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:53:35,327 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:53:35,806 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:53:38,713 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:53:39,231 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:39,701 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:40,123 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:40,611 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:41,058 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:41,510 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:42,011 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:42,443 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:42,886 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:43,350 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:43,794 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:44,230 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:46,273 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:53:45,762 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:53:46,189 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:53:46,607 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:53:48,389 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:53:48,815 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:53:49,236 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:53:49,687 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:53:50,107 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:53:51,490 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:53:51,916 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:53:53,461 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:53:53,886 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:53:54,364 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:53:54,842 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:54:02,473 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:54:02,907 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:54:03,343 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:54:04,312 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:54:06,756 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:54:07,783 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:54:08,238 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:54:08,669 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:54:09,106 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:54:09,535 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:54:11,053 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:54:11,506 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:54:12,012 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:54:12,498 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:54:16,608 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:54:17,139 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:17,145 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:17,653 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:18,268 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:18,907 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:20,692 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:54:21,175 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:54:22,130 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:54:22,621 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:54:23,138 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:54:24,752 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:54:25,249 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:54:26,227 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:54:26,787 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:54:27,712 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:54:28,172 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:54:28,641 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:54:31,234 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:54:32,478 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:54:33,461 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:33,999 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:34,508 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:34,932 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:35,378 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:35,826 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:36,294 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:54:36,784 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:56:27,930 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:56:27,967 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 10:56:27,968 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 10:56:27,968 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 10:56:27,969 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 10:56:27,969 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 10:56:27,969 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:56:27,969 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 10:56:27,969 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 10:56:27,970 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.66 GB, VMS: 4.93 GB
+2025-04-03 10:56:28,368 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:56:28,369 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 10:56:56,278 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:04,973 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:11,804 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:12,906 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:16,215 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 10:57:16,216 - __main__ - INFO - Saved Aphrodite process info: PID=99008
+2025-04-03 10:57:16,370 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:16,371 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:16,373 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:20,319 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:20,320 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:20,321 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:23,831 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:23,833 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:23,833 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:23,926 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:23,927 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:23,930 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:25,162 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:25,163 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:25,163 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:30,008 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:30,013 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:30,014 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:30,094 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:30,094 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:30,096 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:32,243 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:32,243 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:32,244 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:33,810 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:33,811 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:33,811 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:34,080 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 10:57:34,081 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 10:57:34,081 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 10:57:34,467 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 10:57:34,468 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.70 GB, VMS: 33.40 GB
+2025-04-03 10:57:34,469 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 10:57:34,531 - src.core.extraction.info_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-3B-Instruct
+2025-04-03 10:58:09,410 - src.core.extraction.info_extractor - INFO - Model Qwen/Qwen2.5-3B-Instruct loaded successfully for information extraction.
+2025-04-03 10:58:09,411 - src.core.extraction.info_extractor - INFO - Using batch size of 1024 from config
+2025-04-03 10:58:09,412 - src.core.extraction.info_extractor - INFO - Processing batch 1/1 (77 chunks)
+2025-04-03 10:58:14,028 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-0
+2025-04-03 10:58:14,559 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:58:16,625 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-2
+2025-04-03 10:58:17,118 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:58:18,829 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-4
+2025-04-03 10:58:21,018 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-5
+2025-04-03 10:58:21,452 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:58:24,154 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-6
+2025-04-03 10:58:24,612 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:25,025 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:25,443 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:25,903 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:26,322 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:26,755 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:27,168 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:27,634 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:28,069 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:27,542 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:27,994 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:28,441 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:30,450 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-8
+2025-04-03 10:58:30,900 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:58:31,352 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:58:31,842 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:58:33,655 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-9
+2025-04-03 10:58:34,082 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:58:34,499 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:58:34,910 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:58:35,342 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:58:36,740 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-10
+2025-04-03 10:58:37,181 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:58:38,754 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-11
+2025-04-03 10:58:39,217 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:58:39,649 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:58:40,089 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:58:47,425 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-12
+2025-04-03 10:58:47,870 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:58:48,336 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:58:49,346 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-19
+2025-04-03 10:58:51,636 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-20
+2025-04-03 10:58:52,784 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-21
+2025-04-03 10:58:53,219 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:58:53,672 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:58:54,083 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:58:54,612 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:58:56,073 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-22
+2025-04-03 10:58:56,499 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:58:56,911 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:58:57,337 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:58:59,093 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-23
+2025-04-03 10:58:59,522 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:58:59,995 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:59:00,486 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:59:01,003 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:59:01,443 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:59:02,984 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-26
+2025-04-03 10:59:03,471 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:59:03,896 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:59:04,317 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:59:04,729 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:59:06,175 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-27
+2025-04-03 10:59:06,593 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:59:07,034 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:59:07,483 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:59:08,393 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-28
+2025-04-03 10:59:08,809 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:59:09,253 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:59:11,969 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-29
+2025-04-03 10:59:13,166 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-30
+2025-04-03 10:59:13,620 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:14,077 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:14,565 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:15,034 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:15,484 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:15,911 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:16,385 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 10:59:16,823 - src.core.extraction.info_extractor - INFO - Extracted 1 items from chunk unknown-31
+2025-04-03 11:00:10,096 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:00:10,097 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99008). Checking status...
+2025-04-03 11:00:10,100 - __main__ - INFO - Active Aphrodite process (PID: 99008) confirmed running. Restoring session state.
+2025-04-03 11:00:10,419 - src.core.extraction.info_extractor - INFO - Initialized InfoExtractor with model=Qwen/Qwen2.5-3B-Instruct, debug=False
+2025-04-03 11:00:10,421 - src.core.extraction.info_extractor - INFO - Process memory - RSS: 0.61 GB, VMS: 33.47 GB
+2025-04-03 11:00:10,422 - src.core.extraction.info_extractor - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 11:00:10,430 - src.core.extraction.info_extractor - INFO - Exported 31 items to /home/t/lm_rag/temp/extraction_results_1743674410.csv
+2025-04-03 11:04:49,116 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:04:49,149 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-03 11:04:49,151 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-03 11:04:49,151 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-03 11:04:49,151 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-03 11:04:49,151 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-03 11:04:49,152 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 11:04:49,152 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-03 11:04:49,152 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-03 11:04:49,152 - src.core.query_system.query_engine - INFO - Process memory - RSS: 0.65 GB, VMS: 4.93 GB
+2025-04-03 11:04:49,620 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 11:04:49,621 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-0.5B-Instruct
+2025-04-03 11:05:07,518 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:05:07,887 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:05:10,299 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:05:14,346 - __main__ - INFO - Aphrodite service started successfully
+2025-04-03 11:05:14,363 - __main__ - INFO - Saved Aphrodite process info: PID=99988
+2025-04-03 11:05:13,665 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:05:13,667 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99988). Checking status...
+2025-04-03 11:05:13,668 - __main__ - INFO - Active Aphrodite process (PID: 99988) confirmed running. Restoring session state.
+2025-04-03 11:05:29,493 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:05:29,494 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99988). Checking status...
+2025-04-03 11:05:29,494 - __main__ - INFO - Active Aphrodite process (PID: 99988) confirmed running. Restoring session state.
+2025-04-03 11:53:37,630 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-03 11:53:37,638 - __main__ - INFO - Session state contains Aphrodite process info (PID: 99988). Checking status...
+2025-04-03 11:53:37,640 - __main__ - INFO - Active Aphrodite process (PID: 99988) confirmed running. Restoring session state.
+2025-04-03 11:53:37,931 - src.core.filtering.embedding_filter - INFO - EmbeddingFilter initialized
+2025-04-03 11:53:37,935 - src.core.filtering.embedding_filter - INFO - Process memory - RSS: 1.27 GB, VMS: 37.64 GB
+2025-04-03 11:53:37,935 - src.core.filtering.embedding_filter - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-03 11:53:38,128 - src.core.filtering.embedding_filter - INFO - Found 1 unique documents

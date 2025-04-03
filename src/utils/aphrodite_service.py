@@ -26,7 +26,8 @@ import queue # Use 'queue' instead of multiprocessing.Queue for Empty exception
 import torch
 import signal
 import traceback
-from typing import Dict, Any, Optional, List, Tuple
+from typing import List, Dict, Any, Optional, Union, Type, get_type_hints
+from pydantic import BaseModel, create_model, Field
 
 # Add project root to path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -66,6 +67,282 @@ def init_worker_logging():
     console.setFormatter(formatter)
     root_logger.addHandler(console)
     logger.info("Worker process logging initialized")
+
+
+def process_info_extraction_request(llm, prompt, schema_definition):
+    """
+    Process information extraction request with dynamic schema.
+
+    Args:
+        llm: The loaded LLM instance
+        prompt: Formatted prompt for extraction
+        schema_definition: Dictionary defining the schema fields
+
+    Returns:
+        Dictionary with extraction results or error
+    """
+    global global_llm
+
+    try:
+        from aphrodite import SamplingParams
+        from outlines.serve.vllm import JSONLogitsProcessor
+        logger.info(f"Processing information extraction with dynamic schema")
+
+        # Create a dynamic Pydantic model from the schema definition
+        try:
+            # Extract field definitions
+            fields = {}
+            for field_name, field_info in schema_definition.items():
+                # Map string types to Python types
+                field_type = _get_python_type(field_info.get("type", "string"))
+                description = field_info.get("description", "")
+
+                # Add field with proper type and metadata
+                fields[field_name] = (field_type, Field(description=description, default=None))
+
+            # Create the dynamic model class
+            DynamicModel = create_model("DynamicModel", **fields)
+
+            # Create list wrapper model for the schema
+            DynamicModelList = create_model("DynamicModelList", items=(List[DynamicModel], ...))
+
+            # Create JSONLogitsProcessor with the dynamic model
+            if hasattr(llm, 'llm_engine'):
+                dynamic_processor = JSONLogitsProcessor(DynamicModelList, llm.llm_engine)
+                logger.info(f"Created dynamic JSONLogitsProcessor for schema with {len(fields)} fields")
+            else:
+                logger.warning("Could not access llm.llm_engine for JSONLogitsProcessor")
+                dynamic_processor = None
+
+        except Exception as schema_err:
+            logger.error(f"Error creating dynamic schema processor: {schema_err}", exc_info=True)
+            dynamic_processor = None
+
+        # Create extraction-specific parameters
+        extraction_params = SamplingParams(
+            temperature=CONFIG["aphrodite"].get("info_extraction_temperature", 0.2),
+            max_tokens=CONFIG["aphrodite"].get("info_extraction_max_tokens", 2048),
+            # Add the dynamic processor if available
+            logits_processors=[dynamic_processor] if dynamic_processor else []
+        )
+
+        # Log parameters
+        logger.info(f"Using temperature: {extraction_params.temperature}, max_tokens: {extraction_params.max_tokens}")
+        if not dynamic_processor:
+            logger.warning(
+                "Executing info extraction without JSONLogitsProcessor. Output format may not be guaranteed.")
+
+        # Generate using the model
+        outputs = llm.generate(
+            prompts=[prompt],  # Just one prompt at a time for now
+            sampling_params=extraction_params,
+            use_tqdm=False
+        )
+
+        if outputs and outputs[0].outputs:
+            result_text = outputs[0].outputs[0].text
+            # Try to parse the result as JSON
+            try:
+                import json
+                import re
+
+                # Try direct JSON parsing first
+                try:
+                    result_data = json.loads(result_text)
+                    return {"status": "success", "result": result_data}
+                except json.JSONDecodeError:
+                    # Try to extract a JSON array pattern
+                    array_pattern = r'\[\s*\{.*\}\s*\]'
+                    match = re.search(array_pattern, result_text, re.DOTALL)
+                    if match:
+                        array_text = match.group(0)
+                        result_data = json.loads(array_text)
+                        return {"status": "success", "result": result_data}
+                    else:
+                        # Check for a single object pattern (not in an array)
+                        object_pattern = r'\{\s*".*"\s*:.*\}'
+                        match = re.search(object_pattern, result_text, re.DOTALL)
+                        if match:
+                            object_text = match.group(0)
+                            result_data = json.loads(object_text)
+                            # Wrap single object in a list for consistency
+                            return {"status": "success", "result": [result_data]}
+                        else:
+                            logger.warning(f"Could not parse output as JSON: {result_text[:200]}...")
+                            return {"status": "error", "error": "Failed to parse output as JSON",
+                                    "raw_output": result_text}
+            except Exception as parse_err:
+                logger.error(f"Error parsing extraction output: {parse_err}")
+                return {"status": "error", "error": str(parse_err), "raw_output": result_text}
+        else:
+            logger.warning("Info extraction produced no output")
+            return {"status": "error", "error": "No output generated"}
+
+    except Exception as e:
+        logger.error(f"Error processing info extraction request: {e}", exc_info=True)
+        return {"status": "error", "error": str(e)}
+
+
+def _get_python_type(type_str):
+    """Convert string type name to Python type."""
+    type_map = {
+        "string": str,
+        "number": float,
+        "integer": int,
+        "boolean": bool,
+        "date": str,  # We'll store dates as strings
+        "array": list,
+        "object": dict
+    }
+    return type_map.get(type_str.lower(), str)
+
+
+# --- Add this to aphrodite_service.py after process_info_extraction_request function ---
+
+def process_classification_request(llm, prompts, schema_definition, multi_label_fields=None):
+    """
+    Process document classification request with dynamic schema.
+
+    Args:
+        llm: The loaded LLM instance
+        prompts: List of formatted prompts for classification
+        schema_definition: Dictionary defining the schema fields
+        multi_label_fields: Set of field names that accept multiple values
+
+    Returns:
+        Dictionary with classification results or error
+    """
+    global global_llm
+
+    try:
+        from aphrodite import SamplingParams
+        from outlines.serve.vllm import JSONLogitsProcessor
+        logger.info(f"Processing classification with dynamic schema")
+
+        # Multi-label fields set (prevent None error)
+        multi_label_fields = multi_label_fields or set()
+
+        # Create a dynamic Pydantic model from the schema definition
+        try:
+            # Import necessary libraries for dynamic models
+            from typing import List, Literal, Optional, Union, get_type_hints
+            from pydantic import BaseModel, create_model, Field
+
+            # Extract field definitions
+            fields = {}
+            for field_name, field_info in schema_definition.items():
+                # Get allowed values
+                allowed_values = field_info.get("values", [])
+                description = field_info.get("description", "")
+
+                # Check if this is a multi-label field
+                is_multi_label = field_name in multi_label_fields
+
+                # Create the appropriate field type
+                if is_multi_label:
+                    # Create a List[Literal] for multi-label fields
+                    field_type = List[Literal[tuple(allowed_values)]]
+                else:
+                    # Create a simple Literal for single-label fields
+                    field_type = Literal[tuple(allowed_values)]
+
+                # Add field with proper type and metadata
+                fields[field_name] = (field_type, Field(description=description, default=None))
+
+            # Create the dynamic model class
+            DynamicClassificationModel = create_model("DynamicClassificationModel", **fields)
+
+            # Create JSONLogitsProcessor with the dynamic model
+            if hasattr(llm, 'llm_engine'):
+                dynamic_processor = JSONLogitsProcessor(DynamicClassificationModel, llm.llm_engine)
+                logger.info(f"Created dynamic JSONLogitsProcessor for classification schema with {len(fields)} fields")
+            else:
+                logger.warning("Could not access llm.llm_engine for JSONLogitsProcessor")
+                dynamic_processor = None
+
+        except Exception as schema_err:
+            logger.error(f"Error creating dynamic schema processor for classification: {schema_err}", exc_info=True)
+            dynamic_processor = None
+
+        # Create classification-specific parameters - lower temperature for more deterministic classification
+        classification_params = SamplingParams(
+            temperature=CONFIG["aphrodite"].get("classification_temperature", 0.1),
+            max_tokens=CONFIG["aphrodite"].get("classification_max_tokens", 256),
+            # Add the dynamic processor if available
+            logits_processors=[dynamic_processor] if dynamic_processor else []
+        )
+
+        # Log parameters
+        logger.info(
+            f"Using temperature: {classification_params.temperature}, max_tokens: {classification_params.max_tokens}")
+        if not dynamic_processor:
+            logger.warning(
+                "Executing classification without JSONLogitsProcessor. Output format may not be guaranteed.")
+
+        # Process prompts in batches (to handle large numbers of chunks)
+        batch_size = 1024  # Process this many prompts at once
+        all_results = []
+
+        for i in range(0, len(prompts), batch_size):
+            batch_prompts = prompts[i:i + batch_size]
+            logger.info(
+                f"Processing classification batch {i // batch_size + 1}/{(len(prompts) + batch_size - 1) // batch_size} ({len(batch_prompts)} prompts)")
+
+            # Generate using the model for this batch
+            outputs = llm.generate(
+                prompts=batch_prompts,
+                sampling_params=classification_params,
+                use_tqdm=True
+            )
+
+            # Process outputs for this batch
+            batch_results = []
+            for j, output in enumerate(outputs):
+                if output.outputs:
+                    result_text = output.outputs[0].text
+                    # Try to parse the result as JSON
+                    try:
+                        import json
+                        import re
+
+                        # Try direct JSON parsing first
+                        try:
+                            result_data = json.loads(result_text)
+                            batch_results.append({"status": "success", "result": result_data})
+                        except json.JSONDecodeError:
+                            # Try to extract JSON pattern
+                            json_pattern = r'\{.*\}'
+                            match = re.search(json_pattern, result_text, re.DOTALL)
+                            if match:
+                                json_text = match.group(0)
+                                result_data = json.loads(json_text)
+                                batch_results.append({"status": "success", "result": result_data})
+                            else:
+                                logger.warning(f"Could not parse output as JSON: {result_text[:200]}...")
+                                batch_results.append({
+                                    "status": "error",
+                                    "error": "Failed to parse output as JSON",
+                                    "raw_output": result_text
+                                })
+                    except Exception as parse_err:
+                        logger.error(f"Error parsing classification output: {parse_err}")
+                        batch_results.append({
+                            "status": "error",
+                            "error": str(parse_err),
+                            "raw_output": result_text
+                        })
+                else:
+                    logger.warning(f"Classification prompt {i + j} produced no output")
+                    batch_results.append({"status": "error", "error": "No output generated"})
+
+            # Add this batch's results to the overall results
+            all_results.extend(batch_results)
+
+        return {"status": "success", "results": all_results}
+
+    except Exception as e:
+        logger.error(f"Error processing classification request: {e}", exc_info=True)
+        return {"status": "error", "error": str(e)}
 
 def load_aphrodite_model(model_name: str, attempt=0):
     """Load an Aphrodite model generically and create JSON processor."""
@@ -274,6 +551,26 @@ def aphrodite_worker(request_queue, response_queue):
                 result = process_extraction_request(global_llm, prompts)
                 result["request_id"] = request_id # Add request_id to response
                 response_queue.put(result)
+            # --- Add this case to the worker process command switch in aphrodite_worker function ---
+
+            elif command == "classify_chunks":
+                if not global_llm:  # Check if the global LLM object exists
+                    response_queue.put({"status": "error", "error": "No model loaded", "request_id": request_id})
+                    continue
+
+                prompts = request.get("prompts", [])
+                schema_definition = request.get("schema_definition", {})
+                multi_label_fields = request.get("multi_label_fields", [])
+
+                if not prompts:
+                    response_queue.put({"status": "error", "error": "No prompts provided for classification",
+                                        "request_id": request_id})
+                    continue
+
+                # Process the classification request with the global llm object
+                result = process_classification_request(global_llm, prompts, schema_definition, set(multi_label_fields))
+                result["request_id"] = request_id  # Add request_id to response
+                response_queue.put(result)
 
             elif command == "generate_chat":
                 if not global_llm: # Check if the global LLM object exists
@@ -288,6 +585,30 @@ def aphrodite_worker(request_queue, response_queue):
                 # Pass the global llm object
                 result = process_chat_request(global_llm, prompt)
                 result["request_id"] = request_id # Add request_id to response
+                response_queue.put(result)
+
+
+            elif command == "extract_info":
+                if not global_llm:
+                    response_queue.put({"status": "error", "error": "No model loaded", "request_id": request_id})
+                    continue
+
+                prompt = request.get("prompt", "")
+                schema_definition = request.get("schema_definition", {})
+
+                if not prompt:
+                    response_queue.put({"status": "error", "error": "No prompt provided for info extraction",
+                                        "request_id": request_id})
+                    continue
+
+                if not schema_definition:
+                    response_queue.put(
+                        {"status": "error", "error": "No schema definition provided", "request_id": request_id})
+                    continue
+
+                # Process the info extraction request with the dynamic schema
+                result = process_info_extraction_request(global_llm, prompt, schema_definition)
+                result["request_id"] = request_id
                 response_queue.put(result)
 
             elif command == "status":
@@ -326,6 +647,8 @@ def aphrodite_worker(request_queue, response_queue):
     logger.info("Worker process shutting down.")
     # No need for sys.exit(0) here, loop exit is sufficient
 
+
+
 class AphroditeService:
     """Service class for managing Aphrodite in a separate process."""
     def __init__(self):
@@ -335,6 +658,46 @@ class AphroditeService:
         self.current_model_info: Dict[str, Any] = {"name": None} # Track only loaded model name
         self._request_counter = 0 # Simple counter for request IDs
 
+    def extract_info(self, prompt, schema_definition):
+        """
+        Extract structured information using a dynamic schema definition.
+
+        Args:
+            prompt: Formatted prompt for extraction
+            schema_definition: Dictionary defining the schema fields
+
+        Returns:
+            Dictionary with extraction results
+        """
+        return self._send_request(
+            "extract_info",
+            {"prompt": prompt, "schema_definition": schema_definition},
+            timeout=300  # Longer timeout for schema-based extraction
+        )
+
+    # --- Add this method to the AphroditeService class ---
+
+    def classify_chunks(self, prompts, schema_definition, multi_label_fields=None):
+        """
+        Classify chunks of text according to the provided schema.
+
+        Args:
+            prompts: List of formatted classification prompts
+            schema_definition: Dictionary defining the schema fields and allowed values
+            multi_label_fields: List of field names that accept multiple values
+
+        Returns:
+            Dictionary with classification results or error
+        """
+        return self._send_request(
+            "classify_chunks",
+            {
+                "prompts": prompts,
+                "schema_definition": schema_definition,
+                "multi_label_fields": multi_label_fields or []
+            },
+            timeout=600  # Longer timeout for batch classification
+        )
     def _generate_request_id(self) -> str:
         """Generate a unique request ID."""
         self._request_counter += 1
