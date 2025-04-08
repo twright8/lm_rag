@@ -190,19 +190,30 @@ class EntityExtractor:
             logger.warning("No chunks to process")
             return
 
+        # Count spreadsheet rows vs regular chunks
+        spreadsheet_rows = sum(1 for chunk in chunks if chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row')
+        regular_chunks = len(chunks) - spreadsheet_rows
+        
         visual_chunks_ids = visual_chunks_ids or []
         visual_chunks_set = set(visual_chunks_ids)
 
-        logger.info(f"Adding {len(chunks)} chunks for batch processing ({len(visual_chunks_ids)} visual chunks)")
+        logger.info(f"Adding {len(chunks)} chunks for batch processing ({spreadsheet_rows} spreadsheet rows, {regular_chunks} regular chunks, {len(visual_chunks_ids)} visual chunks)")
 
         # Queue all chunks
+        chunk_counter = 0
         for chunk in chunks:
             chunk_id = chunk.get('chunk_id', 'unknown')
             is_visual = chunk_id in visual_chunks_set
+            is_spreadsheet = chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row'
+            
+            chunk_counter += 1
+            if chunk_counter % 10 == 0 or chunk_counter == 1 or chunk_counter == len(chunks):
+                logger.debug(f"Queuing chunk {chunk_counter}/{len(chunks)}, ID: {chunk_id}, is_spreadsheet: {is_spreadsheet}, is_visual: {is_visual}")
+            
             self.queue_chunk(chunk, is_visual)
 
         # Process immediately after queuing all
-        logger.info(f"Added {len(chunks)} chunks. Processing now.")
+        logger.info(f"Added {len(chunks)} chunks to queue. Processing now.")
         self.process_all_chunks()
 
     def process_all_chunks(self, progress_callback=None):
@@ -218,6 +229,10 @@ class EntityExtractor:
 
         total_chunks = len(self.all_chunks)
         logger.info(f"Processing all {total_chunks} chunks at once")
+        
+        # Log memory usage at start of processing
+        logger.info("Memory usage before starting chunk processing:")
+        log_memory_usage(logger)
 
         try:
             # Ensure the designated extraction model is loaded in the service
@@ -231,8 +246,16 @@ class EntityExtractor:
             # Separate visual and text chunks
             text_chunks = []
             visual_chunks = []
+            
+            # Count spreadsheet chunks for logging
+            spreadsheet_chunks = 0
 
             for chunk, is_visual in self.all_chunks:
+                # Check if it's a spreadsheet row
+                is_spreadsheet = chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row'
+                if is_spreadsheet:
+                    spreadsheet_chunks += 1
+                
                 # Note: Actual visual processing logic isn't implemented here yet.
                 # If visual processing were added, it might need a different model/prompt.
                 # For now, visual chunks are treated like text chunks.
@@ -242,7 +265,7 @@ class EntityExtractor:
                 text_chunks.append((chunk, is_visual))
 
             # Log chunk counts
-            logger.info(f"Processing {len(text_chunks)} chunks (visual processing not implemented, treated as text)")
+            logger.info(f"Processing {len(text_chunks)} chunks ({spreadsheet_chunks} spreadsheet rows, {len(text_chunks) - spreadsheet_chunks} regular chunks)")
 
             # Report initial progress
             if progress_callback:
@@ -256,11 +279,36 @@ class EntityExtractor:
                 if progress_callback:
                     progress_callback(0.1, f"Processing {len(text_chunks)} text chunks in a batch")
 
-                # This now uses the single loaded model with extraction-specific params
-                self._process_text_chunks_batch(text_chunks)
-
-                elapsed = time.time() - start_time
-                logger.info(f"Batch text processing completed in {elapsed:.2f}s")
+                try:
+                    # Log initial state before batch processing
+                    logger.info("Starting batch processing of text chunks...")
+                    
+                    # Break into smaller batches if too many chunks
+                    batch_size = 2048  # Process in batches of 100 chunks
+                    
+                    if len(text_chunks) > batch_size:
+                        logger.info(f"Breaking processing into {(len(text_chunks) + batch_size - 1) // batch_size} batches of {batch_size} chunks")
+                        
+                        for i in range(0, len(text_chunks), batch_size):
+                            batch = text_chunks[i:i+batch_size]
+                            batch_start = time.time()
+                            logger.info(f"Processing batch {i//batch_size + 1}/{(len(text_chunks) + batch_size - 1)//batch_size} ({len(batch)} chunks)")
+                            
+                            # Process this batch
+                            self._process_text_chunks_batch(batch)
+                            
+                            batch_elapsed = time.time() - batch_start
+                            logger.info(f"Batch {i//batch_size + 1} completed in {batch_elapsed:.2f}s")
+                    else:
+                        # Process all chunks in one go if under the batch size
+                        self._process_text_chunks_batch(text_chunks)
+                    
+                    elapsed = time.time() - start_time
+                    logger.info(f"All batch text processing completed in {elapsed:.2f}s")
+                    
+                except Exception as e:
+                    logger.error(f"Error during batch processing: {e}", exc_info=True)
+                    # Continue with processing to ensure we handle as many chunks as possible
 
                 if progress_callback:
                     progress_callback(1.0, "All chunks processed") # Now goes to 1.0
@@ -288,6 +336,9 @@ class EntityExtractor:
             text_chunks: List of (chunk, is_visual) tuples to process
         """
         try:
+            batch_start_time = time.time()
+            logger.info(f"Starting to process batch of {len(text_chunks)} text chunks")
+            
             # Model should already be loaded by ensure_model_loaded
             if not self.aphrodite_service.is_running():
                  logger.error("Aphrodite service stopped unexpectedly.")
@@ -295,43 +346,78 @@ class EntityExtractor:
                      self._add_empty_modified_chunk(chunk)
                  return
 
+            # Count spreadsheet chunks for special handling
+            spreadsheet_chunks = 0
+            for chunk, _ in text_chunks:
+                if chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row':
+                    spreadsheet_chunks += 1
+            
+            if spreadsheet_chunks > 0:
+                logger.info(f"Batch contains {spreadsheet_chunks} spreadsheet rows")
+
             # Prepare prompts for all text chunks
+            logger.info("Preparing extraction prompts...")
+            
             prompts = []
             chunk_map = {}  # Map index -> chunk for tracking
 
+            prompt_prep_start = time.time()
             for i, (chunk, _) in enumerate(text_chunks):
+                chunk_id = chunk.get('chunk_id', f'unknown-{i}')
                 chunk_text = chunk.get('text', '')
+                is_spreadsheet = chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row'
+                
+                # Log every 10 chunks, plus first and last for tracking progress
+                if i % 10 == 0 or i == 0 or i == len(text_chunks) - 1:
+                    logger.debug(f"Preparing prompt {i+1}/{len(text_chunks)} for chunk {chunk_id} (spreadsheet: {is_spreadsheet}, text length: {len(chunk_text)})")
+                
                 prompt = self._create_extraction_prompt(chunk_text)
                 prompts.append(prompt)
                 chunk_map[i] = chunk
+            
+            logger.info(f"Prompts prepared in {time.time() - prompt_prep_start:.2f}s")
 
             # Generate outputs in a single batch through the service
-            start_time = time.time()
+            request_start_time = time.time()
             logger.info(f"Sending batch of {len(prompts)} extraction prompts to Aphrodite service")
 
             # Send request to the service (extract_entities applies extraction params)
-            response = self.aphrodite_service.extract_entities(prompts)
+            try:
+                response = self.aphrodite_service.extract_entities(prompts)
+                logger.info("Successfully received response from Aphrodite service")
+            except Exception as svc_err:
+                logger.error(f"Error from Aphrodite service: {svc_err}", exc_info=True)
+                # Create an error response
+                response = {"status": "error", "error": str(svc_err)}
 
-            elapsed = time.time() - start_time
-            logger.info(f"Batch extraction for {len(text_chunks)} chunks took {elapsed:.2f}s")
+            request_elapsed = time.time() - request_start_time
+            logger.info(f"Batch request/response cycle took {request_elapsed:.2f}s")
 
             # Check response status
             if response.get("status") != "success":
                 error_msg = response.get("error", "Unknown error")
                 logger.error(f"Error from Aphrodite service during extraction: {error_msg}")
                 # Add empty chunks on error
+                logger.info(f"Adding {len(text_chunks)} empty modified chunks due to service error")
                 for chunk, _ in text_chunks:
                     self._add_empty_modified_chunk(chunk)
                 return
 
             # Get results from response
             results = response.get("results", [])
+            logger.info(f"Received {len(results)} results from service")
 
             # Check if we got the expected number of outputs
             if len(results) != len(text_chunks):
-                logger.warning(f"Expected {len(text_chunks)} outputs but got {len(results)}")
+                logger.warning(f"Expected {len(text_chunks)} outputs but got {len(results)} - this may cause issues")
 
             # Process the results
+            processing_start = time.time()
+            logger.info("Processing extraction results...")
+            
+            processed_count = 0
+            error_count = 0
+            
             for i, result_text in enumerate(results):
                 if i >= len(text_chunks):
                     logger.warning(f"Received more results than chunks, skipping result at index {i}")
@@ -339,8 +425,11 @@ class EntityExtractor:
 
                 chunk = chunk_map[i]
                 chunk_id = chunk.get('chunk_id', f'unknown-{i}')
+                is_spreadsheet = chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row'
 
-                logger.info(f"Processing output for chunk {i+1}/{len(text_chunks)}: {chunk_id}")
+                # Log every 10 chunks, plus first and last for tracking progress
+                if i % 10 == 0 or i == 0 or i == len(results) - 1:
+                    logger.debug(f"Processing output for chunk {i+1}/{len(results)}: {chunk_id} (spreadsheet: {is_spreadsheet})")
 
                 if self.debug:
                     # Print the full output to console in debug mode
@@ -354,7 +443,9 @@ class EntityExtractor:
                     # Direct JSON parsing (rely on JSONLogitsProcessor if available)
                     result_dict = json.loads(result_text)
                     parsed_result = EntityRelationshipList.parse_obj(result_dict)
+                    processed_count += 1
                 except Exception as parse_err:
+                    error_count += 1
                     logger.warning(f"Error parsing result for chunk {chunk_id}: {parse_err}. Content: '{result_text[:100]}...'")
 
 
@@ -362,7 +453,10 @@ class EntityExtractor:
                 if parsed_result and hasattr(parsed_result, 'entity_relationship_list'):
                     # Log results
                     num_items = len(parsed_result.entity_relationship_list) if parsed_result.entity_relationship_list else 0
-                    logger.info(f"Extracted {num_items} items from chunk {chunk_id}")
+                    
+                    # Only log detailed info for significant extractions or spreadsheets
+                    if num_items > 0 or is_spreadsheet:
+                        logger.info(f"Extracted {num_items} items from chunk {chunk_id} (spreadsheet: {is_spreadsheet})")
 
                     # Process the extraction result
                     self._process_extraction_result(parsed_result, chunk)
@@ -371,11 +465,27 @@ class EntityExtractor:
                     self._add_empty_modified_chunk(chunk)
 
             # Handle any chunks that didn't get results
+            missing_count = 0
             for i, (chunk, _) in enumerate(text_chunks):
                 if i >= len(results):
+                    missing_count += 1
                     chunk_id = chunk.get('chunk_id', f'unknown-{i}')
-                    logger.warning(f"No output generated for chunk at index {i}: {chunk_id}. Adding empty modified chunk.")
+                    
+                    # Log only every 10th missing chunk to avoid log flooding
+                    if missing_count % 10 == 1:
+                        logger.warning(f"No output generated for chunk at index {i}: {chunk_id} (and potentially others). Adding empty modified chunks.")
+                    
                     self._add_empty_modified_chunk(chunk)
+                    
+            if missing_count > 0:
+                logger.warning(f"Total of {missing_count} chunks had no output generated")
+            
+            # Log processing statistics
+            processing_elapsed = time.time() - processing_start
+            total_elapsed = time.time() - batch_start_time
+            logger.info(f"Processing of results completed in {processing_elapsed:.2f}s")
+            logger.info(f"Complete batch processing took {total_elapsed:.2f}s")
+            logger.info(f"Statistics: {processed_count} chunks processed successfully, {error_count} parsing errors, {missing_count} missing outputs")
 
         except Exception as e:
             logger.error(f"Error processing text chunks batch: {e}")

@@ -280,7 +280,7 @@ def process_classification_request(llm, prompts, schema_definition, multi_label_
                 "Executing classification without JSONLogitsProcessor. Output format may not be guaranteed.")
 
         # Process prompts in batches (to handle large numbers of chunks)
-        batch_size = 1024  # Process this many prompts at once
+        batch_size = 512  # Process this many prompts at once
         all_results = []
 
         for i in range(0, len(prompts), batch_size):
@@ -366,7 +366,7 @@ def load_aphrodite_model(model_name: str, attempt=0):
                 enforce_eager=True, # Often needed for stability/correctness
                 enable_prefix_caching=True, # Generally good for performance
                 trust_remote_code=True, # Be aware of security implications
-                #max_num_seq=1024,
+                #max_num_seqs=1024,
                 #speculative_model="[ngram]",  # [!code highlight]
                 #num_speculative_tokens=5,  # [!code highlight]
                 #ngram_prompt_lookup_max=4,  # [!code highlight]
@@ -696,7 +696,7 @@ class AphroditeService:
                 "schema_definition": schema_definition,
                 "multi_label_fields": multi_label_fields or []
             },
-            timeout=600  # Longer timeout for batch classification
+            timeout=6000  # Longer timeout for batch classification
         )
     def _generate_request_id(self) -> str:
         """Generate a unique request ID."""

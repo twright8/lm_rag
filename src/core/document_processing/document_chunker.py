@@ -125,7 +125,7 @@ class DocumentChunker:
             logger.info("===== MODEL UNLOAD COMPLETE =====")
             
             log_memory_usage(logger)
-    
+
     def chunk_document(self, document: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Chunk a document using semantic chunking.
@@ -144,8 +144,13 @@ class DocumentChunker:
         
         logger.info(f"Starting chunking for document: {doc_name} (ID: {doc_id}, Type: {doc_type})")
         
+        # Check if document is a spreadsheet based on file type
+        is_spreadsheet = doc_type.lower() in ['.csv', '.xlsx', '.xls']
+        if is_spreadsheet:
+            logger.info(f"Document {doc_name} is a spreadsheet type ({doc_type}), will use row-based chunking")
+
         chunks = []
-        
+
         try:
             # Process each content item (page or section)
             content_items = document.get('content', [])
@@ -153,26 +158,60 @@ class DocumentChunker:
             
             logger.info(f"Document has {total_items} content items")
             
+            # Log how many items are spreadsheet rows
+            spreadsheet_rows = sum(1 for item in content_items if item.get('is_spreadsheet_row', False))
+            if spreadsheet_rows > 0:
+                logger.info(f"Document contains {spreadsheet_rows} spreadsheet row items that will bypass semantic chunking")
+
             for i, content_item in enumerate(content_items):
+                # Check if this is a spreadsheet row - if so, use as-is without chunking
+                if content_item.get('is_spreadsheet_row', False):
+                    # Create chunk directly from the row, preserving metadata
+                    chunk_id = str(uuid.uuid4())
+                    row_text = content_item.get('text', '')
+                    
+                    logger.debug(f"Processing spreadsheet row {i+1}/{total_items} (row_idx: {content_item.get('row_idx')}), text length: {len(row_text)} chars")
+                    
+                    chunk = {
+                        'chunk_id': chunk_id,
+                        'document_id': doc_id,
+                        'file_name': doc_name,
+                        'text': row_text,
+                        'page_num': None,  # No page for spreadsheets
+                        'row_idx': content_item.get('row_idx'),  # Keep row index for reference
+                        'chunk_idx': i,
+                        'metadata': {
+                            'document_metadata': document.get('metadata', {}),
+                            'file_type': doc_type,
+                            'chunk_method': 'spreadsheet_row',
+                            'spreadsheet_columns': content_item.get('metadata', {}).get('spreadsheet_columns', []),
+                            'row_idx': content_item.get('row_idx')
+                        }
+                    }
+                    chunks.append(chunk)
+                    logger.debug(f"Added spreadsheet row {content_item.get('row_idx')} as chunk {chunk_id} without semantic chunking")
+                    continue
+
+                # Normal chunking logic for non-spreadsheet content continues here...
                 page_num = content_item.get('page_num', None)
                 text = content_item.get('text', '')
-                
+
                 # Skip empty content
                 if not text.strip():
-                    logger.info(f"Skipping empty content item {i+1}/{total_items}")
+                    logger.info(f"Skipping empty content item {i + 1}/{total_items}")
                     continue
-                
+
                 # Log item details
                 page_info = f" (page {page_num})" if page_num else ""
-                logger.info(f"Processing content item {i+1}/{total_items}{page_info}, size: {len(text)} chars")
-                
+                logger.info(f"Processing content item {i + 1}/{total_items}{page_info}, size: {len(text)} chars")
+
                 # Generate semantic chunks for this content
                 content_chunks = self._semantic_chunking(text)
-                
+
                 # Create chunk objects with metadata
                 for chunk_idx, chunk_text in enumerate(content_chunks):
                     chunk_id = str(uuid.uuid4())
-                    
+
                     chunk = {
                         'chunk_id': chunk_id,
                         'document_id': doc_id,
@@ -186,15 +225,20 @@ class DocumentChunker:
                             'chunk_method': 'semantic'
                         }
                     }
-                    
+
                     chunks.append(chunk)
             
             # Log results
             total_time = time.time() - start_time
             avg_chunk_size = sum(len(chunk.get('text', '')) for chunk in chunks) / len(chunks) if chunks else 0
             
+            # Count spreadsheet chunks vs regular chunks
+            spreadsheet_chunks = sum(1 for chunk in chunks if chunk.get('metadata', {}).get('chunk_method') == 'spreadsheet_row')
+            semantic_chunks = len(chunks) - spreadsheet_chunks
+            
             logger.info(f"Created {len(chunks)} chunks for document {doc_name} in {total_time:.2f}s. "
-                        f"Average chunk size: {avg_chunk_size:.1f} characters")
+                        f"({spreadsheet_chunks} spreadsheet rows, {semantic_chunks} semantic chunks)")
+            logger.info(f"Average chunk size: {avg_chunk_size:.1f} characters")
             
             log_memory_usage(logger)
             

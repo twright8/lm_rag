@@ -637,6 +637,8 @@ class QueryEngine:
         Rerank results using a reranker model (e.g., BAAI/bge-reranker-v2-m3).
         Uses the ORIGINAL query and ORIGINAL document texts.
         """
+        min_score_threshold = CONFIG["retrieval"].get("minimum_score_threshold", 0.1)
+
         if self.embed_register is None:
              logger.error("Reranker model (embed register) not loaded.")
              return results # Return original results if reranker isn't available
@@ -695,9 +697,10 @@ class QueryEngine:
 
             # Sort by new reranker score
             reranked_results.sort(key=lambda x: x['score'], reverse=True)
+            filtered_results = [result for result in reranked_results if result['score'] >= min_score_threshold]
 
             # Limit to final top_k_rerank
-            final_reranked = reranked_results[:self.top_k_rerank]
+            final_reranked = filtered_results[:self.top_k_rerank]
 
             logger.info(f"Reranking completed. Returning {len(final_reranked)} results.")
             return final_reranked

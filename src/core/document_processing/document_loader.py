@@ -54,7 +54,143 @@ class DocumentLoader:
             logger.warning(f"Tesseract OCR not available: {e}")
             logger.warning("OCR functionality will be disabled")
             self.use_ocr = False
-    
+
+    def load_document_with_options(self, file_path: Union[str, Path], options: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Load a document with custom options, primarily for spreadsheets.
+
+        Args:
+            file_path: Path to the document file
+            options: Dictionary of options for processing
+                - selected_columns: List of column names to include
+                - separator: String to use between column values (default " | ")
+                - include_column_names: Whether to include column names in the text (default True)
+
+        Returns:
+            dict: Document data including text content
+        """
+        file_path = Path(file_path)
+        file_name = file_path.name
+        file_ext = file_path.suffix.lower()
+
+        logger.info(f"Loading document with options: {file_name}")
+
+        try:
+            # Initialize document data
+            document_id = str(uuid.uuid4())
+            document_data = {
+                "document_id": document_id,
+                "file_name": file_name,
+                "file_path": str(file_path),
+                "file_type": file_ext,
+                "content": [],
+                "metadata": {
+                    "page_count": 0,
+                    "word_count": 0,
+                }
+            }
+
+            # Check if it's a spreadsheet and we have options
+            if file_ext in [".csv", ".xlsx", ".xls"] and options:
+                logger.info(f"Processing spreadsheet with options: {file_name}")
+                document_data = self._process_spreadsheet_with_options(file_path, document_data, options)
+            else:
+                # Fall back to standard document loading
+                document_data = self.load_document(file_path)
+
+            return document_data
+
+        except Exception as e:
+            logger.error(f"Error loading document with options {file_name}: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
+
+    def _process_spreadsheet_with_options(self, file_path: Path, document_data: Dict[str, Any],
+                                          options: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process a spreadsheet with column selection options.
+        Uses a fixed separator format with pipes and spaces.
+
+        Args:
+            file_path: Path to the spreadsheet file
+            document_data: Document data dictionary
+            options: Processing options (only needs selected_columns)
+
+        Returns:
+            dict: Updated document data
+        """
+        try:
+            file_ext = file_path.suffix.lower()
+
+            # Get selected columns
+            selected_columns = options.get('selected_columns', [])
+
+            # Always use pipe with spaces as separator
+            separator = "  |  "
+
+            # Always include column names in output
+            include_column_names = True
+
+            # Read spreadsheet
+            if file_ext == ".csv":
+                df = pd.read_csv(file_path)
+            else:
+                df = pd.read_excel(file_path)
+
+            logger.info(f"Loaded spreadsheet with {len(df)} rows and {len(df.columns)} columns")
+
+            # Filter columns if selections provided
+            if selected_columns and all(col in df.columns for col in selected_columns):
+                df = df[selected_columns]
+                logger.info(f"Filtered to {len(selected_columns)} selected columns")
+            else:
+                # If no valid columns selected or selection is invalid, use all columns
+                selected_columns = df.columns.tolist()
+                logger.info(f"Using all {len(selected_columns)} columns")
+
+            # Store metadata
+            document_data["metadata"]["rows"] = len(df)
+            document_data["metadata"]["columns"] = len(df.columns)
+            document_data["metadata"]["column_names"] = selected_columns
+
+            # For each row, create a separate content item (which will become a chunk)
+            for idx, row in df.iterrows():
+                # Format with column names: "Column: Value | Column: Value"
+                fields = [f"{col}: {str(val)}" for col, val in row[selected_columns].items()]
+
+                # Join fields with the fixed separator
+                row_text = separator.join(fields)
+
+                # Create content item for this row
+                content_item = {
+                    "text": row_text,
+                    "row_idx": idx,
+                    "is_spreadsheet_row": True,
+                    "metadata": {
+                        "row_idx": idx,
+                        "file_name": document_data["file_name"],
+                        "spreadsheet_columns": selected_columns
+                    },
+                    "images": []
+                }
+
+                # Add to document data
+                document_data["content"].append(content_item)
+
+            # Update page count to reflect number of rows
+            document_data["metadata"]["page_count"] = len(df)
+
+            # Calculate word count (approximate)
+            total_words = sum(len(item.get("text", "").split()) for item in document_data["content"])
+            document_data["metadata"]["word_count"] = total_words
+
+            logger.info(f"Processed spreadsheet into {len(df)} row-based content items")
+            return document_data
+
+        except Exception as e:
+            logger.error(f"Error processing spreadsheet with options {file_path.name}: {e}")
+            raise
     def load_document(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         """
         Load a document from the given file path.
@@ -279,47 +415,64 @@ class DocumentLoader:
         except Exception as e:
             logger.error(f"Error processing TXT {file_path.name}: {e}")
             raise
-    
+
     def _process_spreadsheet(self, file_path: Path, document_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process a spreadsheet file (CSV, XLSX, XLS).
-        
+        Each row becomes a separate content item with selected columns merged with pipe separators.
+
         Args:
             file_path: Path to the spreadsheet file
             document_data: Document data dictionary
-            
+
         Returns:
             dict: Updated document data
         """
         try:
             file_ext = file_path.suffix.lower()
-            
+
             # Read spreadsheet
             if file_ext == ".csv":
                 df = pd.read_csv(file_path)
             else:
                 df = pd.read_excel(file_path)
-            
-            # Convert to string representation
-            text = df.to_string()
-            
-            # Create content item
-            content_item = {
-                "text": text,
-                "metadata": {
-                    "rows": len(df),
-                    "columns": len(df.columns),
-                    "column_names": df.columns.tolist()
-                },
-                "images": []
-            }
-            
-            # Add to document data
-            document_data["content"].append(content_item)
-            document_data["metadata"]["page_count"] = 1
-            
+
+            logger.info(f"Loaded spreadsheet with {len(df)} rows and {len(df.columns)} columns")
+
+            # Store basic metadata about the spreadsheet
+            document_data["metadata"]["rows"] = len(df)
+            document_data["metadata"]["columns"] = len(df.columns)
+            document_data["metadata"]["column_names"] = df.columns.tolist()
+
+            # For each row, create a separate content item (which will become a chunk)
+            for idx, row in df.iterrows():
+                # Convert row to string with pipe separator between values
+                # We'll use all columns by default, but this could be modified
+                # to use only selected columns based on user input
+                row_text = " | ".join([f"{col}: {str(val)}" for col, val in row.items()])
+
+                # Create content item for this row
+                content_item = {
+                    "text": row_text,
+                    "row_idx": idx,
+                    "is_spreadsheet_row": True,
+                    "metadata": {
+                        "file_name": document_data["file_name"],
+                        "row_idx": idx,
+                        "spreadsheet_columns": df.columns.tolist()
+                    },
+                    "images": []
+                }
+
+                # Add to document data
+                document_data["content"].append(content_item)
+
+            # Update page count to reflect number of rows (treated as "pages")
+            document_data["metadata"]["page_count"] = len(df)
+
+            logger.info(f"Processed spreadsheet into {len(df)} row-based content items")
             return document_data
-            
+
         except Exception as e:
             logger.error(f"Error processing spreadsheet {file_path.name}: {e}")
             raise
