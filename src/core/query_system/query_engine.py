@@ -333,9 +333,8 @@ class QueryEngine:
     def get_chunks(self, limit: int = 20, search_text: str = None, document_filter: str = None) -> List[Dict[str, Any]]:
         """
         Get chunks from the vector database for exploration.
-        (No changes needed from original for E5 integration)
+        MODIFIED: Includes all payload fields in the returned metadata.
         """
-        # --- Keep original implementation ---
         try:
             from qdrant_client import QdrantClient
             from qdrant_client.http import models as rest
@@ -343,16 +342,22 @@ class QueryEngine:
             client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port)
             filter_conditions = []
             if search_text:
+                # Using match_text for substring searching within the 'text' field
                 filter_conditions.append(rest.FieldCondition(key="text", match=rest.MatchText(text=search_text)))
             if document_filter:
-                filter_conditions.append(rest.FieldCondition(key="file_name", match=rest.MatchValue(value=document_filter)))
+                # Assuming 'file_name' is stored directly in the payload (adjust key if needed)
+                filter_conditions.append(
+                    rest.FieldCondition(key="file_name", match=rest.MatchValue(value=document_filter)))
+
             filter_obj = rest.Filter(must=filter_conditions) if filter_conditions else None
 
+            # Check if collection exists
             collections = client.get_collections().collections
             if self.qdrant_collection not in [c.name for c in collections]:
                 logger.warning(f"Collection {self.qdrant_collection} does not exist")
                 return []
 
+            # Use the compatible scroll function
             scroll_result, next_offset = scroll_with_filter_compatible(
                 client=client, collection_name=self.qdrant_collection, limit=limit,
                 with_payload=True, with_vectors=False, scroll_filter=filter_obj
@@ -365,25 +370,48 @@ class QueryEngine:
 
             chunks = []
             for point in points:
-                text = point.payload.get('text', '')
-                original_text = point.payload.get('original_text', text)
+                payload = point.payload  # Get the full payload dictionary
+
+                # Extract main text fields
+                text = payload.get('text', '')  # Enhanced text
+                original_text = payload.get('original_text', text)  # Original text (fallback)
+
+                # --- MODIFIED: Improved metadata handling ---
+                # Create metadata dict by:
+                # 1. Copying top-level payload fields except text/original_text/metadata
+                metadata_from_payload = {
+                    k: v for k, v in payload.items()
+                    if k not in ['text', 'original_text', 'metadata']
+                }
+
+                # 2. Add in metadata fields from payload['metadata'] if they exist
+                if 'metadata' in payload and isinstance(payload['metadata'], dict):
+                    # This brings the nested metadata fields up to the top level
+                    metadata_from_payload.update(payload['metadata'])
+
+                # Ensure essential keys like chunk_id and file_name are present
+                if 'chunk_id' not in metadata_from_payload:
+                    metadata_from_payload['chunk_id'] = point.id  # Use Qdrant ID as fallback
+                if 'file_name' not in metadata_from_payload:
+                    metadata_from_payload['file_name'] = 'Unknown'  # Add fallback if missing
+                # --- END MODIFICATION ---
+
+                # Construct the chunk dictionary for the UI
                 chunk = {
-                    'id': point.id,
-                    'text': original_text, # Use original text for display
-                    'metadata': {
-                        'file_name': point.payload.get('file_name', 'Unknown'),
-                        'page_num': point.payload.get('page_num', None),
-                        'document_id': point.payload.get('document_id', 'Unknown'),
-                        'chunk_id': point.payload.get('chunk_id', point.id)
-                    }
+                    'id': point.id,  # Qdrant point ID
+                    'text': text,  # Enhanced text (used by default in explorer checkbox)
+                    'original_text': original_text,  # Original text (used by default in explorer checkbox)
+                    'metadata': metadata_from_payload  # All other payload fields go here
                 }
                 chunks.append(chunk)
+
+            logger.info(f"Retrieved {len(chunks)} chunks for exploration.")
             return chunks
 
         except Exception as e:
             logger.error(f"Error retrieving chunks: {e}", exc_info=True)
             return []
-        # --- End of original implementation ---
+
 
     def retrieve(self, query: str) -> List[Dict[str, Any]]:
         """
@@ -432,25 +460,27 @@ class QueryEngine:
     def _bm25_search(self, query: str) -> List[Dict[str, Any]]:
         """
         Search using BM25.
-        (No changes needed from original for E5 integration)
+        Updated to explicitly use enhanced text with metadata for consistent retrieval.
         """
-        # --- Keep original implementation ---
         if not self.bm25_index or not self.tokenized_texts or not self.bm25_metadata:
-             logger.warning("BM25 components not loaded, cannot perform BM25 search.")
-             return []
+            logger.warning("BM25 components not loaded, cannot perform BM25 search.")
+            return []
         try:
             import nltk
             from nltk.tokenize import word_tokenize
 
-            try: nltk.data.find('tokenizers/punkt')
-            except LookupError: nltk.download('punkt', quiet=True)
+            try:
+                nltk.data.find('tokenizers/punkt')
+            except LookupError:
+                nltk.download('punkt', quiet=True)
 
             stop_words = set()
             try:
                 stopwords_path = self.bm25_path.parent / "stopwords.pkl"
                 if stopwords_path.exists():
                     with open(stopwords_path, 'rb') as f: stop_words = pickle.load(f)
-            except Exception as e: logger.warning(f"Error loading stopwords: {e}.")
+            except Exception as e:
+                logger.warning(f"Error loading stopwords: {e}.")
 
             tokenized_query = word_tokenize(query.lower())
             filtered_query = [token for token in tokenized_query if token not in stop_words]
@@ -458,51 +488,63 @@ class QueryEngine:
 
             bm25_scores = self.bm25_index.get_scores(filtered_query)
 
+            # Log confirmation that we're using enhanced text in BM25 search
+            logger.info("BM25 search using enhanced text with metadata (summary, red flags, entities)")
+
             results = []
             for i, score in enumerate(bm25_scores):
                 if score > 0 and i < len(self.bm25_metadata) and i < len(self.tokenized_texts):
                     metadata = self.bm25_metadata[i]
-                    original_text = metadata.get('original_text', ' '.join(self.tokenized_texts[i]))
+
+                    # Here we're utilizing the enhanced text stored during indexing
+                    # BM25 metadata includes both 'text' (enhanced) and 'original_text'
+                    enhanced_text = metadata.get('text', ' '.join(self.tokenized_texts[i]))
+                    original_text = metadata.get('original_text', enhanced_text)
+
                     chunk_id = metadata.get('chunk_id', f"bm25_doc_{i}")
-                    metadata['chunk_id'] = chunk_id # Ensure it's there
+                    metadata['chunk_id'] = chunk_id  # Ensure it's there
+
                     results.append({
-                        'index': i, 'score': float(score),
-                        'text': ' '.join(self.tokenized_texts[i]), # Text used for BM25 indexing
-                        'original_text': original_text,
-                        'metadata': metadata, 'id': chunk_id
+                        'index': i,
+                        'score': float(score),
+                        'text': enhanced_text,  # Enhanced text with metadata
+                        'original_text': original_text,  # Original text
+                        'metadata': metadata,
+                        'id': chunk_id  # Ensure 'id' is the chunk_id
                     })
 
             results.sort(key=lambda x: x['score'], reverse=True)
             results = results[:self.top_k_bm25]
-            logger.info(f"BM25 search returned {len(results)} results")
+            logger.info(f"BM25 search returned {len(results)} results using enhanced text")
             return results
 
         except Exception as e:
             logger.error(f"Error in BM25 search: {e}", exc_info=True)
             return []
-        # --- End of original implementation ---
 
     def _vector_search(self, query: str) -> List[Dict[str, Any]]:
         """
         Search using vector search (Qdrant).
         MODIFIED: Formats the query for E5-Instruct before embedding.
+        Uses enhanced text (with metadata) for embeddings during retrieval.
         """
         if self.embed_register is None:
-             logger.error("Embedding model (embed register) not loaded for vector search.")
-             return []
+            logger.error("Embedding model (embed register) not loaded for vector search.")
+            return []
         try:
             from qdrant_client import QdrantClient
 
             # --- MODIFICATION START ---
             # Format the query specifically for E5-instruct embedding
-            formatted_query = self._format_query_for_e5(query) # Call the helper
+            formatted_query = self._format_query_for_e5(query)  # Call the helper
             logger.info(f"Formatted E5 query for embedding: '{formatted_query[:100]}...'")
 
             # Generate query embedding using the formatted query
-            logger.debug(f"Requesting embedding for formatted query via embed register (model: {self.embedding_model_name})")
+            logger.debug(
+                f"Requesting embedding for formatted query via embed register (model: {self.embedding_model_name})")
             future = self.embed_register.embed(
-                sentences=[formatted_query], # Pass the formatted query
-                model_id=self.embedding_model_name # Specify the E5 model
+                sentences=[formatted_query],  # Pass the formatted query
+                model_id=self.embedding_model_name  # Specify the E5 model
             )
             # --- MODIFICATION END ---
 
@@ -521,8 +563,8 @@ class QueryEngine:
                 return []
             query_embedding = embeddings[0]
             if not isinstance(query_embedding, (list, tuple)) and not hasattr(query_embedding, 'tolist'):
-                 logger.error(f"Invalid query embedding format received: {type(query_embedding)}")
-                 return []
+                logger.error(f"Invalid query embedding format received: {type(query_embedding)}")
+                return []
 
             # Connect to Qdrant
             client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port, timeout=10)
@@ -534,14 +576,17 @@ class QueryEngine:
                     logger.warning(f"Qdrant collection '{self.qdrant_collection}' does not exist.")
                     return []
             except Exception as conn_err:
-                 logger.error(f"Failed to connect to Qdrant to check collection: {conn_err}")
-                 return []
+                logger.error(f"Failed to connect to Qdrant to check collection: {conn_err}")
+                return []
 
             # Prepare vector for search
             try:
-                if hasattr(query_embedding, 'tolist'): vector = query_embedding.tolist()
-                elif isinstance(query_embedding, (list, tuple)): vector = list(query_embedding)
-                else: raise TypeError("Embedding is not list-like or convertible")
+                if hasattr(query_embedding, 'tolist'):
+                    vector = query_embedding.tolist()
+                elif isinstance(query_embedding, (list, tuple)):
+                    vector = list(query_embedding)
+                else:
+                    raise TypeError("Embedding is not list-like or convertible")
 
                 if not vector or len(vector) < 10:
                     logger.error(f"Query vector appears invalid or too short (length: {len(vector)}).")
@@ -555,23 +600,37 @@ class QueryEngine:
                 collection_name=self.qdrant_collection,
                 query_vector=vector,
                 limit=self.top_k_vector,
-                with_payload=True # Need payload for text and metadata
+                with_payload=True  # Need payload for text and metadata
             )
 
             # Format results
             results = []
             for point in search_result:
-                text = point.payload.get('text', '') # This is the text stored during indexing
-                original_text = point.payload.get('original_text', text) # Prefer original if available
-                metadata = {k: v for k, v in point.payload.items() if k not in ['text', 'original_text']}
-                chunk_id = metadata.get('chunk_id', point.id)
-                metadata['chunk_id'] = chunk_id # Ensure consistent ID key
+                payload = point.payload  # Get full payload
+
+                # IMPORTANT: We're using the enhanced text (with metadata) that was embedded
+                # The field 'text' contains the enhanced version with metadata
+                text = payload.get('text', '')  # Enhanced text with metadata
+                original_text = payload.get('original_text', text)  # Original text (fallback)
+
+                # Log confirmation that we're using enhanced text for retrieval
+                logger.debug(f"Retrieved enhanced text with metadata for point {point.id}")
+
+                # Create metadata dict from payload, excluding text fields
+                metadata_from_payload = {
+                    k: v for k, v in payload.items()
+                    if k not in ['text', 'original_text']
+                }
+                # Ensure chunk_id is present
+                chunk_id = metadata_from_payload.get('chunk_id', point.id)
+                metadata_from_payload['chunk_id'] = chunk_id
+
                 results.append({
-                    'id': point.id, # Qdrant's point ID
+                    'id': point.id,  # Qdrant's point ID (can differ from chunk_id if points are recreated)
                     'score': float(point.score),
-                    'text': text, # Text stored in Qdrant (potentially with tags)
-                    'original_text': original_text, # Original text (prefer for display/reranking)
-                    'metadata': metadata
+                    'text': text,  # Enhanced text with metadata
+                    'original_text': original_text,  # Original text
+                    'metadata': metadata_from_payload  # All other payload fields
                 })
 
             logger.info(f"Vector search returned {len(results)} results")
@@ -584,25 +643,27 @@ class QueryEngine:
     def _fuse_results(self, bm25_results: List[Dict[str, Any]], vector_results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Fuse results from BM25 and vector search using Reciprocal Rank Fusion (RRF).
-        (No changes needed from original for E5 integration, uses 'id' which should be chunk_id)
+        Uses 'chunk_id' from metadata for matching.
         """
-        # --- Keep original implementation ---
         if not bm25_results and not vector_results: return []
         if not bm25_results: return sorted(vector_results, key=lambda x: x['score'], reverse=True)[:self.top_k_hybrid]
         if not vector_results: return sorted(bm25_results, key=lambda x: x['score'], reverse=True)[:self.top_k_hybrid]
 
         k = 60 # RRF constant
-        bm25_dict, vector_dict = {}, {}
+        bm25_dict = {} # Map chunk_id -> bm25 result
+        vector_dict = {} # Map chunk_id -> vector result
 
+        # Process BM25 results (use 'id' which should be chunk_id)
         bm25_sorted = sorted(bm25_results, key=lambda x: x['score'], reverse=True)
         for rank, result in enumerate(bm25_sorted):
-            doc_id = result.get('id') # Use chunk_id stored in 'id' field
+            doc_id = result.get('id') # This 'id' was set to chunk_id in _bm25_search
             if doc_id and doc_id not in bm25_dict:
                 bm25_dict[doc_id] = {'rank': rank + 1, **result}
 
+        # Process vector results (use chunk_id from metadata)
         vector_sorted = sorted(vector_results, key=lambda x: x['score'], reverse=True)
         for rank, result in enumerate(vector_sorted):
-             doc_id = result.get('metadata', {}).get('chunk_id', result.get('id')) # Prioritize chunk_id from metadata
+             doc_id = result.get('metadata', {}).get('chunk_id') # Get chunk_id from metadata
              if doc_id and doc_id not in vector_dict:
                 vector_dict[doc_id] = {'rank': rank + 1, **result}
 
@@ -613,59 +674,69 @@ class QueryEngine:
             vector_rank = vector_dict.get(doc_id, {'rank': len(vector_results) * 2})['rank']
             rrf_score = (self.bm25_weight / (k + bm25_rank)) + (self.vector_weight / (k + vector_rank))
 
+            # Prioritize vector_dict info as it likely has more complete metadata
             doc_info = vector_dict.get(doc_id) or bm25_dict.get(doc_id)
-            if not doc_info: continue
+            if not doc_info:
+                logger.warning(f"Could not find document info for fused ID {doc_id}")
+                continue
+
+            # Ensure metadata exists and contains chunk_id
+            metadata = doc_info.get('metadata', {})
+            if 'chunk_id' not in metadata:
+                 metadata['chunk_id'] = doc_id
 
             rrf_results.append({
-                'id': doc_id, # Store the chunk_id
+                'id': doc_id, # Keep chunk_id as the primary identifier
                 'score': rrf_score,
                 'bm25_rank': bm25_rank if doc_id in bm25_dict else None,
                 'vector_rank': vector_rank if doc_id in vector_dict else None,
-                'text': doc_info['text'], # Text from source (BM25 or Vector)
+                'text': doc_info['text'], # Enhanced text
                 'original_text': doc_info.get('original_text', doc_info['text']), # Prefer original
-                'metadata': doc_info['metadata']
+                'metadata': metadata # Use the potentially more complete metadata
             })
 
         rrf_results.sort(key=lambda x: x['score'], reverse=True)
         results = rrf_results[:self.top_k_hybrid]
         logger.info(f"Fusion returned {len(results)} results")
         return results
-        # --- End of original implementation ---
 
     def _rerank(self, query: str, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Rerank results using a reranker model (e.g., BAAI/bge-reranker-v2-m3).
-        Uses the ORIGINAL query and ORIGINAL document texts.
+        Modified to ensure enhanced text (with metadata) is used for reranking.
         """
         min_score_threshold = CONFIG["retrieval"].get("minimum_score_threshold", 0.1)
 
         if self.embed_register is None:
-             logger.error("Reranker model (embed register) not loaded.")
-             return results # Return original results if reranker isn't available
+            logger.error("Reranker model (embed register) not loaded.")
+            return results  # Return original results if reranker isn't available
         if not self.reranking_model_name:
-             logger.warning("No reranking model name specified in config. Skipping reranking.")
-             return results
+            logger.warning("No reranking model name specified in config. Skipping reranking.")
+            return results
         if not results:
-             return []
+            return []
 
         try:
-            # Use 'original_text' if available, otherwise fall back to 'text'
-            texts_to_rerank = [result.get('original_text', result.get('text', '')) for result in results]
+            # IMPORTANT: Use 'text' (enhanced with metadata) instead of 'original_text'
+            # This ensures consistency across the retrieval pipeline
+            texts_to_rerank = [result.get('text', '') for result in results]
+            print(texts_to_rerank)
 
             if not texts_to_rerank:
                 logger.warning("No text found in results to rerank.")
                 return results
 
             logger.info(f"Reranking {len(texts_to_rerank)} results using model: {self.reranking_model_name}")
+            logger.info(f"Using enhanced text with metadata (summary, red flags, entities) for reranking")
             logger.debug(f"Reranking with original query: '{query[:100]}...'")
 
             # Rerank using the ORIGINAL query and the specified reranker model
             future = self.embed_register.rerank(
-                query=query, # Use original query
-                docs=texts_to_rerank, # Use original texts
-                model_id=self.reranking_model_name # Specify the reranker model
+                query=query,  # Use original query
+                docs=texts_to_rerank,  # Use enhanced texts with metadata
+                model_id=self.reranking_model_name  # Specify the reranker model
             )
-            rerank_result = future.result() # Blocks until completion
+            rerank_result = future.result()  # Blocks until completion
 
             # Process reranker output (handle tuple or list of scores/tuples)
             if isinstance(rerank_result, tuple):
@@ -675,24 +746,25 @@ class QueryEngine:
 
             # Extract scores, handling [(index, score)] or [score] formats
             if isinstance(scores_data, list) and scores_data and isinstance(scores_data[0], tuple):
-                scores_data.sort(key=lambda x: x[0]) # Sort by original index
+                scores_data.sort(key=lambda x: x[0])  # Sort by original index
                 scores_only = [score for _, score in scores_data]
             elif isinstance(scores_data, list):
-                scores_only = scores_data # Assume scores are already in order
+                scores_only = scores_data  # Assume scores are already in order
             else:
                 logger.error(f"Unexpected reranker scores format: {type(scores_data)}. Skipping reranking.")
                 return results
 
             if len(scores_only) != len(results):
-                logger.error(f"Reranker score count mismatch: got {len(scores_only)}, expected {len(results)}. Skipping reranking.")
+                logger.error(
+                    f"Reranker score count mismatch: got {len(scores_only)}, expected {len(results)}. Skipping reranking.")
                 return results
 
             # Update results with reranked scores
             reranked_results = []
             for i, score in enumerate(scores_only):
                 result = results[i].copy()
-                result['original_score'] = result['score'] # Keep original fused score
-                result['score'] = float(score) # Update with reranker score
+                result['original_score'] = result['score']  # Keep original fused score
+                result['score'] = float(score)  # Update with reranker score
                 reranked_results.append(result)
 
             # Sort by new reranker score
@@ -707,7 +779,7 @@ class QueryEngine:
 
         except Exception as e:
             logger.error(f"Error during reranking: {e}", exc_info=True)
-            return results # Return original results on error
+            return results  # Return original results on error
 
     def _create_chat_prompt(self, query: str, context: str) -> str:
         """
@@ -757,7 +829,7 @@ Question: {query}<|im_end|>
         """
         Query the system (non-streaming). Retrieves context and generates a response
         using the persistent Aphrodite service.
-        (No changes needed in flow for E5 integration, relies on modified sub-methods)
+        MODIFIED: Ensures original_text is preferred for LLM context.
         """
         try:
             # 1. Check if generative LLM service/model is ready
@@ -774,21 +846,30 @@ Question: {query}<|im_end|>
             logger.info(f"Retrieval took {time.time() - start_retrieve:.2f}s, found {len(retrieval_results)} results for generation.")
 
             # 3. Prepare context for LLM
-            sources = [
-                {   # Use original_text for context quality, keep metadata and score
-                    'text': result.get('original_text', result.get('text', '')),
+            # --- MODIFICATION: Ensure original_text is used for context ---
+            sources_for_llm = []
+            context_texts = []
+            for result in retrieval_results:
+                # Prioritize original_text for the LLM context
+                text_for_context = result.get('original_text', result.get('text', ''))
+                context_texts.append(text_for_context)
+                # Keep the full result structure for the 'sources' return value
+                sources_for_llm.append({
+                    'text': result.get('text', ''), # Enhanced text
+                    'original_text': result.get('original_text', result.get('text', '')), # Original text
                     'metadata': result.get('metadata', {}),
                     'score': result.get('score', 0.0)
-                }
-                for result in retrieval_results
-            ]
-            context_texts = [src['text'] for src in sources] # Text snippets for the prompt
+                })
+            # --- END MODIFICATION ---
 
-            # Format context with source markers [1], [2], etc.
+            # Format context with source markers [1], [2], etc. using the extracted original texts
             context_for_prompt = "\n\n".join([f"[{i + 1}] {text}" for i, text in enumerate(context_texts)])
             if not context_for_prompt:
                 logger.warning("No context retrieved for the query. LLM will be informed.")
                 context_for_prompt = "No relevant context was found in the documents for this query."
+            else:
+                 logger.info(f"Using original_text for LLM context (first snippet preview: '{context_texts[0][:100]}...')")
+
 
             # 4. Create prompt for the generative LLM
             prompt = self._create_chat_prompt(query, context_for_prompt)
@@ -804,14 +885,14 @@ Question: {query}<|im_end|>
             if response and response.get("status") == "success":
                 answer = response.get("result", "Error: No answer content received from LLM service.")
                 logger.info(f"Received successful chat response (length: {len(answer)})")
-                # Return final answer and the sources used to generate it
-                return {'answer': answer, 'sources': sources}
+                # Return final answer and the structured sources used
+                return {'answer': answer, 'sources': sources_for_llm}
             else:
                 error_msg = response.get("error", "Unknown error during chat generation") if response else "No response from service"
                 logger.error(f"Error from Aphrodite service during chat generation: {error_msg}")
                 final_error_msg = f"Error generating response: {error_msg}"
                 # Return error message but still include the sources that were retrieved
-                return {'answer': final_error_msg, 'sources': sources}
+                return {'answer': final_error_msg, 'sources': sources_for_llm}
 
         except Exception as e:
             logger.error(f"Unexpected error in query method: {e}", exc_info=True)

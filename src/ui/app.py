@@ -3,6 +3,9 @@ from pathlib import Path
 import streamlit as st
 import base64
 import io
+from datetime import datetime
+import networkx as nx
+from collections import deque
 
 # Add project root to sys.path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -61,6 +64,7 @@ EXTRACTED_DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
 BM25_DIR.parent.mkdir(parents=True, exist_ok=True)
 (ROOT_DIR / "temp").mkdir(parents=True, exist_ok=True) # Ensure temp dir exists
 
+
 def initialize_app():
     """
     Initialize the Streamlit application state.
@@ -76,63 +80,61 @@ def initialize_app():
     )
 
     aphrodite_service_restored = False
-    llm_model_restored = False # Renamed from chat_model_loaded
+    llm_model_restored = False  # Renamed from chat_model_loaded
     service_instance = None
 
     if APHRODITE_SERVICE_AVAILABLE:
         try:
-            service_instance = get_service()
-        except Exception as e:
-            logger.error(f"Failed to get AphroditeService instance during init: {e}")
-            service_instance = None
+            service = get_service()
+            is_service_actually_running = service.is_running()
 
-        # --- Check for existing Aphrodite process tied to this session ---
-        if "aphrodite_process_info" in st.session_state and st.session_state.aphrodite_process_info and service_instance:
-            pid = st.session_state.aphrodite_process_info.get("pid")
-            if pid:
-                logger.info(f"Session state contains Aphrodite process info (PID: {pid}). Checking status...")
-                try:
-                    # Use the service's method to check its own process
-                    if service_instance.is_running() and service_instance.process.pid == pid:
-                        # Process from current session IS alive - KEEP IT
-                        logger.info(f"Active Aphrodite process (PID: {pid}) confirmed running. Restoring session state.")
-                        aphrodite_service_restored = True
-                        # Check if model was loaded based on stored info
-                        llm_model_restored = bool(st.session_state.aphrodite_process_info.get("model_name"))
-                        if llm_model_restored:
-                             logger.info(f"Model '{st.session_state.aphrodite_process_info.get('model_name')}' marked as restored.")
-                        # Sync service state with Streamlit state
-                        service_instance.current_model_info["name"] = st.session_state.aphrodite_process_info.get("model_name")
+            # Sync state based on actual service status
+            if is_service_actually_running:
+                status = service.get_status(timeout=5)
+                current_model_loaded = status.get("model_loaded", False)
+                current_model_name = status.get("current_model")
+                current_pid = service.process.pid if service.process else None
 
-                    else:
-                        # Stored PID but process is dead or mismatched - clear the stale state
-                        logger.info(f"Stale or mismatched Aphrodite process info found (Expected PID: {pid}, Running: {service_instance.is_running()}, Actual PID: {service_instance.process.pid if service_instance.process else 'None'}). Clearing session state.")
-                        st.session_state.aphrodite_process_info = None
-                        aphrodite_service_restored = False
-                        llm_model_restored = False
-                        # Attempt to shutdown cleanly if the instance thinks it's running but PID mismatch
-                        if service_instance.is_running():
-                             service_instance.shutdown()
-                except Exception as e:
-                    logger.error(f"Error checking status of Aphrodite process PID {pid}: {e}. Clearing session state.", exc_info=True)
-                    st.session_state.aphrodite_process_info = None
-                    aphrodite_service_restored = False
-                    llm_model_restored = False
+                # Get current session state values safely
+                session_model_loaded = st.session_state.get("llm_model_loaded", False)
+                session_info = st.session_state.get("aphrodite_process_info") # Use .get()
+                session_model_name = session_info.get("model_name") if session_info else None
+                session_pid = session_info.get("pid") if session_info else None
+
+                # Check if any state mismatches require an update
+                needs_update = (
+                    st.session_state.get("aphrodite_service_running") is not True or
+                    session_model_loaded != current_model_loaded or
+                    session_model_name != current_model_name or
+                    session_pid != current_pid
+                )
+
+                if needs_update:
+                    logger.info(f"Syncing Aphrodite status: Running=True, Model Loaded={current_model_loaded}, Model={current_model_name}, PID={current_pid}")
+                    st.session_state.aphrodite_service_running = True
+                    st.session_state.llm_model_loaded = current_model_loaded
+                    # Always update/create the info dict when syncing and service is running
+                    st.session_state.aphrodite_process_info = {
+                        "pid": current_pid,
+                        "model_name": current_model_name
+                    }
             else:
-                # Info dictionary exists but no PID - invalid state, clear it
-                logger.warning("Aphrodite process info found in session state but no PID. Clearing state.")
-                st.session_state.aphrodite_process_info = None
-                aphrodite_service_restored = False
-                llm_model_restored = False
-        else:
-             # No info stored for this session, assume not running
-             if "aphrodite_process_info" not in st.session_state: # Only log if it's truly the first run
-                 logger.info("No Aphrodite process info found in session state.")
-             # Ensure state reflects not running if no info was present
-             st.session_state.aphrodite_process_info = None
-             aphrodite_service_restored = False
-             llm_model_restored = False
+                # Service is not running, ensure state reflects this
+                if (st.session_state.get("aphrodite_service_running") is True or
+                    st.session_state.get("llm_model_loaded") is True or
+                    st.session_state.get("aphrodite_process_info") is not None):
 
+                    logger.info("Syncing Aphrodite status: Service not running. Clearing state.")
+                    st.session_state.aphrodite_service_running = False
+                    st.session_state.llm_model_loaded = False
+                    st.session_state.aphrodite_process_info = None
+
+        except Exception as sync_err:
+            logger.error(f"Error during Aphrodite status sync: {sync_err}", exc_info=True)
+            # Attempt to reset state on error to prevent inconsistent state
+            st.session_state.aphrodite_service_running = False
+            st.session_state.llm_model_loaded = False
+            st.session_state.aphrodite_process_info = None
 
     # --- Initialize standard session state variables using setdefault ---
     # This ensures they exist but doesn't overwrite if they were already set
@@ -142,20 +144,393 @@ def initialize_app():
     st.session_state.setdefault("documents", [])
     st.session_state.setdefault("query_engine", None)
     st.session_state.setdefault("chat_history", [])
-    st.session_state.setdefault("selected_llm_model_name", None) # To store the model chosen during processing
+    st.session_state.setdefault("selected_llm_model_name", None)  # To store the model chosen during processing
 
     # Set/Reset Aphrodite states based on checks above or default if service unavailable
     st.session_state.setdefault("aphrodite_service_running", aphrodite_service_restored)
-    st.session_state.setdefault("llm_model_loaded", llm_model_restored) # Renamed state variable
+    st.session_state.setdefault("llm_model_loaded", llm_model_restored)  # Renamed state variable
     # Ensure aphrodite_process_info is initialized if it wasn't already
     st.session_state.setdefault("aphrodite_process_info", None)
 
+    # --- Initialize ConversationStore Singleton ---
+    if "conversation_store" not in st.session_state:
+        logger.info("Initializing ConversationStore...")
+        from src.utils.conversation_store import ConversationStore
+        st.session_state.conversation_store = ConversationStore(ROOT_DIR)
+    else:
+        logger.debug("ConversationStore already initialized.")
+
+    # UI State for Chat Display
+    st.session_state.setdefault("ui_chat_display", [])  # List of messages purely for UI rendering
+
+    # Active Conversation State
+    st.session_state.setdefault("current_conversation_id", None)  # ID of the loaded conversation
+    st.session_state.setdefault("active_conversation_data", None)  # Holds the entire dict of the loaded conversation
+
+    # Retrieval Control State
+    # This flag determines if the *next* query submitted by the user will trigger RAG.
+    # It's set True when a new conversation starts, False otherwise, and the user toggle controls it.
+    st.session_state.setdefault("retrieval_enabled_for_next_turn", True)
+
     # Initialize Query Engine and update collection info
-    get_or_create_query_engine() # This also updates collection info
+    get_or_create_query_engine()  # This also updates collection info
 
     # Log final initial state
-    logger.debug(f"Initialized session state: service_running={st.session_state.aphrodite_service_running}, llm_model_loaded={st.session_state.llm_model_loaded}")
+    logger.debug(
+        f"Initialized session state: service_running={st.session_state.aphrodite_service_running}, llm_model_loaded={st.session_state.llm_model_loaded}")
 
+def save_current_conversation():
+    """Safely saves the currently active conversation data to disk via ConversationStore."""
+    conv_id = st.session_state.get("current_conversation_id")
+    conv_data = st.session_state.get("active_conversation_data")
+    store = st.session_state.get("conversation_store")
+
+    if conv_id and conv_data and store:
+        logger.debug(f"Attempting to save conversation {conv_id}...")
+        success = store.save_conversation(conv_id, conv_data)
+        if success:
+            logger.debug(f"Conversation {conv_id} saved successfully.")
+        else:
+            logger.error(f"Failed to save conversation {conv_id}.")
+            # Optionally notify the user in the UI if save fails critically
+            # st.toast("Error: Failed to save conversation state.", icon="❌")
+    elif conv_id or conv_data:
+        logger.warning("Attempted to save conversation but ID, data, or store was missing.")
+
+
+def generate_llm_response(
+    llm_manager, query_engine, conversation_history, current_prompt, context_sources,
+    # Pass Streamlit placeholders for real-time updates
+    message_placeholder, thinking_placeholder
+    ) -> Dict[str, Any]:
+    """
+    Generates response using the LLM (Aphrodite/DeepSeek).
+    Handles formatting input and calling the appropriate backend service.
+    Manages streaming updates to UI placeholders for DeepSeek.
+
+    Args:
+        llm_manager: Instance of AphroditeService or DeepSeekManager.
+        query_engine: Instance of QueryEngine.
+        conversation_history: List of previous message dicts.
+        current_prompt: The user's latest prompt string.
+        context_sources: List of source dicts from RAG (can be empty).
+        message_placeholder: Streamlit st.empty() object for the main answer.
+        thinking_placeholder: Streamlit st.empty() object for the thinking process.
+
+    Returns:
+        Dictionary containing the *final* state after generation:
+        - 'final_answer': The complete generated response string after streaming.
+        - 'final_thinking': The complete reasoning string (if any).
+        - 'error': Error message string if generation failed.
+    """
+    logger.info("Initiating LLM response generation...")
+    final_data = {"final_answer": "", "final_thinking": "", "error": None}
+
+    # --- 1. Prepare Input ---
+    try:
+        max_turns = CONFIG.get("conversation", {}).get("max_history_turns", 5)
+        history_to_use = conversation_history[-(max_turns * 2):]
+
+        context_for_prompt = ""
+        if context_sources:
+            logger.info(f"Providing {len(context_sources)} context sources to LLM.")
+            context_texts = [src.get('original_text', src.get('text', '')) for src in context_sources] # Prefer original_text
+            context_for_prompt = "\n\n".join([f"[{i + 1}] {text}" for i, text in enumerate(context_texts)])
+        else:
+            logger.info("No context provided to LLM for this turn.")
+            context_for_prompt = "No context was retrieved or provided for this query."
+
+        formatted_history = "\n".join([f"{msg['role'].capitalize()}: {msg['content']}" for msg in history_to_use])
+
+        # Standard system prompt (adjust if needed)
+        system_prompt = """<|im_start|>system
+You are an expert assistant specializing in anti-corruption investigations and analysis. Your responses should be detailed, factual, and based ONLY on the provided context if available. If the answer is not found in the context or conversation history, state that clearly. Do not make assumptions or use external knowledge. Cite sources using [index] notation where applicable based on the provided context.<|im_end|>"""
+
+        # Construct the full prompt for the LLM call
+        full_prompt_for_llm = f"""{system_prompt}
+<|im_start|>user
+Context:
+{context_for_prompt}
+
+Conversation History (if any):
+{formatted_history}
+
+Based on the conversation history and the context provided above (if any), answer the following question:
+Question: {current_prompt}<|im_end|>
+<|im_start|>assistant
+"""
+        logger.debug(f"Formatted LLM Input (truncated):\nContext: {context_for_prompt[:100]}...\nHistory: ...\nQuestion: {current_prompt}\nAssistant:")
+
+    except Exception as e:
+        logger.error(f"Error preparing LLM input: {e}", exc_info=True)
+        final_data['error'] = f"Error preparing input: {str(e)}"
+        message_placeholder.error(final_data['error'])
+        return final_data
+
+    # --- 2. Initiate LLM Call & Handle Streaming/Response ---
+    llm_called = False
+    try:
+        # --- DeepSeek Streaming Path ---
+        # Check if llm_manager looks like DeepSeekManager and DeepSeek is configured
+        if hasattr(llm_manager, 'generate') and CONFIG.get("deepseek", {}).get("use_api", False):
+            llm_called = True
+            logger.info("Using DeepSeekManager - initiating streaming generation.")
+
+            full_response_buffer = ""
+            full_thinking_buffer = ""
+            thinking_displayed = False
+            # Define the callback function *within this scope* to access placeholders
+            def deepseek_stream_callback(token_or_thinking):
+                nonlocal full_response_buffer, full_thinking_buffer, thinking_displayed
+                try:
+                    if isinstance(token_or_thinking, dict) and token_or_thinking.get("type") == "thinking":
+                        thinking_chunk = token_or_thinking.get("content", "")
+                        if thinking_chunk:
+                            full_thinking_buffer += thinking_chunk
+                            # Update thinking placeholder progressively
+                            if not thinking_displayed and thinking_chunk.strip():
+                                thinking_displayed = True
+                                with thinking_placeholder.container():
+                                    st.markdown('<div class="thinking-title">💭 Reasoning Process (Live):</div>', unsafe_allow_html=True)
+                                    st.markdown(f'<div class="thinking-box">{full_thinking_buffer}▌</div>', unsafe_allow_html=True)
+                            elif thinking_displayed:
+                                with thinking_placeholder.container(): # Overwrite previous content
+                                    st.markdown('<div class="thinking-title">💭 Reasoning Process (Live):</div>', unsafe_allow_html=True)
+                                    st.markdown(f'<div class="thinking-box">{full_thinking_buffer}▌</div>', unsafe_allow_html=True)
+
+                    elif isinstance(token_or_thinking, str):
+                        # Append to buffer and update message placeholder
+                        full_response_buffer += token_or_thinking
+                        message_placeholder.markdown(full_response_buffer + "▌") # Add cursor effect
+                except Exception as callback_e:
+                     # Log errors within the callback, but don't necessarily stop the stream
+                     logger.error(f"Error in deepseek_stream_callback: {callback_e}", exc_info=True)
+
+            # Initiate the streaming call - this blocks until the stream is complete
+            # The DeepSeekManager's generate method returns the final aggregated answer string
+            aggregated_answer = llm_manager.generate(
+                prompt=full_prompt_for_llm, # Pass the fully formatted prompt
+                system_prompt=None, # System prompt is already included in full_prompt_for_llm
+                stream_callback=deepseek_stream_callback
+            )
+
+            # --- Post-Streaming Finalization (DeepSeek) ---
+            if isinstance(aggregated_answer, str) and "Error:" in aggregated_answer:
+                 # Handle error returned by the generate method itself
+                 final_data['error'] = aggregated_answer
+                 message_placeholder.error(aggregated_answer)
+            else:
+                 final_data['final_answer'] = aggregated_answer # Store aggregated answer
+                 final_data['final_thinking'] = full_thinking_buffer
+                 message_placeholder.markdown(final_data['final_answer']) # Final update without cursor
+
+                 # Collapse thinking box after completion
+                 if thinking_displayed:
+                     with thinking_placeholder.container():
+                          with st.expander("💭 Reasoning Process", expanded=False):
+                              st.markdown(f'<div class="thinking-box">{final_data["final_thinking"]}</div>', unsafe_allow_html=True)
+
+        # --- Aphrodite Non-Streaming Path ---
+        elif hasattr(llm_manager, 'generate_chat'): # Check if it looks like AphroditeService
+            llm_called = True
+            logger.info("Using AphroditeService - initiating non-streaming generation.")
+            # This call blocks until the response is complete
+            aphrodite_response = llm_manager.generate_chat(prompt=full_prompt_for_llm)
+
+            if aphrodite_response.get("status") == "success":
+                final_data['final_answer'] = aphrodite_response.get("result", "").strip()
+                # No progressive update, just display the final answer
+                message_placeholder.markdown(final_data['final_answer'])
+                # Aphrodite service doesn't currently return a separate 'thinking' process
+                final_data['final_thinking'] = None
+            else:
+                final_data['error'] = aphrodite_response.get("error", "Unknown error from Aphrodite service")
+                message_placeholder.error(f"Error: {final_data['error']}")
+        else:
+            # This case should ideally not be reached if llm_manager is validated earlier
+             final_data['error'] = "Error: No valid LLM manager found or configured."
+             message_placeholder.error(final_data['error'])
+
+        # Final validation
+        if not final_data['final_answer'] and not final_data['error'] and llm_called:
+            final_data['error'] = "Error: LLM returned no answer content."
+            message_placeholder.error(final_data['error'])
+
+    except Exception as e:
+        logger.error(f"Critical error during LLM generation coordination: {e}", exc_info=True)
+        final_data['error'] = f"LLM Generation System Error: {str(e)}"
+        # Ensure user sees an error message
+        final_data['final_answer'] = f"Sorry, a critical error occurred while trying to generate the response."
+        message_placeholder.error(f"Error: {final_data['error']}")
+
+    logger.info(f"LLM generation process finished. Final Answer length: {len(final_data.get('final_answer', ''))}. Error: {final_data.get('error')}")
+    return final_data # Return dictionary with final aggregated results
+
+# In app.py
+
+# (Keep save_current_conversation and generate_llm_response functions as previously provided)
+
+# --- Rewritten handle_chat_message function ---
+def handle_chat_message(prompt: str, query_engine, llm_manager):
+    """
+    Orchestrates processing a user's chat message. Handles retrieval based on user
+    toggle state AT THE TIME OF SUBMISSION, calls the LLM, updates state, and saves.
+
+    Args:
+        prompt: The user's input string.
+        query_engine: Instance of QueryEngine.
+        llm_manager: Instance of the active LLM service manager.
+    """
+    logger.info(f"Handling chat message: '{prompt[:50]}...'")
+
+    # --- 1. Check for Active Conversation ---
+    if not st.session_state.get("active_conversation_data"):
+        logger.warning("handle_chat_message called without active conversation.")
+        st.error("Please start or load a conversation first.")
+        return
+
+    # --- 2. Get Current Conversation State ---
+    try:
+        # Work directly with session state for simplicity here, save logic handles persistence
+        active_conv_data = st.session_state.active_conversation_data
+        # Make a temporary copy of messages for this turn's processing if needed,
+        # but append directly to the session state list at the end.
+        conversation_history_for_llm = active_conv_data.get("messages", [])[:] # Shallow copy for passing to LLM
+    except Exception as e:
+         logger.error(f"Failed to access active conversation data: {e}", exc_info=True)
+         st.error("Internal error: Could not access conversation data.")
+         return
+
+    # --- 3. Determine Retrieval Need for THIS turn ---
+    # **** IMPORTANT: Read the state variable's value AS IT WAS WHEN THE USER SUBMITTED ****
+    retrieve_now = st.session_state.retrieval_enabled_for_next_turn
+    logger.info(f"Retrieval decision for this turn: {'ENABLED' if retrieve_now else 'DISABLED'} (based on checkbox state when prompt was submitted).")
+    # **** REMOVED THE PROBLEMATIC LINE: st.session_state.retrieval_enabled_for_next_turn = False ****
+    # The reset happens implicitly because the checkbox default value is False on the next run unless clicked again.
+
+    # --- 4. Add User Message to History (Internal State and UI Display) ---
+    user_message_id = f"msg_user_{len(active_conv_data.get('messages', [])) + 1}"
+    user_message = {
+        "role": "user",
+        "content": prompt,
+        "timestamp": time.time(),
+        "id": user_message_id
+    }
+    # Append to the *actual* session state list
+    st.session_state.active_conversation_data["messages"].append(user_message)
+    # Also update the list used for immediate UI rendering
+    st.session_state.ui_chat_display.append({"role": "user", "content": prompt})
+    # Render the user message instantly (this part should be outside the handler, in the main page logic)
+    # The rerun triggered by chat_input submission handles display usually.
+    # If not, you might need to manually render it *before* calling the handler.
+
+    # --- 5. Perform Retrieval (Conditional) ---
+    sources = []
+    retrieval_info_msg = "Retrieval skipped (toggle was off)."
+    if retrieve_now:
+        retrieval_info_msg = "Performing RAG retrieval..."
+        logger.info(retrieval_info_msg)
+        retrieval_status_placeholder = st.empty() # Display status temporarily
+        with retrieval_status_placeholder.status("Retrieving context...", expanded=True):
+            try:
+                st.write("Searching relevant documents...")
+                sources = query_engine.retrieve(prompt)
+                retrieval_info_msg = f"Retrieved {len(sources)} relevant sources."
+                st.write(retrieval_info_msg)
+                logger.info(retrieval_info_msg)
+            except Exception as e:
+                logger.error(f"Error during retrieval: {e}", exc_info=True)
+                retrieval_info_msg = f"Error during retrieval: {e}"
+                st.error(retrieval_info_msg)
+                sources = []
+        time.sleep(0.5)
+        retrieval_status_placeholder.empty()
+    else:
+        logger.info(retrieval_info_msg)
+        # Display caption only if skipping, otherwise status handles it
+        st.caption(retrieval_info_msg)
+
+    # --- 6. Initiate LLM Response Generation ---
+    # Create placeholders *before* the assistant message context
+    message_placeholder = st.empty()
+    thinking_placeholder = st.empty()
+    sources_placeholder = st.empty()
+
+    # Generate response within the assistant's chat message context
+    with st.chat_message("assistant"):
+        # Re-assign placeholders within this context if needed, or ensure they are accessible
+        message_placeholder = st.empty() # Re-scope placeholder inside chat_message
+        thinking_placeholder = st.empty()
+        sources_placeholder = st.empty()
+
+        with st.spinner("Assistant is thinking..."):
+            final_result = generate_llm_response(
+                llm_manager=llm_manager,
+                query_engine=query_engine,
+                # Pass the history *before* adding the potential assistant message
+                conversation_history=active_conv_data["messages"][:-1] if active_conv_data["messages"] else [],
+                current_prompt=prompt,
+                context_sources=sources,
+                message_placeholder=message_placeholder,
+                thinking_placeholder=thinking_placeholder
+            )
+
+    # --- Generation Complete ---
+    final_answer = final_result.get("final_answer", "")
+    final_thinking = final_result.get("final_thinking")
+    error = final_result.get("error")
+
+    # Populate sources expander if needed (outside chat_message context likely better)
+    if not error and sources and CONFIG.get("conversation", {}).get("persist_retrieved_context", True):
+         with sources_placeholder.expander("View Sources Used", expanded=False):
+             # (Same source display logic as before)
+             for i, source in enumerate(sources):
+                 st.markdown(f"**Source {i + 1} (Score: {source.get('score', 0.0):.2f}):**")
+                 st.markdown(f"> {source.get('original_text', source.get('text', ''))}")
+                 meta = source.get('metadata', {})
+                 st.caption(f"Doc: {meta.get('file_name', 'N/A')} | Page: {meta.get('page_num', 'N/A')} | Chunk: {meta.get('chunk_id', 'N/A')}")
+                 st.markdown("---")
+
+    # --- 7. Add Final Assistant Message to Conversation History ---
+    assistant_message_id = f"msg_asst_{len(active_conv_data['messages'])}" # ID relates to the turn
+    assistant_message = {
+        "role": "assistant",
+        "content": final_answer if not error else f"Error generating response: {error}",
+        "timestamp": time.time(),
+        "id": assistant_message_id
+    }
+    if sources and not error and CONFIG.get("conversation", {}).get("persist_retrieved_context", True):
+        assistant_message["used_context"] = [ # Store context used
+            # (Same context structuring logic as before)
+            {"text": s.get('original_text', s.get('text', '')),
+             "metadata": s.get('metadata', {}),
+             "score": s.get('score', 0.0),
+             "source_index": i+1}
+            for i, s in enumerate(sources)
+        ]
+    if final_thinking:
+        assistant_message["thinking_process"] = final_thinking
+
+    # Append the final assistant message to the *actual* session state data
+    st.session_state.active_conversation_data["messages"].append(assistant_message)
+
+    # --- 8. Update UI Display List ---
+    st.session_state.ui_chat_display.append({ # Add the complete assistant message info
+        "role": "assistant",
+        "content": assistant_message["content"],
+        "thinking": final_thinking,
+        "sources": assistant_message.get("used_context") # Use context stored in the message
+    })
+
+    # --- 9. Auto-Save Conversation ---
+    if CONFIG.get("conversation", {}).get("auto_save_on_turn", True):
+        save_current_conversation()
+
+    logger.info("Finished handling chat message cycle.")
+
+    # --- Optional: Rerun may not be needed now ---
+    # The state updates should trigger a natural rerun by Streamlit
+    # st.rerun()
 
 def render_spreadsheet_options(uploaded_files):
     """
@@ -852,69 +1227,6 @@ def render_upload_page():
             st.session_state.processing = False
 
         # Refresh the page to show updated status
-
-def render_explore_page():
-    """
-    Render the data exploration page with the enhanced relationship graph.
-    """
-    st.header("🔎 Explore Data")
-
-    tab1, tab2, tab3 = st.tabs(["Documents & Chunks", "Entities", "Relationships"])
-
-    with tab1:
-        render_document_explorer()
-
-    with tab2:
-        render_entity_explorer()
-
-    with tab3:
-        render_relationship_graph()  # This now includes all the enhanced visualizations
-
-def render_document_explorer():
-    """
-    Render the document and chunk explorer. (No changes needed here)
-    """
-    st.subheader("Document Explorer")
-
-    # Get documents and chunks from Qdrant
-    query_engine = get_or_create_query_engine()
-
-    # Document filter and search
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        search_text = st.text_input("Search within chunks", placeholder="Enter search terms...")
-    with col2:
-         # Provide unique document names for filtering
-         try:
-             all_chunks_for_filter = query_engine.get_chunks(limit=1000) # Get more chunks to find unique names
-             doc_names = sorted(list(set(c['metadata'].get('file_name', 'Unknown') for c in all_chunks_for_filter if c['metadata'].get('file_name'))))
-             doc_filter = st.selectbox("Filter by document", options=["All Documents"] + doc_names)
-         except Exception as e:
-              logger.error(f"Failed to get document names for filter: {e}")
-              doc_filter = st.selectbox("Filter by document", options=["All Documents", "Error loading names"])
-
-    # Get chunks from DB based on filter
-    doc_filter_value = doc_filter if doc_filter != "All Documents" else None
-    chunks = query_engine.get_chunks(limit=50, search_text=search_text if search_text else None, document_filter=doc_filter_value)
-
-    if not chunks:
-        if search_text or doc_filter_value:
-             st.info("No documents match the current filter.")
-        else:
-             st.info("No documents found. Upload and process documents first.")
-        return
-
-    # Display chunks
-    st.markdown(f"Displaying **{len(chunks)}** chunks:")
-    for i, chunk in enumerate(chunks):
-        with st.expander(f"Chunk {chunk['metadata'].get('chunk_id', chunk['id'])} - {chunk['metadata'].get('file_name', 'Unknown')}"):
-            # Show original text (not the modified text with tags)
-            st.markdown(chunk['text'])
-
-            # Show metadata in a smaller font
-            st.caption(f"Document: {chunk['metadata'].get('file_name', 'Unknown')} | Page: {chunk['metadata'].get('page_num', 'N/A')}")
-
-
 def render_entity_explorer():
     """
     Render the entity explorer with tables of extracted entities.
@@ -983,6 +1295,365 @@ def render_entity_explorer():
         st.caption(f"Displaying {len(filtered_entities)} of {len(entities)} total entities.")
     else:
         st.info("No entities match the current filters.")
+def render_explore_page():
+    """
+    Render the data exploration page with the enhanced relationship graph.
+    """
+    st.header("🔎 Explore Data")
+
+    tab1, tab2, tab3 = st.tabs(["Documents & Chunks", "Entities", "Relationships"])
+
+    with tab1:
+        render_document_explorer()
+
+    with tab2:
+        render_entity_explorer()
+
+    with tab3:
+        render_relationship_graph()  # This now includes all the enhanced visualizations
+
+# --- START OF RELEVANT FUNCTION: render_document_explorer (in app.py) ---
+
+def render_document_explorer():
+    """
+    Render the document and chunk explorer.
+    Always shows original text and extracted metadata (if available).
+    """
+    st.subheader("Document Explorer")
+
+    # Get documents and chunks from Qdrant
+    query_engine = get_or_create_query_engine()
+
+    # Document filter and search
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        search_text = st.text_input("Search within chunks", placeholder="Enter search terms...")
+    with col2:
+         # Provide unique document names for filtering
+         try:
+             # Increase limit slightly to catch more potential doc names
+             all_chunks_for_filter = query_engine.get_chunks(limit=1500)
+             doc_names = sorted(list(set(c['metadata'].get('file_name', 'Unknown')
+                                        for c in all_chunks_for_filter
+                                        if c['metadata'].get('file_name'))))
+             if not doc_names:
+                  logger.warning("No document names found in retrieved chunks metadata.")
+             doc_filter = st.selectbox("Filter by document", options=["All Documents"] + doc_names)
+         except Exception as e:
+              logger.error(f"Failed to get document names for filter: {e}")
+              doc_filter = st.selectbox("Filter by document", options=["All Documents", "Error loading names"])
+
+    # Get chunks from DB based on filter
+    doc_filter_value = doc_filter if doc_filter != "All Documents" else None
+    # Fetch slightly more chunks for display flexibility
+    chunks = query_engine.get_chunks(limit=100, search_text=search_text if search_text else None, document_filter=doc_filter_value)
+
+    if not chunks:
+        if search_text or doc_filter_value:
+             st.info("No documents match the current filter.")
+        else:
+             st.info("No documents found. Upload and process documents first.")
+        return
+
+    # Display chunks
+    st.markdown(f"Displaying **{len(chunks)}** chunks:")
+    for i, chunk in enumerate(chunks):
+        # Use chunk_id for unique expander key if available
+        chunk_id_display = chunk['metadata'].get('chunk_id', chunk.get('id', f'chunk_{i}'))
+        file_name_display = chunk['metadata'].get('file_name', 'Unknown')
+        expander_title = f"Chunk {chunk_id_display} - {file_name_display}"
+
+        with st.expander(expander_title):
+            meta = chunk.get('metadata', {})
+            page_num_display = meta.get('page_num', 'N/A')
+            row_idx_display = meta.get('row_idx', None) # Check for spreadsheet row index
+
+            # --- Display Original Text ---
+            st.markdown("##### Original Text")
+            original_text = chunk.get('original_text', chunk.get('text', '')) # Fallback to 'text' if original is missing
+            st.markdown(original_text if original_text else "_No text content available_")
+
+            # --- Display Location Info ---
+            if row_idx_display is not None:
+                 location_info = f"Row: {row_idx_display}"
+            else:
+                 location_info = f"Page: {page_num_display}"
+            st.caption(f"Document: {file_name_display} | {location_info}")
+
+            # --- Always Display Extracted Metadata Section ---
+            st.markdown("---")
+            st.markdown("##### Extracted Metadata")
+
+            # Get metadata values with defaults
+            summary = meta.get('extracted_summary', 'Not available')
+            red_flags = meta.get('extracted_red_flags', 'None detected')
+            entity_types_list = meta.get('extracted_entity_types', [])
+            types_text = ", ".join(entity_types_list) if entity_types_list else 'None detected'
+
+            # Display using captions for consistent style
+            st.caption(f"**Summary:** {summary}")
+            st.caption(f"**Red Flags:** {red_flags}")
+            st.caption(f"**Entity Types:** {types_text}")
+
+
+
+def render_connection_explorer_tab(entities, relationships):
+    """
+    Render the entity connection explorer tab to visualize paths between two entities.
+    Enhanced with updated physics controls and tooltips.
+
+    Args:
+        entities: List of entity dictionaries (potentially filtered)
+        relationships: List of relationship dictionaries (potentially filtered)
+    """
+    try:
+        import math
+        import networkx as nx
+        from pyvis.network import Network
+        from collections import deque # For efficient BFS
+    except ImportError as e:
+        st.error(f"Missing library required for graph visualization: {e}. Please install PyVis and NetworkX.")
+        return
+
+    st.markdown("#### Entity-to-Entity Connection Path")
+    st.markdown("Find and visualize the shortest paths connecting two specific entities.")
+
+    if not entities:
+        st.warning("No entities available for selection.")
+        return
+
+    # Create entity lookup maps
+    entity_name_to_id = {e.get("name"): e.get("id") for e in entities if e.get("name") and e.get("id")}
+    entity_id_to_name = {v: k for k, v in entity_name_to_id.items()}
+    entity_id_to_type = {e.get("id"): e.get("type", "Unknown") for e in entities if e.get("id")}
+    entity_names = sorted(entity_name_to_id.keys())
+
+    if len(entity_names) < 2:
+        st.warning("Need at least two entities to find a connection.")
+        return
+
+    # --- Controls ---
+    st.markdown("**Connection Controls**")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        source_entity_name = st.selectbox(
+            "Source Entity", options=entity_names, index=0, key="conn_source"
+        )
+    with col2:
+        # Ensure default target is different from source
+        default_target_index = 1 if len(entity_names) > 1 else 0
+        if entity_names[default_target_index] == source_entity_name and len(entity_names) > 1:
+            default_target_index = 0 # Fallback if source is the second item
+        target_entity_name = st.selectbox(
+            "Target Entity", options=entity_names, index=default_target_index, key="conn_target"
+        )
+    with col3:
+        # Use a smaller max degree for this view
+        degrees_of_separation = st.slider(
+            "Max Path Length (hops)", min_value=1, max_value=10, value=3, key="conn_degrees",
+             help="Maximum number of relationship steps allowed in the path."
+        )
+
+    # --- Physics Controls ---
+    st.markdown("**Physics & Layout Controls**")
+    physics_col1, physics_col2, physics_col3 = st.columns(3)
+    with physics_col1:
+        physics_enabled = st.toggle("Enable Physics Simulation", value=True, key="conn_physics_toggle")
+        physics_solver = st.selectbox(
+                "Physics Solver", options=["barnesHut", "forceAtlas2Based", "repulsion"], index=1, # Default ForceAtlas2
+                key="conn_physics_solver"
+            )
+    with physics_col2:
+        grav_constant = st.slider( "Node Repulsion Strength", min_value=-20000, max_value=-100, value=-5000, step=500, key="conn_grav_constant")
+        central_gravity = st.slider( "Central Gravity", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="conn_central_gravity")
+    with physics_col3:
+        spring_length = st.slider( "Ideal Edge Length", min_value=50, max_value=500, value=100, step=10, key="conn_spring_length")
+        spring_constant = st.slider( "Edge Stiffness", min_value=0.005, max_value=0.5, value=0.06, step=0.005, format="%.3f", key="conn_spring_constant")
+
+
+    # --- Visualization Button ---
+    if st.button("Visualize Connection Path", key="visualize_connection_btn", type="primary"):
+        if source_entity_name == target_entity_name:
+            st.warning("Source and Target entities must be different.")
+            return
+
+        source_id = entity_name_to_id.get(source_entity_name)
+        target_id = entity_name_to_id.get(target_entity_name)
+
+        if not source_id or not target_id:
+            st.error("Could not find IDs for selected entities.")
+            return
+
+        # --- Build Full Graph for Path Finding ---
+        with st.spinner("Finding connection paths..."):
+            G_path = nx.DiGraph()
+            # Add nodes involved in any relationship first for efficiency
+            nodes_in_rels = set()
+            rel_lookup = {} # Store descriptions keyed by (source, target, type) for graph building
+            for rel in relationships:
+                 s_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+                 t_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+                 r_type = rel.get("type", rel.get("relationship_type", "RELATED_TO"))
+                 r_desc = rel.get("description")
+                 if s_id and t_id:
+                     nodes_in_rels.add(s_id)
+                     nodes_in_rels.add(t_id)
+                     rel_lookup[(s_id, t_id, r_type)] = r_desc
+
+            # Add only relevant nodes to the pathfinding graph
+            for entity in entities:
+                e_id = entity.get("id")
+                if e_id in nodes_in_rels:
+                     G_path.add_node(e_id, label=entity.get("name"), type=entity.get("type"))
+
+            # Add edges
+            for rel in relationships:
+                s_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+                t_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+                r_type = rel.get("type", rel.get("relationship_type", "RELATED_TO"))
+                r_desc = rel.get("description")
+                # Add edge only if both nodes exist in our filtered graph
+                if G_path.has_node(s_id) and G_path.has_node(t_id):
+                     G_path.add_edge(s_id, t_id, type=r_type, description=r_desc)
+
+            # --- Path Finding (Undirected BFS up to max depth) ---
+            UG_path = G_path.to_undirected()
+            paths_found = []
+            if nx.has_path(UG_path, source_id, target_id):
+                 # Use all_shortest_paths which is efficient
+                 try:
+                    shortest_paths = list(nx.all_shortest_paths(UG_path, source=source_id, target=target_id))
+                    # Filter paths by max length if necessary (though shortest paths are usually within reasonable limits)
+                    paths_found = [p for p in shortest_paths if len(p) - 1 <= degrees_of_separation]
+                    if not paths_found and shortest_paths: # If shortest paths exceed limit, inform user
+                         st.warning(f"Shortest path(s) have {len(shortest_paths[0])-1} hops, exceeding the limit of {degrees_of_separation}.")
+                 except nx.NetworkXNoPath:
+                    paths_found = []
+                 except Exception as path_err:
+                    st.error(f"Error finding paths: {path_err}")
+                    logger.error(f"Path finding error: {traceback.format_exc()}")
+                    paths_found = []
+
+            if not paths_found:
+                st.warning(f"No connection path found between '{source_entity_name}' and '{target_entity_name}' within {degrees_of_separation} hops.")
+                return
+
+            # --- Create Visualization Subgraph ---
+            path_nodes = set(node for path in paths_found for node in path)
+            viz_graph = nx.DiGraph()
+
+            # Add nodes from paths
+            for node_id in path_nodes:
+                 if node_id in entity_id_to_name:
+                    viz_graph.add_node(
+                        node_id,
+                        label=entity_id_to_name[node_id],
+                        type=entity_id_to_type.get(node_id, "Unknown"),
+                        is_source=(node_id == source_id),
+                        is_target=(node_id == target_id)
+                    )
+
+            # Add edges between nodes in paths (preserve original direction and get description)
+            for u, v, data in G_path.edges(data=True):
+                 if u in path_nodes and v in path_nodes:
+                     # Check if this edge segment is part of any found path (undirected check)
+                     is_in_a_path = any((u == path[i] and v == path[i+1]) or (v == path[i] and u == path[i+1])
+                                        for path in paths_found for i in range(len(path)-1))
+                     if is_in_a_path:
+                         viz_graph.add_edge(u, v, type=data.get("type"), description=data.get("description"))
+
+        # --- Create PyVis Network ---
+        with st.spinner("Rendering connection path..."):
+            net = Network(height="700px", width="100%", directed=True, notebook=True, cdn_resources='remote', heading="")
+
+            colors = CONFIG.get("visualization", {}).get("node_colors", {}) # Use centrally defined colors
+            shapes = CONFIG.get("visualization", {}).get("node_shapes", {})
+            source_color = "#FF4444" # Bright Red
+            target_color = "#44FF44" # Bright Green
+
+            # Add nodes to PyVis
+            for node_id, attrs in viz_graph.nodes(data=True):
+                 entity_type = attrs.get("type", "Unknown")
+                 is_source = attrs.get("is_source", False)
+                 is_target = attrs.get("is_target", False)
+
+                 if is_source:
+                     color, border_width, size = source_color, 3, 30
+                     title_suffix = " (Source)"
+                 elif is_target:
+                     color, border_width, size = target_color, 3, 30
+                     title_suffix = " (Target)"
+                 else:
+                     color = colors.get(entity_type, colors.get("Unknown", "#9CA3AF"))
+                     border_width, size = 1, 20
+                     title_suffix = ""
+
+                 shape = shapes.get(entity_type, shapes.get("Unknown", "dot"))
+                 label = attrs.get("label", "Unknown")
+                 title = f"{label}\nType: {entity_type}{title_suffix}"
+
+                 net.add_node(node_id, label=label, title=title, color=color, shape=shape, size=size, borderWidth=border_width)
+
+            # Add edges to PyVis
+            shortest_path_edges = set()
+            if paths_found:
+                # Mark edges belonging to the first shortest path
+                shortest_p = paths_found[0]
+                for i in range(len(shortest_p) - 1):
+                     # Store both directions for undirected matching
+                     shortest_path_edges.add(tuple(sorted((shortest_p[i], shortest_p[i+1]))))
+
+            edge_count = 0
+            for source, target, attrs in viz_graph.edges(data=True):
+                 edge_count += 1
+                 rel_type = attrs.get("type", "RELATED_TO")
+                 description = attrs.get("description", "N/A")
+                 edge_title = f"Type: {rel_type}\nDescription: {description if description else 'N/A'}"
+
+                 # Style edges based on whether they are in the shortest path
+                 is_shortest = tuple(sorted((source, target))) in shortest_path_edges
+                 edge_color = "#FF6347" if is_shortest else "#AAAAAA" # Tomato for shortest, gray otherwise
+                 width = 3 if is_shortest else 1.5
+                 dashes = False if is_shortest else True
+
+                 net.add_edge(
+                    source, target, title=edge_title, label="", width=width, color=edge_color, dashes=dashes,
+                    arrows={'to': {'enabled': True, 'scaleFactor': 0.6}}
+                 )
+
+            # Build and set PyVis options
+            pyvis_options = _build_pyvis_options(
+                physics_enabled, physics_solver, spring_length, spring_constant, central_gravity, grav_constant
+            )
+            net.set_options(json.dumps(pyvis_options))
+
+            # Save and display
+            graph_html_path = ROOT_DIR / "temp" / "connection_graph.html"
+            try:
+                net.save_graph(str(graph_html_path))
+                with open(graph_html_path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+
+                # Display path info above the graph
+                st.markdown(f"**Found {len(paths_found)} shortest path(s) (length: {len(paths_found[0])-1} hops):**")
+                path_desc = " → ".join([entity_id_to_name.get(node_id, "?") for node_id in paths_found[0]])
+                st.success(f"Path: {path_desc}")
+                # Optionally show other paths if more than one was found
+                if len(paths_found) > 1:
+                     with st.expander(f"Show {len(paths_found)-1} other shortest path(s)"):
+                         for i, path in enumerate(paths_found[1:], 1):
+                             path_desc_other = " → ".join([entity_id_to_name.get(node_id, "?") for node_id in path])
+                             st.text(f"Path {i+1}: {path_desc_other}")
+
+                # Display the graph
+                st.components.v1.html(html_content, height=710, scrolling=False)
+                st.caption(f"Displaying {viz_graph.number_of_nodes()} entities and {edge_count} relationships involved in the connection path(s).")
+
+            except Exception as render_err:
+                st.error(f"Failed to render connection graph: {render_err}")
+                logger.error(f"PyVis rendering failed for connection graph: {traceback.format_exc()}")
+
+# --- END OF MODIFIED FUNCTION: render_connection_explorer_tab ---
 
 
 def render_entity_connection_explorer(entities, relationships):
@@ -2110,419 +2781,1013 @@ def render_network_metrics(entities, relationships):
         # Display insights
         for insight in insights:
             st.markdown(f"- {insight}")
-def render_entity_centered_explorer(entities, relationships):
+def render_entity_centered_tab(entities, relationships):
     """
-    Render the entity-centered explorer to visualize connections around a specific entity.
-    Enhanced with node distance controls.
+    Render the entity-centered explorer tab to visualize connections around a specific entity.
+    Enhanced with updated physics controls and tooltips.
 
     Args:
-        entities: List of entity dictionaries
-        relationships: List of relationship dictionaries
+        entities: List of entity dictionaries (potentially filtered)
+        relationships: List of relationship dictionaries (potentially filtered)
     """
-    import math
-    import networkx as nx
-    from pyvis.network import Network
+    try:
+        import math
+        import networkx as nx
+        from pyvis.network import Network
+    except ImportError as e:
+        st.error(f"Missing library required for graph visualization: {e}. Please install PyVis and NetworkX.")
+        return
 
-    st.subheader("Entity-Centered Explorer")
+    st.markdown("#### Entity-Centered Network View")
+    st.markdown("Explore the immediate neighborhood around a selected entity.")
 
-    # Create entity name to ID mapping for easier lookup
-    entity_name_to_id = {}
-    entity_id_to_name = {}
-    entity_id_to_type = {}
+    if not entities:
+        st.warning("No entities available for selection.")
+        return
 
-    for entity in entities:
-        entity_id = entity.get("id")
-        entity_name = entity.get("name", "Unknown")
-        entity_type = entity.get("type", "Unknown")
-
-        # Store mappings
-        if entity_id and entity_name:
-            entity_name_to_id[entity_name] = entity_id
-            entity_id_to_name[entity_id] = entity_name
-            entity_id_to_type[entity_id] = entity_type
-
-    # Get sorted list of entity names for dropdowns
+    # Create entity lookup maps
+    entity_name_to_id = {e.get("name"): e.get("id") for e in entities if e.get("name") and e.get("id")}
+    entity_id_to_name = {v: k for k, v in entity_name_to_id.items()}
+    entity_id_to_type = {e.get("id"): e.get("type", "Unknown") for e in entities if e.get("id")}
     entity_names = sorted(entity_name_to_id.keys())
 
-    # Create controls
-    col1, col2 = st.columns(2)
-
+    # --- Controls ---
+    st.markdown("**View Controls**")
+    col1, col2, col3 = st.columns(3)
     with col1:
-        # Search/filter for entity
-        entity_search = st.text_input(
-            "Search Entity",
-            placeholder="Start typing to search...",
-            key="centered_entity_search"
+        # Select center entity
+        center_entity_name = st.selectbox(
+            "Center Entity", options=entity_names, index=0, key="center_entity"
         )
-
-        # Filter entity names based on search
-        filtered_entities = [name for name in entity_names
-                             if entity_search.lower() in name.lower()] if entity_search else entity_names
-
-        # Select entity
-        central_entity = st.selectbox(
-            "Center Entity",
-            options=filtered_entities,
-            index=0 if filtered_entities else None,
-            key="centered_entity_select"
-        )
-
     with col2:
-        # Connections depth slider
-        max_depth = 15
+        # Connection depth
         connection_depth = st.slider(
-            "Connection Depth",
-            min_value=1,
-            max_value=max_depth,
-            value=1,
-            key="centered_connection_depth"
+            "Connection Depth (hops)", min_value=1, max_value=5, value=1, key="center_depth",
+            help="How many steps away from the center entity to display."
         )
-
-        # Filter by relationship type
-        rel_types = sorted(list(set(
-            rel.get("type", rel.get("relationship_type", "Unknown"))
-            for rel in relationships
-        )))
-
+    with col3:
+        # Filter relationships by type
+        rel_types = sorted(list(set(rel.get("type", rel.get("relationship_type", "Unknown")) for rel in relationships)))
         selected_rel_types = st.multiselect(
-            "Filter by Relationship Type",
-            options=rel_types,
-            default=rel_types,
-            key="centered_rel_type_filter"
+            "Filter Relationship Types", options=rel_types, default=rel_types, key="center_rel_filter"
         )
 
-    # NEW: Node distance controls
-    st.markdown("### Node Distance Settings")
-    distance_col1, distance_col2, distance_col3 = st.columns(3)
+    # --- Physics Controls ---
+    st.markdown("**Physics & Layout Controls**")
+    physics_col1, physics_col2, physics_col3 = st.columns(3)
+    with physics_col1:
+        physics_enabled = st.toggle("Enable Physics Simulation", value=True, key="center_physics_toggle")
+        physics_solver = st.selectbox(
+                "Physics Solver", options=["barnesHut", "forceAtlas2Based", "repulsion"], index=0, # Default barnesHut
+                key="center_physics_solver"
+            )
+    with physics_col2:
+        grav_constant = st.slider( "Node Repulsion Strength", min_value=-20000, max_value=-100, value=-6000, step=500, key="center_grav_constant")
+        central_gravity = st.slider( "Central Gravity", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="center_central_gravity")
+    with physics_col3:
+        spring_length = st.slider( "Ideal Edge Length", min_value=50, max_value=500, value=150, step=10, key="center_spring_length")
+        spring_constant = st.slider( "Edge Stiffness", min_value=0.005, max_value=0.5, value=0.07, step=0.005, format="%.3f", key="center_spring_constant")
 
-    with distance_col1:
-        # Spring length controls node distance
-        spring_length = st.slider(
-            "Spring Length",
-            min_value=50,
-            max_value=500,
-            value=150,
-            step=10,
-            help="Higher values increase distance between nodes",
-            key="centered_spring_length"
-        )
 
-    with distance_col2:
-        # Spring constant affects how strongly nodes are pulled together
-        spring_constant = st.slider(
-            "Spring Constant",
-            min_value=0.01,
-            max_value=0.5,
-            value=0.08,
-            step=0.01,
-            help="Lower values make connections more flexible",
-            key="centered_spring_constant"
-        )
-
-    with distance_col3:
-        # Central gravity pulls nodes toward center
-        central_gravity = st.slider(
-            "Central Gravity",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.1,
-            step=0.05,
-            help="Lower values allow nodes to spread out more",
-            key="centered_central_gravity"
-        )
-
-    # Button to generate visualization
-    if st.button("Visualize Centered Network", key="visualize_centered_btn"):
-        # Check if entity is selected
-        if not central_entity:
-            st.warning("Please select a center entity.")
-            return
-
-        # Get entity ID
-        center_id = entity_name_to_id.get(central_entity)
-
+    # --- Visualization Button ---
+    if st.button("Visualize Centered Network", key="visualize_centered_btn", type="primary"):
+        center_id = entity_name_to_id.get(center_entity_name)
         if not center_id:
-            st.error("Could not find ID for the selected entity.")
+            st.error("Could not find ID for the selected center entity.")
             return
 
-        # Create full graph
-        G = nx.DiGraph()
+        # --- Build Full Graph ---
+        with st.spinner(f"Building neighborhood graph around '{center_entity_name}'..."):
+            G_full = nx.DiGraph()
+            nodes_in_rels = set()
+            rel_lookup = {} # Store descriptions keyed by (source, target, type)
 
-        # Add all entities as nodes
-        for entity in entities:
-            entity_id = entity.get("id")
-            if entity_id:
-                G.add_node(
-                    entity_id,
-                    label=entity.get("name", "Unknown"),
-                    type=entity.get("type", "Unknown")
-                )
+            # Add nodes involved in relevant relationships
+            for rel in relationships:
+                 s_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+                 t_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+                 r_type = rel.get("type", rel.get("relationship_type", "RELATED_TO"))
+                 r_desc = rel.get("description")
+                 # Filter by selected relationship types
+                 if r_type in selected_rel_types:
+                     if s_id and t_id:
+                         nodes_in_rels.add(s_id)
+                         nodes_in_rels.add(t_id)
+                         rel_lookup[(s_id, t_id, r_type)] = r_desc
 
-        # Add filtered relationships as edges
-        for rel in relationships:
-            source_rel_id = rel.get("source_entity_id", rel.get("from_entity_id"))
-            target_rel_id = rel.get("target_entity_id", rel.get("to_entity_id"))
-            rel_type = rel.get("type", rel.get("relationship_type", "Unknown"))
+            # Add only relevant nodes
+            for entity in entities:
+                 e_id = entity.get("id")
+                 if e_id in nodes_in_rels:
+                     G_full.add_node(e_id, label=entity.get("name"), type=entity.get("type"))
 
-            # Skip if relationship type is filtered out
-            if rel_type not in selected_rel_types:
-                continue
+            # Add filtered edges
+            for rel in relationships:
+                 s_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+                 t_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+                 r_type = rel.get("type", rel.get("relationship_type", "RELATED_TO"))
+                 r_desc = rel.get("description")
+                 # Add edge only if both nodes exist and type is selected
+                 if r_type in selected_rel_types and G_full.has_node(s_id) and G_full.has_node(t_id):
+                      G_full.add_edge(s_id, t_id, type=r_type, description=r_desc)
 
-            if source_rel_id and target_rel_id:
-                G.add_edge(
-                    source_rel_id,
-                    target_rel_id,
-                    type=rel_type
-                )
+            # --- Find Neighborhood (Undirected BFS) ---
+            UG_full = G_full.to_undirected()
+            nodes_in_neighborhood = {center_id: 0} # node_id: distance
+            queue = deque([(center_id, 0)])
 
-        # For undirected traversal, create an undirected version of the graph
-        UG = G.to_undirected()
+            while queue:
+                curr_node, dist = queue.popleft()
+                if dist >= connection_depth:
+                    continue
+                for neighbor in UG_full.neighbors(curr_node):
+                    if neighbor not in nodes_in_neighborhood:
+                        nodes_in_neighborhood[neighbor] = dist + 1
+                        queue.append((neighbor, dist + 1))
 
-        # Get nodes within n connections from the center entity
-        nodes_within_n_connections = {center_id: 0}  # node_id: distance
-        queue = [(center_id, 0)]  # (node_id, distance)
+            if len(nodes_in_neighborhood) <= 1 and connection_depth > 0:
+                st.warning(f"No connections found for '{center_entity_name}' within {connection_depth} hop(s) with the selected relationship types.")
+                return
 
-        while queue:
-            node, distance = queue.pop(0)
+            # --- Create Visualization Subgraph ---
+            viz_graph = nx.DiGraph()
+            # Add nodes in neighborhood
+            for node_id, distance in nodes_in_neighborhood.items():
+                 if node_id in entity_id_to_name: # Ensure node exists in original data
+                    viz_graph.add_node(
+                        node_id,
+                        label=entity_id_to_name[node_id],
+                        type=entity_id_to_type.get(node_id, "Unknown"),
+                        distance=distance,
+                        is_center=(node_id == center_id)
+                    )
 
-            if distance < connection_depth:
-                for neighbor in UG.neighbors(node):
-                    if neighbor not in nodes_within_n_connections:
-                        nodes_within_n_connections[neighbor] = distance + 1
-                        queue.append((neighbor, distance + 1))
+            # Add edges between nodes *within* the neighborhood
+            edge_count = 0
+            for u, v, data in G_full.edges(data=True):
+                 if u in nodes_in_neighborhood and v in nodes_in_neighborhood:
+                     viz_graph.add_edge(u, v, type=data.get("type"), description=data.get("description"))
+                     edge_count +=1
 
-        # If no connections found
-        if len(nodes_within_n_connections) <= 1:
-            st.warning(f"No connections found for {central_entity} with the current filters.")
-            return
+        # --- Create PyVis Network ---
+        with st.spinner("Rendering centered visualization..."):
+            net = Network(height="700px", width="100%", directed=True, notebook=True, cdn_resources='remote', heading="")
 
-        # Create visualization subgraph
-        viz_graph = nx.DiGraph()
+            colors = CONFIG.get("visualization", {}).get("node_colors", {})
+            shapes = CONFIG.get("visualization", {}).get("node_shapes", {})
+            center_color = "#FF0000" # Bright Red
 
-        # Add nodes from the neighborhood
-        for node_id, distance in nodes_within_n_connections.items():
-            if node_id in entity_id_to_name:
-                viz_graph.add_node(
-                    node_id,
-                    label=entity_id_to_name[node_id],
-                    type=entity_id_to_type.get(node_id, "Unknown"),
-                    distance=distance,
-                    is_center=(node_id == center_id)
-                )
+            # Add nodes
+            for node_id, attrs in viz_graph.nodes(data=True):
+                 entity_type = attrs.get("type", "Unknown")
+                 distance = attrs.get("distance", 0)
+                 is_center = attrs.get("is_center", False)
 
-        # Add edges between nodes in the neighborhood (preserve direction)
-        for u, v, data in G.edges(data=True):
-            if u in nodes_within_n_connections and v in nodes_within_n_connections:
-                viz_graph.add_edge(u, v, **data)
+                 # Size based on distance from center
+                 size = max(12, 35 - (distance * 6)) # More pronounced size difference
 
-        # Create PyVis network for visualization
-        net = Network(height="700px", width="100%", directed=True, notebook=True, cdn_resources='remote')
+                 if is_center:
+                     color, border_width = center_color, 3
+                     title_suffix = " (Center)"
+                 else:
+                     color = colors.get(entity_type, colors.get("Unknown", "#9CA3AF"))
+                     border_width = 1
+                     title_suffix = f" ({distance} hop{'s' if distance != 1 else ''})"
 
-        # Node color map by type
-        colors = {
-            "PERSON": "#3B82F6",  # Blue
-            "ORGANIZATION": "#10B981",  # Green
-            "GOVERNMENT_BODY": "#60BD68",  # Green variant
-            "COMMERCIAL_COMPANY": "#10B981",  # Green variant
-            "LOCATION": "#F59E0B",  # Yellow/Orange
-            "POSITION": "#8B5CF6",  # Purple
-            "MONEY": "#EC4899",  # Pink
-            "ASSET": "#EF4444",  # Red
-            "EVENT": "#6366F1",  # Indigo
-            "Unknown": "#9CA3AF"  # Light gray
-        }
+                 shape = shapes.get(entity_type, shapes.get("Unknown", "dot"))
+                 label = attrs.get("label", "Unknown")
+                 title = f"{label}\nType: {entity_type}{title_suffix}"
 
-        # Center node color
-        center_color = "#FF0000"  # Red for center
+                 net.add_node(node_id, label=label, title=title, color=color, shape=shape, size=size, borderWidth=border_width)
 
-        # Node shapes by type
-        shapes = {
-            "PERSON": "dot",
-            "ORGANIZATION": "square",
-            "GOVERNMENT_BODY": "triangle",
-            "COMMERCIAL_COMPANY": "diamond",
-            "LOCATION": "star",
-            "POSITION": "ellipse",
-            "MONEY": "hexagon",
-            "ASSET": "box",
-            "EVENT": "database",
-            "Unknown": "dot"
-        }
+            # Add edges
+            for source, target, attrs in viz_graph.edges(data=True):
+                 rel_type = attrs.get("type", "RELATED_TO")
+                 description = attrs.get("description", "N/A")
+                 edge_title = f"Type: {rel_type}\nDescription: {description if description else 'N/A'}"
 
-        # Add nodes to PyVis with visual attributes
-        for node_id, attrs in viz_graph.nodes(data=True):
-            entity_type = attrs.get("type", "Unknown")
-            distance = attrs.get("distance", 0)
-            is_center = attrs.get("is_center", False)
+                 # Style edges connecting to center differently
+                 is_direct_connection = (source == center_id or target == center_id)
+                 edge_color = "#FF6A6A" if is_direct_connection else "#B0B0B0" # Light red for direct, light gray otherwise
+                 width = 2.5 if is_direct_connection else 1.0
+                 dashes = False if is_direct_connection else True
 
-            # Size based on distance from center (larger for center, smaller for distant nodes)
-            size = 35 - (distance * 5) if distance <= 5 else 10
+                 net.add_edge(
+                     source, target, title=edge_title, label="", width=width, color=edge_color, dashes=dashes,
+                     arrows={'to': {'enabled': True, 'scaleFactor': 0.6}}
+                     )
 
-            # Determine color
-            if is_center:
-                color = center_color
-                border_width = 3
-            else:
-                color = colors.get(entity_type, colors["Unknown"])
-                border_width = 1
-
-            # Get shape
-            shape = shapes.get(entity_type, shapes["Unknown"])
-
-            # Create label with type and distance
-            label = attrs.get("label", "Unknown")
-            if is_center:
-                title = f"{label} ({entity_type}) - CENTER"
-            else:
-                title = f"{label} ({entity_type}) - {distance} step(s) away"
-
-            # Add node with visual attributes
-            net.add_node(
-                node_id,
-                label=label,
-                title=title,
-                color=color,
-                shape=shape,
-                size=size,
-                borderWidth=border_width,
-                font={'size': 16, 'face': 'Arial', 'color': 'black'}
+            # Build and set PyVis options
+            pyvis_options = _build_pyvis_options(
+                physics_enabled, physics_solver, spring_length, spring_constant, central_gravity, grav_constant
             )
+            # Try hierarchical layout if depth is 1? Might look cleaner.
+            # if connection_depth == 1:
+            #     pyvis_options["layout"] = {"hierarchical": {"enabled": True, "sortMethod": "directed"}}
+            #     pyvis_options["physics"]["enabled"] = False # Disable physics for hierarchical
 
-        # Add edges to PyVis with visual attributes
-        for source, target, attrs in viz_graph.edges(data=True):
-            rel_type = attrs.get("type", "RELATED_TO")
+            net.set_options(json.dumps(pyvis_options))
 
-            # Check distances for gradient coloring
-            source_distance = viz_graph.nodes[source].get("distance", 0)
-            target_distance = viz_graph.nodes[target].get("distance", 0)
+            # Save and display
+            graph_html_path = ROOT_DIR / "temp" / "centered_graph.html"
+            try:
+                 net.save_graph(str(graph_html_path))
+                 with open(graph_html_path, "r", encoding="utf-8") as f:
+                     html_content = f.read()
+                 st.components.v1.html(html_content, height=710, scrolling=False)
+                 st.caption(f"Displaying neighborhood: {viz_graph.number_of_nodes()} entities and {edge_count} relationships within {connection_depth} hop(s) of '{center_entity_name}'.")
+            except Exception as render_err:
+                 st.error(f"Failed to render centered graph: {render_err}")
+                 logger.error(f"PyVis rendering failed for centered graph: {traceback.format_exc()}")
 
-            # Determine edge width based on distance from center
-            max_width = 5
-            min_width = 1
-            width = max(min_width, max_width - min(source_distance, target_distance))
 
-            # Edge styling
-            if source == center_id or target == center_id:
-                # Direct connections to center
-                color = "#FF0000"  # Red
-                dash = False
+def render_network_metrics_tab(entities, relationships):
+    """
+    Render the network metrics analysis tab with sub-tabs for different metric categories.
+
+    Args:
+        entities: List of entity dictionaries (potentially filtered)
+        relationships: List of relationship dictionaries (potentially filtered)
+    """
+    st.markdown("#### Advanced Network Analysis")
+    st.markdown("""
+    Dive deeper into the network structure with quantitative metrics. Identify key players,
+    cohesive groups, potential hidden connections, and structural anomalies.
+    """)
+
+    if not entities or not relationships:
+        st.info("Insufficient data for network metrics calculation (need both entities and relationships).")
+        return
+
+    @st.cache_data(ttl=3600)  # Cache for 1 hour
+    def build_analysis_graphs(_entities, _relationships):
+        logger.info("Building NetworkX graphs for analysis...")
+        G = nx.DiGraph()  # Directed graph
+        UG = nx.Graph()  # Undirected graph
+
+        # Build entity_lookup first, ensuring IDs are present
+        entity_lookup = {}
+        valid_entity_count = 0
+        for entity in _entities:
+            e_id = entity.get("id")
+            if e_id:
+                # Ensure basic fields exist, provide defaults if necessary
+                entity_data = {
+                    "id": e_id,
+                    "label": entity.get("name", f"Unknown Entity {e_id[:4]}"),  # Use ID part if name missing
+                    "type": entity.get("type", "Unknown")  # Use Unknown if type missing
+                }
+                # Include original data for potential future use
+                entity_data.update(entity)
+                entity_lookup[e_id] = entity_data
+                valid_entity_count += 1
             else:
-                # Other connections
-                color = "#666666"  # Gray
-                dash = False
+                logger.warning(f"Skipping entity due to missing ID: {str(entity)[:100]}...")
 
-            # Add edge with visual attributes
-            net.add_edge(
-                source,
-                target,
-                title=rel_type,
-                label=rel_type,
-                width=width,
-                color=color,
-                dashes=dash,
-                arrows={'to': {'enabled': True, 'scaleFactor': 0.5}}
-            )
+        logger.info(f"Created entity lookup with {valid_entity_count} valid entities.")
 
-        # Configure layout based on center-focused radial approach with user controls
-        net.options = {
-            "physics": {
-                "enabled": True,
-                "solver": "forceAtlas2Based",
-                "forceAtlas2Based": {
-                    "gravitationalConstant": -200,
-                    "centralGravity": central_gravity,
-                    "springLength": spring_length,
-                    "springConstant": spring_constant,
-                    "damping": 0.09
-                },
-                "stabilization": {
-                    "enabled": True,
-                    "iterations": 1000,
-                    "updateInterval": 25
-                }
-            },
-            "interaction": {
-                "hover": True,
-                "navigationButtons": True,
-                "keyboard": {
-                    "enabled": True
-                }
-            },
-            "edges": {
-                "smooth": {
-                    "enabled": True,
-                    "type": "dynamic"
-                },
-                "arrows": {
-                    "to": {
-                        "enabled": True,
-                        "scaleFactor": 0.5
-                    }
-                }
-            },
-            "nodes": {
-                "font": {
-                    "size": 16,
-                    "face": "Arial"
-                }
+        # Add nodes from the lookup, ensuring they have the required attributes
+        for e_id, entity_data in entity_lookup.items():
+            # Use the potentially defaulted label/type from the lookup
+            node_attrs = {
+                "label": entity_data["label"],
+                "type": entity_data["type"]
             }
-        }
+            # Check if node already exists (shouldn't with lookup approach)
+            if not G.has_node(e_id):
+                G.add_node(e_id, **node_attrs)
+                UG.add_node(e_id, **node_attrs)
 
-        # Save to HTML file
-        graph_html_path = ROOT_DIR / "temp" / "centered_graph.html"
-        net.save_graph(str(graph_html_path))
+        # Add edges with validation
+        valid_edge_count = 0
+        skipped_edge_count = 0
+        for rel in _relationships:
+            s_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+            t_id = rel.get("target_entity_id", rel.get("to_entity_id"))
 
-        # Display summary info
-        st.caption(
-            f"Showing {len(viz_graph.nodes)} entities and {len(viz_graph.edges)} relationships within {connection_depth} step(s) of {central_entity}")
+            # Check if both nodes exist in our graph (using the lookup is faster)
+            if s_id in entity_lookup and t_id in entity_lookup:
+                # Validate relationship type
+                r_type = rel.get("type", rel.get("relationship_type"))
+                if r_type and isinstance(r_type, str) and r_type.strip() and r_type.upper() != "UNKNOWN":
+                    # Add edge with type as attribute
+                    edge_attrs = {"type": r_type}
+                    # Check if edge exists before adding (NetworkX handles duplicates, but explicit check is fine)
+                    if not G.has_edge(s_id, t_id):
+                        G.add_edge(s_id, t_id, **edge_attrs)
+                        valid_edge_count += 1
+                    # Add undirected edge regardless of direction or duplicates (UG handles this)
+                    UG.add_edge(s_id, t_id, **edge_attrs)
 
-        # Show connection counts by type
-        connection_types = {}
-        for _, _, data in viz_graph.edges(data=True):
-            rel_type = data.get("type", "Unknown")
-            connection_types[rel_type] = connection_types.get(rel_type, 0) + 1
+                else:
+                    skipped_edge_count += 1
+            else:
+                # This can happen if the document filter removed one of the entities
+                skipped_edge_count += 1
 
-        # Display connection type summary
-        if connection_types:
-            st.info("**Connection types:**")
-            connection_summary = ", ".join(
-                [f"{rel_type}: {count}" for rel_type, count in sorted(connection_types.items())])
-            st.text(connection_summary)
+        logger.info(
+            f"Analysis graphs built: Directed ({G.number_of_nodes()} nodes, {G.number_of_edges()} edges), Undirected ({UG.number_of_nodes()} nodes, {UG.number_of_edges()} edges). Skipped {skipped_edge_count} edges.")
+        if skipped_edge_count > G.number_of_edges() * 0.1 and G.number_of_edges() > 0:
+            logger.warning(
+                f"Skipped a significant number of edges ({skipped_edge_count}) during graph build. Check data quality or filters.")
+        # Return the confirmed lookup along with graphs
+        return G, UG, entity_lookup
 
-        # Read HTML content and display
-        with open(graph_html_path, "r", encoding="utf-8") as f:
-            html_content = f.read()
+    try:
+        import networkx as nx
+        import pandas as pd
+        from collections import Counter
+        # Import community detection library
+        try:
+            import community as community_louvain
+            louvain_available = True
+        except ImportError:
+            louvain_available = False
+            logger.warning("Python-louvain library not found. Community detection will be unavailable. Install with: pip install python-louvain")
+        # Import gensim for Node2Vec
+        try:
+            from node2vec import Node2Vec
+            gensim_available = True
+        except ImportError:
+            gensim_available = False
+            logger.warning("Gensim library not found. Node Similarity (Node2Vec) will be unavailable. Install with: pip install gensim")
 
-        st.components.v1.html(html_content, height=700, scrolling=True)
+        # Build graphs using caching
+        G, UG, entity_lookup = build_analysis_graphs(entities, relationships)
 
+        if G.number_of_nodes() == 0 or G.number_of_edges() == 0:
+             st.warning("The filtered data resulted in an empty graph. Cannot calculate metrics.")
+             return
+
+        # --- Create Sub-Tabs for Metrics ---
+        centrality_tab, community_tab, links_tab, similarity_tab = st.tabs([
+            "👑 Centrality & Influence",
+            "👥 Communities & Groups",
+            "🔮 Link Prediction Hints",
+            "🤝 Node Similarity (Embeddings)"
+        ])
+
+        # --- Centrality Tab ---
+        with centrality_tab:
+            render_centrality_metrics(G, UG, entity_lookup) # Pass both graphs if needed
+
+        # --- Community Tab ---
+        with community_tab:
+            if louvain_available:
+                render_community_metrics(UG, entity_lookup) # Use undirected for communities
+            else:
+                st.warning("Community detection requires the 'python-louvain' library. Please install it (`pip install python-louvain`).")
+
+        # --- Link Prediction Hints Tab ---
+        with links_tab:
+            render_link_prediction_hints(UG, entity_lookup) # Use undirected for link prediction scores
+
+        # --- Node Similarity Tab ---
+        with similarity_tab:
+            if gensim_available:
+                render_node_similarity(UG, entity_lookup) # Use undirected for Node2Vec
+            else:
+                st.warning("Node similarity requires the 'gensim' library. Please install it (`pip install gensim`).")
+
+    except Exception as e:
+        st.error(f"An error occurred during network metrics calculation: {e}")
+        logger.error(f"Network metrics calculation failed: {traceback.format_exc()}")
+
+
+def render_node_similarity(UG: nx.Graph, entity_lookup: Dict):
+    """Renders the Node Similarity (Embeddings) sub-tab using the 'node2vec' library."""
+    import pandas as pd
+
+    # Check for the correct library
+    try:
+        from node2vec import Node2Vec # Check specific library import
+        node2vec_available = True
+    except ImportError:
+        node2vec_available = False
+
+    st.markdown("##### Find Structurally Similar Entities")
+    st.markdown("""
+    Node Embeddings learn vector representations of entities based on their network neighborhood. Entities with similar vectors often play similar roles. This uses the Node2Vec algorithm via the `node2vec` library.
+    - **Node2Vec:** Learns embeddings by simulating random walks on the graph.
+    - **Cosine Similarity:** Measures similarity between entity vectors (closer to 1 is more similar).
+    """)
+
+    if not node2vec_available:
+        st.warning("Node similarity requires the 'node2vec' library. Please install it (`pip install node2vec`). Note: This library also depends on `gensim`.")
+        return
+
+    # --- Node2Vec Model Training & Similarity Search ---
+    if UG.number_of_nodes() < 5:
+         st.warning("Graph is too small (< 5 nodes) for meaningful Node2Vec training.")
+         return
+
+    st.markdown("**Node2Vec Parameters** (Adjust then click 'Find Similar Entities')")
+    n2v_col1, n2v_col2, n2v_col3 = st.columns(3)
+    with n2v_col1:
+         n2v_dims = st.slider("Embedding Dimensions", min_value=16, max_value=128, value=64, step=16, key="n2v_dims")
+         n2v_walk_len = st.slider("Walk Length", min_value=10, max_value=80, value=30, step=5, key="n2v_walklen")
+    with n2v_col2:
+         n2v_num_walks = st.slider("Number of Walks / Node", min_value=10, max_value=200, value=50, step=10, key="n2v_numwalks")
+         n2v_window = st.slider("Window Size (Word2Vec)", min_value=2, max_value=10, value=5, step=1, key="n2v_window")
+    with n2v_col3:
+         # Note about workers=1 on Windows moved to train function logging
+         pass
+
+    st.markdown("**Similarity Search**")
+    search_col1, search_col2 = st.columns([3,1])
+    with search_col1:
+         # Ensure labels exist before creating options
+         entity_names = sorted([data['label'] for _, data in UG.nodes(data=True) if data and 'label' in data])
+         if not entity_names:
+              st.warning("No entity names found in the graph nodes.")
+              return
+         target_entity_name = st.selectbox(
+             "Find entities similar to:", options=entity_names, key="n2v_target"
+         )
+    with search_col2:
+         top_n_similar = st.number_input("Number of similar results", min_value=1, max_value=50, value=10, step=1, key="n2v_topn")
+
+    if st.button("Find Similar Entities", key="n2v_find_btn", type="primary"):
+        target_node_id = None
+        target_node_str = None # We need the string representation used in wv
+        for node_id, data in UG.nodes(data=True):
+            if data and data.get('label') == target_entity_name:
+                target_node_id = node_id
+                target_node_str = str(node_id) # Assume node ID is directly convertible to string key used by wv
+                break
+
+        if target_node_id is None:
+            st.error(f"Could not find node ID for entity: {target_entity_name}")
+            return
+
+        with st.spinner(f"Calculating embeddings and finding entities similar to '{target_entity_name}'..."):
+            # Call the updated train_node2vec_model function
+            # Pass the necessary parameters from sliders
+            # Using workers=4 as default, user might need workers=1 on Windows (noted in logs)
+            wv, node_map = train_node2vec_model(
+                UG,
+                dimensions=n2v_dims,
+                walk_length=n2v_walk_len,
+                num_walks=n2v_num_walks,
+                window=n2v_window,
+                workers=4 # Default worker count
+            )
+
+            if wv is None or node_map is None:
+                 st.error("Failed to get Node2Vec model. Cannot perform similarity search.")
+                 # Clear previous results if training failed
+                 if 'node_similarity_results' in st.session_state: del st.session_state.node_similarity_results
+                 return
+
+            # Ensure the target node string (used as key in wv) exists
+            if target_node_str not in wv:
+                # If direct string conversion didn't work, try finding it in the returned node_map
+                found_in_map = False
+                for orig_id, str_id in node_map.items():
+                     if orig_id == target_node_id:
+                          target_node_str = str_id
+                          if target_node_str in wv:
+                              found_in_map = True
+                              break
+                if not found_in_map:
+                     st.error(f"'{target_entity_name}' (ID: {target_node_id}, Key Attempt: '{target_node_str}') not found in the Node2Vec model vocabulary. It might be isolated or training failed.")
+                     logger.warning(f"Node ID {target_node_id} mapped to '{target_node_str}', which is not in WV keys. WV keys sample: {list(wv.index_to_key[:10])}...")
+                     if 'node_similarity_results' in st.session_state: del st.session_state.node_similarity_results
+                     return
+
+            # Find most similar nodes using the potentially updated target_node_str
+            try:
+                 similar_nodes = wv.most_similar(target_node_str, topn=top_n_similar + 5) # Get a few extra to filter self and potential errors
+
+                 similarity_results = []
+                 # Map string IDs back to original IDs using the reverse map derived from node_map
+                 reverse_node_map = {v: k for k, v in node_map.items()}
+
+                 count = 0
+                 for node_str, similarity_score in similar_nodes:
+                     if count >= top_n_similar: break # Stop once we have enough results
+
+                     original_id = reverse_node_map.get(node_str)
+                     if original_id == target_node_id: continue # Skip self
+                     if original_id is None:
+                          logger.warning(f"Could not map node string '{node_str}' back to an original ID.")
+                          continue
+
+                     if original_id in entity_lookup:
+                         entity_data = entity_lookup[original_id]
+                         similarity_results.append({
+                             'Similar Entity': entity_data.get('label', 'Unknown'),
+                             'Type': entity_data.get('type', 'Unknown'),
+                             'Similarity Score': round(similarity_score, 4),
+                             'Node ID': original_id
+                         })
+                         count += 1
+                     else:
+                          logger.warning(f"Original ID '{original_id}' (from node_str '{node_str}') not found in entity_lookup.")
+
+
+                 df_similar = pd.DataFrame(similarity_results) # Already limited by the loop
+                 st.session_state.node_similarity_results = df_similar
+                 st.session_state.node_similarity_target = target_entity_name # Store target name
+                 st.success(f"Found {len(df_similar)} entities similar to '{target_entity_name}'.")
+
+            except KeyError as ke:
+                 st.error(f"Entity key '{target_node_str}' not found in the embedding model's vocabulary: {ke}")
+                 logger.error(f"KeyError during similarity search for key '{target_node_str}': {ke}")
+                 if 'node_similarity_results' in st.session_state: del st.session_state.node_similarity_results
+            except Exception as e:
+                 st.error(f"An error occurred during similarity search: {e}")
+                 logger.error(f"Node similarity search error: {traceback.format_exc()}")
+                 if 'node_similarity_results' in st.session_state: del st.session_state.node_similarity_results
+
+    # --- Display Results ---
+    if 'node_similarity_results' in st.session_state:
+        df_results = st.session_state.node_similarity_results
+        target_display_name = st.session_state.get('node_similarity_target', 'the selected entity')
+        st.markdown(f"**Entities Structurally Similar to '{target_display_name}'**")
+        if not df_results.empty:
+            st.dataframe(
+                df_results[['Similar Entity', 'Type', 'Similarity Score']],
+                hide_index=True, use_container_width=True,
+                 column_config={ "Similarity Score": st.column_config.NumberColumn(format="%.4f")}
+            )
+        else:
+             st.info(f"No similar entities found for '{target_display_name}' based on the current model and parameters.")
+    else:
+         st.info("Select an entity and click 'Find Similar Entities'. Training the embedding model may take a minute or two depending on graph size and parameters.")
+
+def render_centrality_metrics(G: nx.DiGraph, UG: nx.Graph, entity_lookup: Dict): # Accepts the lookup
+    """Renders the Centrality & Influence analysis sub-tab."""
+    import pandas as pd
+    import networkx as nx
+
+    st.markdown("##### Identify Key Entities")
+    st.markdown("""
+    Centrality metrics help pinpoint influential nodes within the network.
+    - **Degree (In/Out/Total):** Number of direct connections. High degree nodes are local hubs.
+    - **Betweenness:** Measures how often a node lies on the shortest paths between other nodes. High betweenness nodes act as bridges or brokers.
+    - **Eigenvector:** Measures influence based on connections to other influential nodes. High eigenvector nodes are connected to well-connected nodes.
+    - **PageRank:** Google's algorithm, similar to Eigenvector, measures influence based on link structure.
+    """)
+
+
+    if G.number_of_nodes() == 0:
+        st.warning("Graph is empty. Cannot calculate centrality.")
+        return
+
+    with st.spinner("Calculating centrality metrics..."):
+        try:
+            # ... (calculations as before) ...
+            in_degree = dict(G.in_degree())
+            out_degree = dict(G.out_degree())
+            k_betweenness = min(100, G.number_of_nodes() // 2) if G.number_of_nodes() > 20 else None
+            if k_betweenness is not None and k_betweenness <= 0: k_betweenness = None
+            betweenness = nx.betweenness_centrality(G, k=k_betweenness, normalized=True, weight=None)
+            # ... (Robust Eigenvector calculation) ...
+            eigenvector = {} # Initialize
+            if G.number_of_edges() > 0:
+                 try:
+                     largest_cc = max(nx.weakly_connected_components(G), key=len)
+                     G_conn = G.subgraph(largest_cc)
+                     if G_conn.number_of_nodes() > 1:
+                         try:
+                             eigenvector_conn = nx.eigenvector_centrality_numpy(G_conn, max_iter=1000, tol=1e-03)
+                             eigenvector = {node: eigenvector_conn.get(node, 0.0) for node in G.nodes()}
+                         except (nx.PowerIterationFailedConvergence, nx.NetworkXError) as eig_err:
+                             logger.warning(f"Eigenvector centrality failed: {eig_err}. Assigning 0.")
+                             eigenvector = {node: 0.0 for node in G.nodes()}
+                     else: eigenvector = {node: 0.0 for node in G.nodes()}
+                 except Exception as eig_gen_err:
+                      logger.warning(f"Eigenvector prep error: {eig_gen_err}. Assigning 0.")
+                      eigenvector = {node: 0.0 for node in G.nodes()}
+            else: eigenvector = {node: 0.0 for node in G.nodes()}
+
+            pagerank = nx.pagerank(G, alpha=0.85)
+
+            centrality_data = []
+            processed_ids_debug = set() # For debugging lookup issues
+            for node_id in G.nodes():
+                # *** Use the PASSED entity_lookup ***
+                entity = entity_lookup.get(node_id) # Use .get, default is None
+                processed_ids_debug.add(node_id)
+
+                # *** Check if entity lookup was successful ***
+                if entity:
+                    entity_label = entity.get('label', f"Unknown Entity {node_id[:4]}")
+                    entity_type = entity.get('type', 'Unknown')
+                else:
+                    # This case should ideally not happen if build_analysis_graphs is correct
+                    logger.warning(f"Node ID {node_id} found in graph but not in entity_lookup!")
+                    entity_label = f"Missing Label {node_id[:4]}"
+                    entity_type = "Missing Type"
+
+                in_d = in_degree.get(node_id, 0)
+                out_d = out_degree.get(node_id, 0)
+                total_degree = in_d + out_d
+                centrality_data.append({
+                    'Entity': entity_label, # Use potentially defaulted label
+                    'Type': entity_type,     # Use potentially defaulted type
+                    'In-Degree': in_d, 'Out-Degree': out_d, 'Total Degree': total_degree,
+                    'Betweenness': round(betweenness.get(node_id, 0), 5),
+                    'Eigenvector': round(eigenvector.get(node_id, 0), 5),
+                    'PageRank': round(pagerank.get(node_id, 0), 5),
+                    'Node ID': node_id
+                })
+            df_centrality = pd.DataFrame(centrality_data)
+
+            # Debugging: Compare graph nodes and lookup keys
+            graph_nodes_set = set(G.nodes())
+            lookup_keys_set = set(entity_lookup.keys())
+            if graph_nodes_set != lookup_keys_set:
+                 logger.warning(f"Mismatch between graph nodes ({len(graph_nodes_set)}) and lookup keys ({len(lookup_keys_set)}).")
+                 logger.warning(f"Nodes in graph but not lookup: {graph_nodes_set - lookup_keys_set}")
+                 logger.warning(f"Keys in lookup but not graph: {lookup_keys_set - graph_nodes_set}")
+
+
+            if df_centrality.empty and G.number_of_nodes() > 0:
+                 st.warning("Centrality calculations resulted in an empty dataframe, though graph has nodes.")
+                 return
+
+        except Exception as e:
+            st.error(f"Failed to calculate centrality metrics: {e}")
+            logger.error(f"Centrality calculation error: {traceback.format_exc()}")
+            return
+
+    # --- Display Key Players & Full Table ---
+    # (Keep the display logic, ensuring it handles potentially empty df_centrality gracefully)
+    st.markdown("**Key Players Summary (Top 5)**")
+    if not df_centrality.empty:
+        kp_col1, kp_col2, kp_col3 = st.columns(3)
+        # (Metrics display code as before, using the potentially fixed df_centrality)
+        with kp_col1:
+            max_degree_val = df_centrality['Total Degree'].max()
+            top_degree_entity = df_centrality.loc[df_centrality['Total Degree'].idxmax()]['Entity'] if max_degree_val > 0 else "N/A"
+            st.metric("Highest Total Degree", top_degree_entity, f"{max_degree_val} connections")
+            st.dataframe(df_centrality.nlargest(5, 'Total Degree')[['Entity', 'Type', 'Total Degree']], hide_index=True, use_container_width=True)
+        with kp_col2:
+             max_betweenness_val = df_centrality['Betweenness'].max()
+             top_betweenness_entity = df_centrality.loc[df_centrality['Betweenness'].idxmax()]['Entity'] if max_betweenness_val > 0 else "N/A"
+             st.metric("Top Broker (Betweenness)", top_betweenness_entity, f"{max_betweenness_val:.3f} score")
+             st.dataframe(df_centrality.nlargest(5, 'Betweenness')[['Entity', 'Type', 'Betweenness']], hide_index=True, use_container_width=True)
+        with kp_col3:
+            max_pagerank_val = df_centrality['PageRank'].max()
+            top_pagerank_entity = df_centrality.loc[df_centrality['PageRank'].idxmax()]['Entity'] if max_pagerank_val > 0 else "N/A"
+            st.metric("Most Influential (PageRank)", top_pagerank_entity, f"{max_pagerank_val:.3f} score")
+            st.dataframe(df_centrality.nlargest(5, 'PageRank')[['Entity', 'Type', 'PageRank']], hide_index=True, use_container_width=True)
+    else:
+        st.info("No centrality data to display.")
+
+    st.markdown("**Full Centrality Data**")
+    if not df_centrality.empty:
+        filt_col1, filt_col2 = st.columns([2,1])
+        # (Filter controls as before)
+        with filt_col1: search_entity = st.text_input("Search Entity Name", key="cent_search")
+        with filt_col2: min_degree = st.number_input("Min Total Degree", min_value=0, value=0, step=1, key="cent_min_degree")
+
+        filtered_df = df_centrality[df_centrality['Total Degree'] >= min_degree]
+        if search_entity:
+            if 'Entity' in filtered_df.columns:
+                 filtered_df = filtered_df[filtered_df['Entity'].astype(str).str.contains(search_entity, case=False, na=False)]
+
+        st.dataframe(
+            filtered_df.sort_values(by='Total Degree', ascending=False),
+            # (Column config as before)
+             hide_index=True, use_container_width=True,
+             column_config={ "Betweenness": st.column_config.NumberColumn(format="%.5f"), "Eigenvector": st.column_config.NumberColumn(format="%.5f"), "PageRank": st.column_config.NumberColumn(format="%.5f"), "Node ID": None }
+            )
+        st.caption(f"Displaying {len(filtered_df)} of {len(df_centrality)} entities.")
+    else:
+        st.info("No centrality data to display.")
+
+def render_community_metrics(UG: nx.Graph, entity_lookup: Dict):
+    """Renders the Communities & Groups analysis sub-tab."""
+    import pandas as pd
+    import networkx as nx
+    from collections import Counter
+    try:
+        import community as community_louvain
+        louvain_available = True
+    except ImportError:
+        louvain_available = False
+
+    if not louvain_available:
+        st.warning("Community detection requires 'python-louvain'. Install with `pip install python-louvain`.")
+        return
+
+    st.markdown("##### Detect Cohesive Groups")
+    st.markdown("""
+    Community detection algorithms identify groups of nodes that are more densely connected internally than with the rest of the network. These can represent organizations, families, or operational clusters.
+    - **Louvain Method:** A popular algorithm for finding high-modularity partitions (communities).
+    - **Modularity:** A score indicating the quality of the detected community structure (higher is generally better, typically > 0.3).
+    """)
+
+    # --- Calculate Communities ---
+    with st.spinner("Detecting communities using Louvain method..."):
+        try:
+            # Compute the best partition using Louvain
+            partition = community_louvain.best_partition(UG)
+            modularity = community_louvain.modularity(partition, UG)
+
+            # Process partition results
+            community_sizes = Counter(partition.values())
+            num_communities = len(community_sizes)
+            st.success(f"Detected {num_communities} communities with a modularity score of {modularity:.4f}.")
+
+            community_data = []
+            for node_id, comm_id in partition.items():
+                entity = entity_lookup.get(node_id, {})
+                community_data.append({
+                    'Entity': entity.get('label', 'Unknown'),
+                    'Type': entity.get('type', 'Unknown'),
+                    'Community ID': comm_id,
+                    'Community Size': community_sizes[comm_id],
+                    'Node ID': node_id
+                })
+            df_communities = pd.DataFrame(community_data)
+
+        except Exception as e:
+            st.error(f"Failed to detect communities: {e}")
+            logger.error(f"Community detection error: {traceback.format_exc()}")
+            return
+
+    # --- Display Community Summary ---
+    st.markdown("**Community Overview**")
+    # Filter out very small communities for the summary table
+    min_comm_size_display = st.slider("Min Community Size to Display", min_value=1, max_value=max(50, max(community_sizes.values()) // 2), value=max(3, min(5,max(community_sizes.values()))), key="comm_min_size")
+
+    summary_data = []
+    displayed_community_ids = set()
+    for comm_id, size in sorted(community_sizes.items(), key=lambda item: item[1], reverse=True):
+         if size >= min_comm_size_display:
+            displayed_community_ids.add(comm_id)
+            comm_nodes = df_communities[df_communities['Community ID'] == comm_id]
+            type_counts = Counter(comm_nodes['Type'])
+            most_common_types = ", ".join([f"{t} ({c})" for t, c in type_counts.most_common(3)])
+
+            # Find most central node within the community (by degree within the community subgraph)
+            subgraph = UG.subgraph(comm_nodes['Node ID'].tolist())
+            if subgraph.number_of_nodes() > 0:
+                degrees_in_subgraph = dict(subgraph.degree())
+                # Check if degrees_in_subgraph is not empty before finding max
+                if degrees_in_subgraph:
+                    central_node_id = max(degrees_in_subgraph, key=degrees_in_subgraph.get)
+                    central_entity_name = entity_lookup.get(central_node_id, {}).get('label', 'Unknown')
+                else:
+                    central_entity_name = "N/A (isolated node)"
+            else:
+                central_entity_name = "N/A"
+
+
+            summary_data.append({
+                 'ID': comm_id,
+                 'Size': size,
+                 'Top Types': most_common_types,
+                 'Most Connected Internal Node': central_entity_name
+            })
+
+    st.dataframe(pd.DataFrame(summary_data), hide_index=True, use_container_width=True)
+
+    # --- Explore Specific Community ---
+    st.markdown("**Explore Community Members**")
+    if displayed_community_ids:
+        selected_comm_id = st.selectbox(
+            "Select Community ID to View Members",
+            options=sorted(list(displayed_community_ids)),
+            key="comm_select"
+            )
+        if selected_comm_id is not None:
+             members_df = df_communities[df_communities['Community ID'] == selected_comm_id][['Entity', 'Type']].sort_values(by='Type')
+             st.dataframe(members_df, hide_index=True, use_container_width=True)
+    else:
+         st.info("No communities large enough to display based on the current size filter.")
+
+def render_link_prediction_hints(UG: nx.Graph, entity_lookup: Dict):
+    """Renders the Link Prediction Hints sub-tab."""
+    import pandas as pd
+    import networkx as nx
+
+    st.markdown("##### Suggest Potential Connections")
+    st.markdown("""
+    Link prediction algorithms suggest pairs of nodes that are *not* currently connected but are likely to be, based on the network structure. This can help uncover hidden or missing relationships.
+    - **Adamic-Adar Index:** Predicts links based on the number of shared neighbors, weighting rarer neighbors more heavily. Higher scores suggest a higher likelihood of connection.
+    """)
+
+    num_nodes = UG.number_of_nodes()
+    if num_nodes > 1500: # Limit computation for very large graphs
+        st.warning(f"Graph has {num_nodes} nodes. Link prediction calculation is limited to avoid performance issues. Results may be incomplete.")
+        limit_nodes = True
+    else:
+        limit_nodes = False
+
+    # --- Calculate Potential Links ---
+    # Select top N nodes by degree to focus calculation if graph is large
+    nodes_to_consider = UG.nodes()
+    if limit_nodes:
+        degrees = dict(UG.degree())
+        nodes_to_consider = sorted(degrees, key=degrees.get, reverse=True)[:1500]
+
+
+    # Parameters for calculation
+    num_suggestions = st.slider("Number of Potential Links to Suggest", min_value=10, max_value=200, value=50, step=10, key="lp_num")
+
+    if st.button("Calculate Potential Links", key="lp_calc_btn"):
+        with st.spinner("Calculating Adamic-Adar scores for potential links..."):
+            try:
+                # Generate pairs of non-connected nodes within the considered set
+                non_edges = []
+                nodes_list = list(nodes_to_consider)
+                for i in range(len(nodes_list)):
+                    for j in range(i + 1, len(nodes_list)):
+                         u, v = nodes_list[i], nodes_list[j]
+                         if not UG.has_edge(u, v):
+                             non_edges.append((u, v))
+
+                if not non_edges:
+                     st.info("No potential links to evaluate (graph might be fully connected or calculation limited).")
+                     return
+
+                # Calculate Adamic-Adar Index for non-edges
+                predictions = nx.adamic_adar_index(UG, non_edges)
+
+                # Store results
+                link_suggestions = []
+                for u, v, score in predictions:
+                    entity_u = entity_lookup.get(u, {})
+                    entity_v = entity_lookup.get(v, {})
+                    link_suggestions.append({
+                        'Entity 1': entity_u.get('label', 'Unknown'),
+                        'Type 1': entity_u.get('type', 'Unknown'),
+                        'Entity 2': entity_v.get('label', 'Unknown'),
+                        'Type 2': entity_v.get('type', 'Unknown'),
+                        'Adamic-Adar Score': round(score, 4),
+                        'Node ID 1': u,
+                        'Node ID 2': v
+                    })
+
+                # Sort by score and get top N
+                df_suggestions = pd.DataFrame(link_suggestions)
+                df_suggestions = df_suggestions.nlargest(num_suggestions, 'Adamic-Adar Score')
+
+                # Store in session state
+                st.session_state.link_prediction_results = df_suggestions
+                st.success(f"Calculated scores for {len(non_edges)} potential links. Showing top {min(num_suggestions, len(df_suggestions))}.")
+
+            except Exception as e:
+                st.error(f"Failed to calculate link prediction scores: {e}")
+                logger.error(f"Link prediction error: {traceback.format_exc()}")
+                if 'link_prediction_results' in st.session_state:
+                    del st.session_state.link_prediction_results
+
+
+    # --- Display Results ---
+    if 'link_prediction_results' in st.session_state:
+        df_results = st.session_state.link_prediction_results
+        st.markdown("**Top Potential Links (Higher score suggests higher likelihood)**")
+        st.dataframe(
+            df_results[['Entity 1', 'Type 1', 'Entity 2', 'Type 2', 'Adamic-Adar Score']],
+            hide_index=True,
+            use_container_width=True,
+             column_config={
+                 "Adamic-Adar Score": st.column_config.NumberColumn(format="%.4f"),
+             }
+            )
+    else:
+         st.info("Click 'Calculate Potential Links' to generate suggestions.")
+
+
+@st.cache_data(ttl=3600, show_spinner=False) # Cache Node2Vec model for an hour
+def train_node2vec_model(_UG, dimensions=64, walk_length=30, num_walks=100, window=5, workers=4):
+    """Trains a Node2Vec model on the graph using the 'node2vec' library. Cached function."""
+    try:
+        # *** Import the correct library ***
+        from node2vec import Node2Vec
+        import networkx as nx # Ensure networkx is imported here if not globally
+    except ImportError:
+        logger.error("The 'node2vec' library is required for node similarity. Please install it: pip install node2vec")
+        st.error("Node Similarity feature requires 'node2vec'. Please install it (`pip install node2vec`) and restart.")
+        return None, None
+
+    logger.info(f"Preparing graph for Node2Vec training...")
+    # The node2vec library internally handles node types, but using strings is safer if IDs are complex.
+    # However, let's try passing the original graph directly first, as the library might handle it.
+    # If issues arise, we can revert to string conversion.
+
+    if _UG.number_of_nodes() == 0 or _UG.number_of_edges() == 0:
+         logger.warning("Graph is empty or has no edges. Cannot train Node2Vec.")
+         return None, None
+
+    # Map original IDs to integers if they are not already suitable for the library
+    # (Let's assume UUIDs or strings might need mapping for some implementations)
+    node_list = list(_UG.nodes())
+    node_map_int_to_orig = {i: node_id for i, node_id in enumerate(node_list)}
+    node_map_orig_to_int = {node_id: i for i, node_id in node_map_int_to_orig.items()}
+
+    # Create a new graph with integer node IDs for node2vec library if needed
+    # Some versions might handle string IDs directly. Testing with original graph first.
+    # If direct use fails, uncomment the integer mapping graph creation.
+    # int_graph = nx.Graph()
+    # int_graph.add_nodes_from(range(len(node_list)))
+    # int_graph.add_edges_from([(node_map_orig_to_int[u], node_map_orig_to_int[v]) for u, v in _UG.edges()])
+    # graph_to_train = int_graph
+    graph_to_train = _UG # Try using the original graph directly
+
+    logger.info(f"Training Node2Vec model (dim={dimensions}, walk_length={walk_length}, num_walks={num_walks})...")
+
+    # Train Node2Vec model using the node2vec library's API
+    try:
+        # Instantiate Node2Vec object
+        # NOTE: workers > 1 might cause issues on Windows. Add comment.
+        # Consider making 'workers' an advanced setting if problems persist.
+        # p=1, q=1 simulates DeepWalk. Adjust p & q to tune BFS vs DFS exploration.
+        logger.info(f"Using {workers} workers for Node2Vec. (May require workers=1 on Windows if issues occur)")
+        node2vec_model = Node2Vec(
+            graph_to_train,
+            dimensions=dimensions,
+            walk_length=walk_length,
+            num_walks=num_walks,
+            p=1, # Return parameter
+            q=1, # In-out parameter
+            workers=workers, # ** Note: May need workers=1 on Windows **
+            seed=42, # for reproducibility
+            quiet=True # Suppress verbose output during walk generation
+        )
+
+        # Train the model (this calls gensim's Word2Vec internally)
+        # Pass window size, min_count, etc., here.
+        # dimensions and workers are derived from the Node2Vec object.
+        model = node2vec_model.fit(
+            window=window,
+            min_count=1,
+            sg=1, # Use skip-gram
+            epochs=10, # Standard number of epochs
+            batch_words=4 # Standard batch size for Word2Vec
+        )
+
+        logger.info("Node2Vec model training complete.")
+        # We need the Word2VecKeyedVectors part for similarity lookups
+        # Also return the original_id -> integer_id map if we used integer IDs
+        # If using original graph, node_map can just map original ID to itself as string if needed by wv
+        final_node_map = {orig_id: str(orig_id) for orig_id in _UG.nodes()} # Map to string for wv consistency
+
+        return model.wv, final_node_map # Return KeyedVectors and the map used (orig_id -> string)
+
+    except Exception as e:
+         logger.error(f"Node2Vec training failed: {e}", exc_info=True)
+         # Add more specific error message if possible
+         if "received duplicated nodes" in str(e).lower():
+              logger.error("Node2Vec Error Detail: The graph might contain duplicate node IDs which is unexpected.")
+         elif "must be provided" in str(e).lower():
+              logger.error(f"Node2Vec Error Detail: A required parameter might be missing or invalid. Check parameters: dims={dimensions}, wl={walk_length}, nw={num_walks}")
+         st.error(f"Node2Vec training failed: {e}")
+         return None, None
 
 def render_relationship_graph():
     """
     Render the relationship network graph with additional exploration tabs.
+    Acts as the main container for different graph views and analyses.
     """
-    st.subheader("Relationship Network Graph")
+    st.subheader("Relationship Network Analysis")
+    st.markdown("""
+    Explore the extracted entities and relationships through various interactive visualizations and analytical metrics.
+    Use the document filter below to focus the analysis on specific sources.
+    """)
 
-    # Apply custom CSS for taller graph
+    # Apply custom CSS for graph height and styling
     custom_css = """
     <style>
     iframe {
-        min-height: 750px !important;
-        height: 750px !important;
+        min-height: 700px !important; /* Adjusted height */
+        height: 700px !important;
     }
     .network-container, .vis-network {
-        min-height: 750px !important;
-        height: 750px !important;
+        min-height: 700px !important;
+        height: 700px !important;
     }
     div.vis-network div.vis-navigation {
         padding: 0;
         right: 10px;
         bottom: 10px;
     }
+    /* Styling for metric tabs */
+    .stTabs [data-baseweb="tab-list"] {
+		gap: 24px;
+	}
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: #F0F2F6;
+        border-radius: 4px 4px 0px 0px;
+        gap: 8px;
+        padding: 10px;
+    }
+    .stTabs [aria-selected="true"] {
+  		background-color: #FFFFFF;
+	}
     </style>
     """
     st.markdown(custom_css, unsafe_allow_html=True)
 
-    # Load data
+    # --- Load Data ---
     relationships_file = EXTRACTED_DATA_PATH / "relationships.json"
     entities_file = EXTRACTED_DATA_PATH / "entities.json"
 
@@ -2531,409 +3796,468 @@ def render_relationship_graph():
         return
 
     try:
-        with open(relationships_file, "r", encoding='utf-8') as f:
-            relationships = json.load(f)
-        with open(entities_file, "r", encoding='utf-8') as f:
-            entities = json.load(f)
+        # Use caching for loading data
+        @st.cache_data
+        def load_graph_data(rels_path, ents_path):
+            logger.info("Loading relationships and entities from disk...")
+            with open(rels_path, "r", encoding='utf-8') as f:
+                rels = json.load(f)
+            with open(ents_path, "r", encoding='utf-8') as f:
+                ents = json.load(f)
+            logger.info(f"Loaded {len(ents)} entities and {len(rels)} relationships.")
+            return rels, ents
+
+        relationships, entities = load_graph_data(relationships_file, entities_file)
+
     except Exception as e:
         st.error(f"Error loading relationships or entities: {e}")
+        logger.error(f"Graph data loading failed: {traceback.format_exc()}")
         return
 
     if not relationships or not entities:
         st.info("Entity or relationship data is empty.")
         return
 
+    # --- Document Filter ---
     try:
-        # Create a document filter (NEW CODE)
-        all_documents = set()
-
-        # Extract documents from entities
-        for entity in entities:
-            if 'context' in entity and 'file_name' in entity['context']:
-                all_documents.add(entity['context']['file_name'])
-
-        # Extract documents from relationships
-        for rel in relationships:
-            if 'file_name' in rel:
-                all_documents.add(rel['file_name'])
-
-        # Sort document list
-        all_documents = sorted(list(all_documents))
-
-        # Create filter at the top of all visualizations
+        st.markdown("---")
         st.markdown("### Document Filter")
+
+        # Extract unique document names efficiently
+        @st.cache_data
+        def get_unique_doc_names(_entities, _relationships):
+            docs = set()
+            for entity in _entities:
+                docs.add(entity.get("source_document", entity.get('context', {}).get('file_name')))
+            for rel in _relationships:
+                docs.add(rel.get("file_name"))
+            # Remove None or empty strings and sort
+            return sorted([doc for doc in docs if doc])
+
+        all_documents = get_unique_doc_names(entities, relationships)
+
+        # Multiselect for filtering
         selected_documents = st.multiselect(
-            "Filter by documents (select none to show all)",
+            "Filter by documents (select none to analyze all)",
             options=all_documents,
-            default=[]
+            default=[],
+            key="graph_document_filter"
         )
 
-        # Apply the filter to relationships if documents are selected
-        filtered_relationships = relationships
+        # Apply filter
         if selected_documents:
+            # Filter relationships first
             filtered_relationships = [
-                rel for rel in relationships
-                if 'file_name' in rel and rel['file_name'] in selected_documents
+                rel for rel in relationships if rel.get("file_name") in selected_documents
             ]
-
-            # Extract all entity IDs involved in the filtered relationships
+            # Get IDs of entities involved in the filtered relationships
             related_entity_ids = set()
             for rel in filtered_relationships:
-                source_id = rel.get("source_entity_id", rel.get("from_entity_id"))
-                target_id = rel.get("target_entity_id", rel.get("to_entity_id"))
-                if source_id:
-                    related_entity_ids.add(source_id)
-                if target_id:
-                    related_entity_ids.add(target_id)
-
-            # Filter entities to show only those in the filtered relationships
+                related_entity_ids.add(rel.get("source_entity_id", rel.get("from_entity_id")))
+                related_entity_ids.add(rel.get("target_entity_id", rel.get("to_entity_id")))
+            # Filter entities
             filtered_entities = [
-                entity for entity in entities
-                if entity.get("id") in related_entity_ids
+                entity for entity in entities if entity.get("id") in related_entity_ids
             ]
-        else:
-            # No document filter, use all entities
-            filtered_entities = entities
-
-        # Show filter stats
-        if selected_documents:
             st.success(
-                f"Filtered to {len(filtered_relationships)} relationships and {len(filtered_entities)} entities from {len(selected_documents)} documents")
+                f"Filtered to {len(filtered_relationships)} relationships and {len(filtered_entities)} entities from {len(selected_documents)} selected document(s).")
         else:
-            st.info(f"Showing all {len(relationships)} relationships and {len(entities)} entities")
+            # No filter applied
+            filtered_entities = entities
+            filtered_relationships = relationships
+            st.info(f"Analyzing all {len(relationships)} relationships and {len(entities)} entities.")
+        st.markdown("---")
 
-        # Create tabs for the different visualizations and table
+    except Exception as e:
+        st.error(f"Error applying document filter: {e}")
+        logger.error(f"Document filter failed: {traceback.format_exc()}")
+        # Fallback to using all data if filter fails
+        filtered_entities = entities
+        filtered_relationships = relationships
+
+    # Check if filtered data exists
+    if not filtered_entities and selected_documents:
+        st.warning("No entities found for the selected documents.")
+        return
+
+
+    # --- Render Tabs ---
+    try:
         overview_tab, connection_tab, centered_tab, metrics_tab, table_tab = st.tabs([
-            "Network Overview",
-            "Connection Explorer",
-            "Entity Explorer",
-            "Network Metrics",
-            "Relationship Table"
+            "📊 Network Overview",
+            "🔗 Connection Explorer",
+            "🎯 Entity Centered View",
+            "📈 Network Metrics",
+            "📄 Relationship Table"
         ])
 
-        # OVERVIEW TAB - Global network visualization
+        # Pass filtered data to each tab rendering function
         with overview_tab:
-            render_network_overview(filtered_entities, filtered_relationships)
+            render_network_overview_tab(filtered_entities, filtered_relationships)
 
-        # CONNECTION TAB - Entity-to-Entity connection explorer
         with connection_tab:
-            render_entity_connection_explorer(filtered_entities, filtered_relationships)
+            render_connection_explorer_tab(filtered_entities, filtered_relationships)
 
-        # CENTERED TAB - Entity-centered exploration
         with centered_tab:
-            render_entity_centered_explorer(filtered_entities, filtered_relationships)
+            render_entity_centered_tab(filtered_entities, filtered_relationships)
 
-        # METRICS TAB - Network analysis metrics
         with metrics_tab:
-            render_network_metrics(filtered_entities, filtered_relationships)
+            render_network_metrics_tab(filtered_entities, filtered_relationships)
 
-        # TABLE TAB - Relationship table
         with table_tab:
+            # Use the existing table rendering function, passing filtered data
             render_relationship_table(filtered_relationships, filtered_entities)
 
-    except ImportError:
-        st.error(
-            "Please install PyVis and NetworkX (`pip install pyvis networkx pandas`) to view the relationship graph.")
+    except ImportError as ie_err:
+         st.error(f"Missing required library: {ie_err}. Please install it.")
+         st.info("You might need to run: pip install pyvis networkx pandas python-louvain gensim")
+         logger.error(f"Import error in graph rendering: {ie_err}")
     except Exception as e:
-        st.error(f"Error generating relationship graph: {e}")
-        logger.error(f"Graph generation failed: {traceback.format_exc()}")
-
-
-def render_network_overview(entities, relationships):
+        st.error(f"An unexpected error occurred while rendering the relationship tabs: {e}")
+        logger.error(f"Graph rendering failed: {traceback.format_exc()}")
+def _build_pyvis_options(physics_enabled: bool, solver: str, spring_length: int, spring_constant: float, central_gravity: float, grav_constant: int) -> Dict:
     """
-    Render the overview network graph (original visualization).
-    Enhanced with node distance controls.
+    Builds the PyVis physics options dictionary based on user settings and selected solver.
 
     Args:
-        entities: List of entity dictionaries
-        relationships: List of relationship dictionaries
+        physics_enabled (bool): Whether physics simulation is enabled.
+        solver (str): The selected physics solver ('forceAtlas2Based', 'barnesHut', 'repulsion').
+        spring_length (int): Desired distance between connected nodes.
+        spring_constant (float): Stiffness of the connections.
+        central_gravity (float): Attraction force towards the center (0 to 1).
+        grav_constant (int): Repulsion force between nodes (negative value).
+
+    Returns:
+        Dict: Configuration dictionary for PyVis options.
     """
-    import math
-    import networkx as nx
-    from pyvis.network import Network
+    if not physics_enabled:
+        # Return options with physics explicitly disabled
+        return {
+            "physics": {"enabled": False},
+            "interaction": { # Keep interactions enabled even if physics is off
+                "hover": True,
+                "navigationButtons": True,
+                "tooltipDelay": 300,
+                "keyboard": {"enabled": True}
+            },
+             "edges": {
+                "smooth": False, # No smoothing needed if static
+                "arrows": {"to": {"enabled": True, "scaleFactor": 0.7}}
+            },
+            "nodes": {
+                 "font": {"size": 14, "face": "Arial"}
+            }
+        }
 
-    # Create columns for graph controls
-    control_col1, control_col2, control_col3 = st.columns(3)
 
-    with control_col1:
-        # Limit number of entities
-        top_entities_count = st.slider("Number of entities", 10, 100, min(30, len(entities)))
-
-    with control_col2:
-        # Filter by entity type
-        entity_types = sorted(list(set(entity.get("type", "Unknown") for entity in entities)))
-        selected_graph_types = st.multiselect(
-            "Filter by entity type",
-            options=entity_types,
-            default=entity_types,
-            key="entity_graph_type_filter"
-        )
-
-    with control_col3:
-        # Graph physics options
-        physics_enabled = st.checkbox("Enable physics", value=True)
-        if physics_enabled:
-            physics_solver = st.selectbox(
-                "Physics solver",
-                options=["forceAtlas2Based", "barnesHut", "repulsion"],
-                index=1
-            )
-        else:
-            physics_solver = "none"
-
-    # NEW: Node distance controls
-    st.markdown("### Node Distance Settings")
-    distance_col1, distance_col2, distance_col3 = st.columns(3)
-
-    with distance_col1:
-        # Spring length controls node distance
-        spring_length = st.slider(
-            "Spring Length",
-            min_value=50,
-            max_value=500,
-            value=150,
-            step=10,
-            help="Higher values increase distance between nodes"
-        )
-
-    with distance_col2:
-        # Spring constant affects how strongly nodes are pulled together
-        spring_constant = st.slider(
-            "Spring Constant",
-            min_value=0.01,
-            max_value=0.5,
-            value=0.08,
-            step=0.01,
-            help="Lower values make connections more flexible"
-        )
-
-    with distance_col3:
-        # Central gravity pulls nodes toward center
-        central_gravity = st.slider(
-            "Central Gravity",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.3,
-            step=0.05,
-            help="Lower values allow nodes to spread out more"
-        )
-
-    # Create entity lookup dict {entity_id: entity_data}
-    entity_lookup = {entity.get("id"): entity for entity in entities if entity.get("id")}
-
-    # Count entity mentions (inferred from relationship frequency)
-    entity_mentions = {}
-    for rel in relationships:
-        source_id = rel.get("source_entity_id", rel.get("from_entity_id"))
-        target_id = rel.get("target_entity_id", rel.get("to_entity_id"))
-        if source_id:
-            entity_mentions[source_id] = entity_mentions.get(source_id, 0) + 1
-        if target_id:
-            entity_mentions[target_id] = entity_mentions.get(target_id, 0) + 1
-
-    # Filter entities by type and sort by mention count
-    filtered_entities = [
-        entity for entity in entities
-        if entity.get("type", "Unknown") in selected_graph_types
-    ]
-
-    for entity in filtered_entities:
-        entity_id = entity.get("id")
-        entity["mention_count"] = entity_mentions.get(entity_id, 1)
-
-    top_entities = sorted(
-        filtered_entities,
-        key=lambda e: e.get("mention_count", 1),
-        reverse=True
-    )[:top_entities_count]
-
-    # Create list of top entity IDs for filtering relationships
-    top_entity_ids = [entity.get("id") for entity in top_entities]
-
-    # Filter relationships involving top entities
-    filtered_relationships = [
-        rel for rel in relationships
-        if (rel.get("source_entity_id", rel.get("from_entity_id")) in top_entity_ids and
-            rel.get("target_entity_id", rel.get("to_entity_id")) in top_entity_ids)
-    ]
-
-    # Create NetworkX graph
-    G = nx.DiGraph()
-
-    # Add nodes (entities)
-    for entity in top_entities:
-        entity_id = entity.get("id")
-        entity_name = entity.get("name", "Unknown")
-        entity_type = entity.get("type", "Unknown")
-        mentions = entity.get("mention_count", 1)
-
-        G.add_node(
-            entity_id,
-            label=entity_name,
-            type=entity_type,
-            weight=mentions,
-            title=f"{entity_name} ({entity_type})\nMentions: {mentions}"
-        )
-
-    # Add edges (relationships)
-    for rel in filtered_relationships:
-        source_id = rel.get("source_entity_id", rel.get("from_entity_id"))
-        target_id = rel.get("target_entity_id", rel.get("to_entity_id"))
-        rel_type = rel.get("type", rel.get("relationship_type", "RELATED_TO"))
-
-        # Default confidence to 0.7 if not available
-        confidence = rel.get("confidence", 0.7)
-
-        G.add_edge(
-            source_id,
-            target_id,
-            type=rel_type,
-            confidence=confidence,
-            title=f"{rel_type} (conf: {confidence:.2f})"
-        )
-
-    # Create PyVis network with increased height
-    net = Network(height="700px", width="100%", directed=True, notebook=True, cdn_resources='remote')
-
-    # Node color map by type
-    colors = {
-        "PERSON": "#3B82F6",  # Blue
-        "ORGANIZATION": "#10B981",  # Green
-        "GOVERNMENT_BODY": "#60BD68",  # Green variant
-        "COMMERCIAL_COMPANY": "#10B981",  # Green variant
-        "LOCATION": "#F59E0B",  # Yellow/Orange
-        "POSITION": "#8B5CF6",  # Purple
-        "MONEY": "#EC4899",  # Pink
-        "ASSET": "#EF4444",  # Red
-        "EVENT": "#6366F1",  # Indigo
-        "Unknown": "#9CA3AF"  # Light gray
-    }
-
-    # Node shapes by type
-    shapes = {
-        "PERSON": "dot",
-        "ORGANIZATION": "square",
-        "GOVERNMENT_BODY": "triangle",
-        "COMMERCIAL_COMPANY": "diamond",
-        "LOCATION": "star",
-        "POSITION": "ellipse",
-        "MONEY": "hexagon",
-        "ASSET": "box",
-        "EVENT": "database",
-        "Unknown": "dot"
-    }
-
-    # Add nodes to PyVis with visual attributes
-    for node_id, attrs in G.nodes(data=True):
-        entity_type = attrs.get("type", "Unknown")
-        mentions = attrs.get("weight", 1)
-
-        # Size based on mention count (logarithmic scaling)
-        size = 15 + (10 * math.log(mentions + 1))
-
-        # Get color and shape from type maps
-        color = colors.get(entity_type, colors["Unknown"])
-        shape = shapes.get(entity_type, shapes["Unknown"])
-
-        # Add node with visual attributes
-        net.add_node(
-            node_id,
-            label=attrs.get("label", "Unknown"),
-            title=attrs.get("title", ""),
-            color=color,
-            shape=shape,
-            size=size,
-            font={'size': min(14 + int(math.log(mentions + 1)), 24)}
-        )
-
-    # Add edges to PyVis with visual attributes
-    for source, target, attrs in G.edges(data=True):
-        rel_type = attrs.get("type", "RELATED_TO")
-        confidence = attrs.get("confidence", 0.7)
-
-        # Width based on confidence
-        width = 1 + (confidence * 5)
-
-        # Determine edge color (slightly darker than source node color)
-        source_type = G.nodes[source].get('type', 'Unknown')
-        source_color = colors.get(source_type, colors["Unknown"])
-
-        # Create darker variant for edge color
-        rgb = source_color.lstrip('#')
-        r, g, b = tuple(int(rgb[i:i + 2], 16) for i in (0, 2, 4))
-        edge_color = f"#{max(0, r - 30):02x}{max(0, g - 30):02x}{max(0, b - 30):02x}"
-
-        # Add edge with visual attributes
-        net.add_edge(
-            source,
-            target,
-            title=attrs.get("title", rel_type),
-            label=rel_type if confidence > 0.6 else "",
-            width=width,
-            color=edge_color,
-            arrows={'to': {'enabled': True, 'scaleFactor': 0.5}}
-        )
-
-    # Dynamic physics options based on user selection and distance controls
-    physics_options = {
-        "forceAtlas2Based": {
-            "gravitationalConstant": -50,
-            "centralGravity": central_gravity,
-            "springLength": spring_length,
-            "springConstant": spring_constant
+    physics_config = {
+        "enabled": True,
+        "solver": solver,
+        "stabilization": { # Enhanced stabilization settings
+            "enabled": True,
+            "iterations": 2000, # More iterations for better stability initially
+            "updateInterval": 50,
+            "onlyDynamicEdges": False,
+            "fit": True
         },
-        "barnesHut": {
-            "gravitationalConstant": -2000,
+        "adaptiveTimestep": True,
+        "minVelocity": 0.75
+    }
+
+    # Solver-specific parameters - ensure they match vis.js documentation
+    if solver == "forceAtlas2Based":
+        physics_config["forceAtlas2Based"] = {
+            "gravitationalConstant": grav_constant,
             "centralGravity": central_gravity,
             "springLength": spring_length,
             "springConstant": spring_constant,
-            "damping": 0.09
-        },
-        "repulsion": {
-            "nodeDistance": spring_length,
+            "damping": 0.4,
+            "avoidOverlap": 0.6 # Slightly increase overlap avoidance
+        }
+        # forceAtlas2Based doesn't use barnesHut settings
+        if "barnesHut" in physics_config: del physics_config["barnesHut"]
+        if "repulsion" in physics_config: del physics_config["repulsion"]
+
+    elif solver == "barnesHut":
+        physics_config["barnesHut"] = {
+            "gravitationalConstant": grav_constant,
             "centralGravity": central_gravity,
             "springLength": spring_length,
             "springConstant": spring_constant,
+            "damping": 0.09,
+            "avoidOverlap": 0.1
+        }
+        if "forceAtlas2Based" in physics_config: del physics_config["forceAtlas2Based"]
+        if "repulsion" in physics_config: del physics_config["repulsion"]
+
+    elif solver == "repulsion":
+        physics_config["repulsion"] = {
+            "centralGravity": central_gravity,
+            "springLength": spring_length, # Used indirectly by nodeDistance
+            "springConstant": spring_constant,
+            # repulsion solver uses nodeDistance for repulsion, gravitationalConstant isn't directly used here
+            "nodeDistance": int(spring_length * 1.5), # Make node distance related to spring length
             "damping": 0.09
         }
-    }
+        if "forceAtlas2Based" in physics_config: del physics_config["forceAtlas2Based"]
+        if "barnesHut" in physics_config: del physics_config["barnesHut"]
 
-    # Build physics configuration
-    physics_config = {
-        "enabled": physics_enabled,
-        "solver": physics_solver,
-        "stabilization": {"enabled": True, "iterations": 1000},
-    }
 
-    # Add solver-specific options if physics is enabled
-    if physics_enabled and physics_solver in physics_options:
-        for key, value in physics_options[physics_solver].items():
-            physics_config[key] = value
-
-    # Set options with proper structure
-    net.options = {
+    options = {
         "physics": physics_config,
-        "interaction": {"hover": True, "navigationButtons": True},
+        "interaction": {
+            "hover": True,
+            "navigationButtons": True,
+            "tooltipDelay": 300,
+            "keyboard": {"enabled": True}
+            },
         "edges": {
             "smooth": {"enabled": True, "type": "dynamic"},
-            "arrows": {"to": {"enabled": True}}
+            "arrows": {"to": {"enabled": True, "scaleFactor": 0.7}}
+            },
+        "nodes": {
+             "font": {"size": 14, "face": "Arial"}
         }
     }
+    return options
+def render_network_overview_tab(entities, relationships):
+    """
+    Render the overview network graph tab.
+    Enhanced with layout algorithm choice, better styling, physics controls, and tooltips.
 
-    # Save to HTML file
-    graph_html_path = ROOT_DIR / "temp" / "relationship_graph.html"
-    net.save_graph(str(graph_html_path))
+    Args:
+        entities: List of entity dictionaries (potentially filtered)
+        relationships: List of relationship dictionaries (potentially filtered)
+    """
+    try:
+        import math
+        import networkx as nx
+        from pyvis.network import Network
+        import json # Ensure json is imported
+        import traceback # For detailed error logging
+        import numpy as np # Import numpy for checking array types
+    except ImportError as e:
+        st.error(f"Missing library required for graph visualization: {e}. Please install PyVis, NetworkX, and NumPy.")
+        return
 
-    # Display number of entities and relationships
-    st.caption(f"Displaying {len(top_entities)} entities and {len(filtered_relationships)} relationships")
+    st.markdown("#### Global Network Visualization")
+    st.markdown("Visualize the connections between the most prominent entities based on relationship frequency.")
 
-    # Read HTML content and display with increased height
-    with open(graph_html_path, "r", encoding="utf-8") as f:
-        html_content = f.read()
+    # --- Controls ---
+    st.markdown("**Visualization Controls**")
+    control_col1, control_col2, control_col3 = st.columns(3)
+    with control_col1:
+        max_nodes = len(entities)
+        top_entities_count = st.slider(
+            "Max Entities to Display", min_value=10, max_value=max(max_nodes, 300),
+            value=min(50, max_nodes), step=5, key="overview_max_entities",
+            help=f"Adjust the maximum number of entities shown (Total available: {max_nodes}). Lower values improve performance."
+        )
+    with control_col2:
+        entity_types = sorted(list(set(entity.get("type", "Unknown") for entity in entities)))
+        default_types = st.session_state.get("overview_entity_type_filter_default", entity_types)
+        selected_graph_types = st.multiselect(
+            "Filter by Entity Type", options=entity_types, default=default_types,
+            key="overview_entity_type_filter", help="Select entity types to include in the visualization."
+        )
+        st.session_state.overview_entity_type_filter_default = selected_graph_types
+    with control_col3:
+         layout_algorithm = st.selectbox(
+              "Layout Algorithm",
+              options=["PyVis Physics", "Kamada-Kawai (Static)"], index=0, key="overview_layout_algo",
+              help="'PyVis Physics' uses interactive simulation. 'Kamada-Kawai' pre-calculates positions for potentially clearer but static layout (best for < 150 nodes)."
+         )
+         disable_physics_controls = (layout_algorithm == "Kamada-Kawai (Static)")
 
-    st.components.v1.html(html_content, height=700, scrolling=True)
+    # --- Physics Controls ---
+    st.markdown("**Physics & Layout Controls** (Only active for 'PyVis Physics' layout)")
+    physics_col1, physics_col2, physics_col3 = st.columns(3)
+    with physics_col1:
+         physics_enabled_toggle = st.toggle("Enable Physics Simulation", value=True, key="overview_physics_toggle", disabled=disable_physics_controls)
+         physics_enabled = physics_enabled_toggle and not disable_physics_controls
+         physics_solver = st.selectbox(
+                "Physics Solver", options=["barnesHut", "forceAtlas2Based", "repulsion"], index=0,
+                key="overview_physics_solver", disabled=disable_physics_controls or not physics_enabled,
+                help="Algorithm for PyVis physics simulation."
+            )
+    with physics_col2:
+        grav_constant = st.slider( "Node Repulsion", min_value=-30000, max_value=-100, value=-8000, step=500, key="overview_grav_constant", disabled=disable_physics_controls or not physics_enabled)
+        central_gravity = st.slider( "Central Gravity", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="overview_central_gravity", disabled=disable_physics_controls or not physics_enabled)
+    with physics_col3:
+        spring_length = st.slider( "Edge Length", min_value=50, max_value=600, value=150, step=10, key="overview_spring_length", disabled=disable_physics_controls or not physics_enabled)
+        spring_constant = st.slider( "Edge Stiffness", min_value=0.005, max_value=0.5, value=0.04, step=0.005, format="%.3f", key="overview_spring_constant", disabled=disable_physics_controls or not physics_enabled)
+
+    # --- Build Graph ---
+    with st.spinner("Building graph..."):
+        entity_lookup = {entity.get("id"): entity for entity in entities if entity.get("id")}
+        entity_mentions = {}
+        for rel in relationships:
+            source_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+            target_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+            if source_id in entity_lookup:
+                entity_mentions[source_id] = entity_mentions.get(source_id, 0) + 1
+            if target_id in entity_lookup:
+                entity_mentions[target_id] = entity_mentions.get(target_id, 0) + 1
+
+        filtered_entities_by_type = [
+            entity for entity in entities
+            if entity.get("type", "Unknown") in selected_graph_types and entity.get("id") in entity_lookup
+        ]
+        for entity in filtered_entities_by_type:
+            entity["mention_count"] = entity_mentions.get(entity.get("id"), 1)
+        top_entities = sorted(filtered_entities_by_type, key=lambda e: e.get("mention_count", 1), reverse=True)[:top_entities_count]
+        top_entity_ids = {entity.get("id") for entity in top_entities}
+
+        G = nx.DiGraph()
+        node_attributes_added = set() # Track added nodes to prevent duplicates
+
+        for entity in top_entities:
+             node_id = entity.get("id")
+             if node_id not in node_attributes_added:
+                 G.add_node(
+                    node_id,
+                    label=entity.get("name", "Unknown"),
+                    type=entity.get("type", "Unknown"), # Store type attribute correctly
+                    mention_count=entity.get("mention_count", 1),
+                    title=f"{entity.get('name', 'Unknown')}\nType: {entity.get('type', 'Unknown')}\nMentions (all docs): {entity.get('mention_count', 1)}"
+                 )
+                 node_attributes_added.add(node_id)
 
 
+        edge_count = 0
+        skipped_edges = 0
+        for rel in relationships:
+            source_id = rel.get("source_entity_id", rel.get("from_entity_id"))
+            target_id = rel.get("target_entity_id", rel.get("to_entity_id"))
+            if G.has_node(source_id) and G.has_node(target_id): # Check if both nodes are in our graph G
+                rel_type = rel.get("type", rel.get("relationship_type"))
+                description = rel.get("description", None)
+                if rel_type and isinstance(rel_type, str) and rel_type.strip() and rel_type.upper() != "UNKNOWN":
+                     if not G.has_edge(source_id, target_id):
+                         G.add_edge(source_id, target_id, type=rel_type, description=description)
+                         edge_count += 1
+                else:
+                    skipped_edges += 1
+
+    if skipped_edges > 0:
+         st.caption(f"ℹ️ Skipped {skipped_edges} relationships involving entities not in the top {top_entities_count} or with missing/invalid types.")
+
+    # --- Calculate Layout if Kamada-Kawai ---
+    node_positions = None
+    if layout_algorithm == "Kamada-Kawai (Static)":
+         if G.number_of_nodes() == 0:
+              st.warning("Graph is empty, cannot calculate layout.")
+         elif G.number_of_nodes() > 150:
+              st.warning("Kamada-Kawai layout may be slow for > 150 nodes.")
+
+         if G.number_of_nodes() > 1:
+             with st.spinner("Calculating Kamada-Kawai layout..."):
+                 try:
+                     # Use largest weakly connected component for layout
+                     largest_cc_nodes = max(nx.weakly_connected_components(G), key=len)
+                     subgraph_for_layout = G.subgraph(largest_cc_nodes)
+
+                     if subgraph_for_layout.number_of_nodes() > 1:
+                         node_positions_comp = nx.kamada_kawai_layout(subgraph_for_layout)
+                         node_positions = {
+                             node: node_positions_comp.get(node, np.array([0.0, 0.0])) for node in G.nodes() # Use numpy array default
+                         }
+                         logger.info(f"Kamada-Kawai layout calculated for {len(node_positions_comp)} nodes.")
+                         if len(largest_cc_nodes) < G.number_of_nodes():
+                              st.caption(f"Layout applied to the largest component ({len(largest_cc_nodes)} nodes). Other {G.number_of_nodes() - len(largest_cc_nodes)} nodes placed at origin.")
+                     else:
+                         st.warning("Largest connected component has <= 1 node. Cannot apply Kamada-Kawai layout.")
+                         node_positions = None
+                 except Exception as layout_err:
+                     st.error(f"Failed to compute Kamada-Kawai layout: {layout_err}")
+                     logger.error(f"Kamada-Kawai layout error: {traceback.format_exc()}")
+                     node_positions = None
+         else:
+             st.info("Graph has <= 1 node, layout calculation skipped.")
+             node_positions = None
+
+    # --- Create PyVis Network ---
+    if G.number_of_nodes() > 0:
+        with st.spinner("Rendering visualization..."):
+            net = Network(height="700px", width="100%", directed=True, notebook=True, cdn_resources='remote', heading="")
+
+            # Load colors and shapes from config, provide defaults if missing
+            default_colors = {"PERSON": "#3B82F6", "ORGANIZATION": "#10B981", "GOVERNMENT_BODY": "#60BD68", "COMMERCIAL_COMPANY": "#F17CB0", "LOCATION": "#F59E0B", "POSITION": "#8B5CF6", "MONEY": "#EC4899", "ASSET": "#EF4444", "EVENT": "#6366F1", "Unknown": "#9CA3AF"}
+            default_shapes = {"PERSON": "dot", "ORGANIZATION": "square", "GOVERNMENT_BODY": "triangle", "COMMERCIAL_COMPANY": "diamond", "LOCATION": "star", "POSITION": "ellipse", "MONEY": "hexagon", "ASSET": "box", "EVENT": "database", "Unknown": "dot"}
+            colors = CONFIG.get("visualization", {}).get("node_colors", default_colors)
+            shapes = CONFIG.get("visualization", {}).get("node_shapes", default_shapes)
+
+            # Add nodes to PyVis
+            for node_id, attrs in G.nodes(data=True):
+                entity_type = attrs.get("type", "Unknown") # Get type from graph attributes
+                mentions = attrs.get("mention_count", 1)
+                size = max(10, min(35, 10 + 5 * math.log1p(mentions)))
+                color = colors.get(entity_type, colors.get("Unknown", "#9CA3AF"))
+                shape = shapes.get(entity_type, shapes.get("Unknown", "dot")) # Get shape based on type
+
+                # Correct handling of node_positions
+                pos = None
+                if node_positions is not None and node_id in node_positions:
+                     pos_val = node_positions[node_id]
+                     # Check if pos_val is a valid array/list of numbers
+                     if isinstance(pos_val, (np.ndarray, list)) and len(pos_val) >= 2 and all(isinstance(coord, (int, float, np.number)) for coord in pos_val):
+                         pos = pos_val
+                     else:
+                         logger.warning(f"Invalid position data for node {node_id}: {pos_val}. Skipping position.")
+
+
+                pos_x = pos[0] * 1000 if pos is not None else None
+                pos_y = pos[1] * 1000 if pos is not None else None
+
+
+                # Debugging log for shape
+                # logger.debug(f"Node {node_id}, Type: {entity_type}, Assigning Shape: {shape}")
+
+                net.add_node(
+                    node_id, label=attrs.get("label", "Unknown"), title=attrs.get("title", ""),
+                    color=color,
+                    shape=shape, # Assign the looked-up shape
+                    size=size,
+                    font={'size': max(10, min(18, 11 + int(math.log1p(mentions))))},
+                    x=pos_x, y=pos_y
+                )
+
+            # Add edges to PyVis
+            for source, target, attrs in G.edges(data=True):
+                rel_type = attrs.get("type", "RELATED_TO")
+                description = attrs.get("description", "N/A")
+                edge_title = f"Type: {rel_type}\nDescription: {description if description else 'N/A'}"
+                edge_color = "#A0A0A0"
+                width = 1.5
+
+                net.add_edge(
+                    source, target, title=edge_title, label="", width=width,
+                    color={"color": edge_color, "opacity": 0.7},
+                    arrows={'to': {'enabled': True, 'scaleFactor': 0.6}}
+                )
+
+            # Build and set PyVis options
+            pyvis_options = _build_pyvis_options(
+                physics_enabled and layout_algorithm != "Kamada-Kawai (Static)",
+                physics_solver, spring_length, spring_constant, central_gravity, grav_constant
+            )
+            net.set_options(json.dumps(pyvis_options))
+
+            # Save and display
+            graph_html_path = ROOT_DIR / "temp" / "overview_graph.html"
+            try:
+                 net.save_graph(str(graph_html_path))
+                 with open(graph_html_path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+                 st.components.v1.html(html_content, height=710, scrolling=False)
+                 st.caption(f"Displaying {G.number_of_nodes()} entities and {G.number_of_edges()} relationships. Layout: {layout_algorithm}.")
+            except Exception as render_err:
+                 st.error(f"Failed to render graph: {render_err}")
+                 logger.error(f"PyVis rendering failed: {traceback.format_exc()}")
+    else:
+        st.info("No nodes to display based on current filters.")
+
+# --- END OF MODIFIED FUNCTION: render_network_overview_tab ---
 def render_relationship_table(relationships, entities):
     """
     Render a table of relationships with filtering options.
@@ -3046,7 +4370,7 @@ def render_relationship_table(relationships, entities):
 
 def render_query_page():
     """
-    Render the query and chat interface with DeepSeek support.
+    Render the query and chat interface with conversation management.
     """
     st.header("💬 Query System")
 
@@ -3057,7 +4381,7 @@ def render_query_page():
         background-color: #f0f7ff;
         border-left: 5px solid #2196F3;
         padding: 15px;
-        margin: 10px 0;
+        margin-bottom: 15px;
         border-radius: 4px;
         font-family: monospace;
         max-height: 300px;
@@ -3071,25 +4395,19 @@ def render_query_page():
     </style>
     """, unsafe_allow_html=True)
 
-    # Check if there's data to query
-    query_engine = get_or_create_query_engine()
-    collection_info = query_engine.get_collection_info()
-
-    if not collection_info.get("exists", False) or collection_info.get("points_count", 0) == 0:
-        st.warning("No indexed documents found. Please upload and process documents first.")
-        return
-
-    # Check DeepSeek settings
+    # Ensure necessary components (QueryEngine, LLM Manager) are ready
+    query_engine = get_or_create_query_engine()  # Assumes this function exists and works
+    # Determine which LLM manager to use (adapt this logic)
     use_deepseek = CONFIG.get("deepseek", {}).get("use_api", False)
-    deepseek_manager = None
-
+    llm_manager = None
     if use_deepseek:
         # Initialize DeepSeek manager if needed
         from src.utils.deepseek_manager import DeepSeekManager
         deepseek_manager = DeepSeekManager(CONFIG)
-
         if not deepseek_manager.client:
             st.warning("DeepSeek API not properly configured. Check settings.")
+            return
+        llm_manager = deepseek_manager
     else:
         # If not using DeepSeek, check Aphrodite service status
         if not APHRODITE_SERVICE_AVAILABLE:
@@ -3105,153 +4423,194 @@ def render_query_page():
                 st.rerun()
             return
 
-    # --- Rest of your existing Aphrodite model loading code remains the same ---
-    # (Check if the model is loaded, etc.)
+        # Ensure the model is loaded
+        if not st.session_state.get("llm_model_loaded", False):
+            st.warning("Aphrodite service is running, but no model is loaded. Please load a model from Settings.")
+            return
 
-    # Initialize chat history
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+        llm_manager = service
 
-    # Display chat history
-    for message in st.session_state.chat_history:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])  # Use markdown for potential formatting
-            if message.get("thinking"):
-                with st.expander("💭 Reasoning Process", expanded=False):
-                    # Use custom styling for thinking
-                    st.markdown(f'<div class="thinking-box">{message["thinking"]}</div>', unsafe_allow_html=True)
-            if message.get("sources"):
-                with st.expander("View sources"):
-                    for i, source in enumerate(message["sources"]):
-                        st.markdown(f"**Source {i + 1} (Score: {source['score']:.2f}):**")
-                        st.markdown(f"> {source['text']}")  # Blockquote for context
-                        meta = source['metadata']
-                        st.caption(
-                            f"Document: {meta.get('file_name', 'N/A')} | Page: {meta.get('page_num', 'N/A')} | Chunk: {meta.get('chunk_id', 'N/A')}")
-                        st.markdown("---")
+    if not llm_manager:
+        st.error("No valid LLM service is available or configured.")
+        return
 
-    # Chat input
-    prompt = st.chat_input("Ask a question about the documents...")
+    # Get ConversationStore
+    conversation_store = st.session_state.get("conversation_store")
+    if not conversation_store:
+        st.error("Conversation storage system failed to initialize.")
+        return
 
-    if prompt:
-        st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+    # --- UI Tabs ---
+    conv_tab, chat_tab = st.tabs(["Manage Conversations", "Current Chat"])
 
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            thinking_placeholder = st.empty()
-            sources_placeholder = st.empty()
+    # --- Conversation Management Tab ---
+    with conv_tab:
+        st.subheader("Conversations")
 
-            # FOR DEEPSEEK MODE
-            if use_deepseek and deepseek_manager and deepseek_manager.client:
-                # Track thinking content
-                thinking_content = ""
-                response_text = ""
-                thinking_displayed = False
+        col1, col2 = st.columns([3, 1])
+        with col2:
+            if st.button("✨ New Conversation", use_container_width=True, type="primary"):
+                new_conv_id = conversation_store.create_conversation()
+                if new_conv_id:
+                    new_conv_data = conversation_store.get_conversation(new_conv_id)
+                    st.session_state.current_conversation_id = new_conv_id
+                    st.session_state.active_conversation_data = new_conv_data
+                    st.session_state.ui_chat_display = []  # Clear UI display
+                    st.session_state.retrieval_enabled_for_next_turn = True  # Enable RAG for first turn
+                    st.success("New conversation started!")
+                    # Switch to the chat tab automatically (optional)
+                    # st.experimental_set_query_params(tab="chat") # May require specific Streamlit version/handling
+                    st.rerun()  # Rerun to reflect changes and potentially switch tab focus
+                else:
+                    st.error("Failed to create new conversation.")
 
-                # Retrieval first to get context (same as original)
-                with st.spinner("Retrieving relevant context..."):
-                    retrieval_results = query_engine.retrieve(prompt)
-                    sources = [
-                        {
-                            'text': result.get('original_text', result.get('text', '')),
-                            'metadata': result.get('metadata', {}),
-                            'score': result.get('score', 0.0)
-                        }
-                        for result in retrieval_results
-                    ]
-                    context = "\n\n".join([
-                        f"[{i + 1}] {source['text']}"
-                        for i, source in enumerate(sources)
-                    ])
+        conversations = conversation_store.list_conversations()
+        if conversations:
+            st.write(f"You have {len(conversations)} saved conversations:")
+            # Display conversations in reverse chronological order (newest first)
+            for conv in conversations:
+                conv_id = conv['id']
+                is_active = (st.session_state.get("current_conversation_id") == conv_id)
+                bg_color = "#e0f7fa" if is_active else "transparent"  # Highlight active conversation
 
-                # Format prompt with context
-                system_prompt = "You are an expert assistant specializing in anti-corruption investigations and analysis."
-                formatted_prompt = f"""Based ONLY on the provided context, answer the following question. 
-If the answer is not found in the context, state that clearly. Use the source numbers in your answer to cite information.
+                with st.container():  # Use container for styling potential
+                    # st.markdown(f"<div style='background-color: {bg_color}; padding: 10px; border-radius: 5px;'>", unsafe_allow_html=True)
+                    list_col1, list_col2, list_col3 = st.columns([4, 1, 1])
+                    with list_col1:
+                        title = conv.get("title", "Untitled")
+                        msg_count = conv.get("message_count", 0)
+                        last_upd = datetime.fromtimestamp(conv.get("last_updated", 0)).strftime("%Y-%m-%d %H:%M")
+                        display_title = f"**{title}**" if is_active else title
+                        st.markdown(f"{display_title} ({msg_count} messages) - *{last_upd}*", unsafe_allow_html=True)
+                    with list_col2:
+                        if not is_active:
+                            if st.button("Load", key=f"load_{conv_id}", use_container_width=True):
+                                loaded_data = conversation_store.get_conversation(conv_id)
+                                if loaded_data:
+                                    st.session_state.current_conversation_id = conv_id
+                                    st.session_state.active_conversation_data = loaded_data
+                                    # Rebuild UI display from loaded messages
+                                    st.session_state.ui_chat_display = []
+                                    for msg in loaded_data.get("messages", []):
+                                        ui_msg = {"role": msg["role"], "content": msg["content"]}
+                                        # Include sources/thinking if stored and needed for display
+                                        if msg.get("used_context"):
+                                            ui_msg["sources"] = msg["used_context"]
+                                        if msg.get("thinking_process"):
+                                            ui_msg["thinking"] = msg["thinking_process"]
+                                        st.session_state.ui_chat_display.append(ui_msg)
 
-Context:
-{context}
+                                    st.session_state.retrieval_enabled_for_next_turn = False  # Default OFF when loading
+                                    st.success(f"Loaded: {loaded_data.get('title')}")
+                                    st.rerun()
+                                else:
+                                    st.error(f"Failed to load conversation {conv_id}.")
+                        else:
+                            st.write("*(Active)*")  # Indicate active conversation
+                    with list_col3:
+                        if st.button("Delete", key=f"del_{conv_id}", use_container_width=True, type="secondary"):
+                            if conversation_store.delete_conversation(conv_id):
+                                if is_active:  # If deleting the active one, clear state
+                                    st.session_state.current_conversation_id = None
+                                    st.session_state.active_conversation_data = None
+                                    st.session_state.ui_chat_display = []
+                                    st.session_state.retrieval_enabled_for_next_turn = True  # Reset for potential new conv
+                                st.success("Conversation deleted.")
+                                st.rerun()
+                            else:
+                                st.error("Failed to delete conversation.")
+                    # st.markdown("</div>", unsafe_allow_html=True)
+                    st.divider()  # Separator between conversations
+        else:
+            st.info("No saved conversations yet.")
 
-Question: {prompt}"""
+    # --- Current Chat Tab ---
+    with chat_tab:
+        active_conv_data = st.session_state.get("active_conversation_data")
 
-                # Define callback for streaming with enhanced thinking display
-                # Define callback for streaming with reasoning handling
-                def stream_callback(token):
-                    nonlocal thinking_content, response_text, thinking_displayed
+        if active_conv_data:
+            # Display Conversation Controls
+            st.subheader(f"Chat: {active_conv_data.get('title', 'Untitled')}")
+            control_cols = st.columns([3, 1, 1])
+            with control_cols[0]:
+                new_title = st.text_input("Rename:", value=active_conv_data.get("title", ""),
+                                          label_visibility="collapsed", placeholder="Rename Conversation...")
+                if new_title and new_title != active_conv_data.get("title"):
+                    active_conv_data["title"] = new_title.strip()
+                    save_current_conversation()  # Save immediately on rename
+                    # No rerun needed usually, title updates automatically if bound correctly
+            with control_cols[1]:
+                if st.button("End Conversation", use_container_width=True):
+                    save_current_conversation()  # Save before ending
+                    st.session_state.current_conversation_id = None
+                    st.session_state.active_conversation_data = None
+                    st.session_state.ui_chat_display = []
+                    st.session_state.retrieval_enabled_for_next_turn = True  # Ready for new conv
+                    st.success("Conversation ended.")
+                    st.rerun()
 
-                    # Check if it's a thinking token (dict format) - this is the reasoning content
-                    if isinstance(token, dict) and token.get("type") == "thinking":
-                        # Get the thinking content
-                        thinking_token = token.get("content", "")
-                        thinking_content += thinking_token
+            st.divider()
 
-                        # Only initialize the thinking box if it's not already displayed
-                        if not thinking_displayed and thinking_token.strip():
-                            thinking_displayed = True
-                            with thinking_placeholder.container():
-                                st.markdown('<div class="thinking-title">💭 Reasoning Process (Live):</div>',
+            # Display Chat History (using ui_chat_display for rendering)
+            chat_container = st.container()  # Use a container for potentially fixed height scrolling later
+            with chat_container:
+                if not st.session_state.ui_chat_display:
+                    st.info("Ask a question to start the chat!")
+
+                for message in st.session_state.ui_chat_display:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+                        # Display thinking/sources if available in the message dict
+                        if message.get("thinking"):
+                            with st.expander("💭 Reasoning Process", expanded=False):
+                                st.markdown(f'<div class="thinking-box">{message["thinking"]}</div>',
                                             unsafe_allow_html=True)
+                        if message.get("sources"):
+                            with st.expander("View Sources Used", expanded=False):
+                                for i, source in enumerate(message["sources"]):
+                                    # Use source_index if stored, otherwise use loop index
+                                    idx = source.get("source_index", i + 1)
+                                    score = source.get('score', 0.0)
+                                    st.markdown(f"**Source {idx} (Score: {score:.2f}):**")
+                                    st.markdown(f"> {source.get('text', '')}")
+                                    meta = source.get('metadata', {})
+                                    st.caption(
+                                        f"Doc: {meta.get('file_name', 'N/A')} | Page: {meta.get('page_num', 'N/A')} | Chunk: {meta.get('chunk_id', 'N/A')}")
+                                    st.markdown("---")
 
-                        # Update thinking display with custom styling
-                        if thinking_displayed:
-                            with thinking_placeholder.container():
-                                st.markdown(f'<div class="thinking-box">{thinking_content}</div>',
-                                            unsafe_allow_html=True)
+            st.divider()
 
-                        logger.debug(f"Received reasoning token: {thinking_token}")
-                    else:
-                        # Regular token - add to response
-                        response_text += token
-                        logger.debug(f"Response token received: {token}")
-                        message_placeholder.markdown(response_text)
-                # Generate with DeepSeek
-                with st.spinner("Generating response with DeepSeek..."):
-                    deepseek_response = deepseek_manager.generate(
-                        prompt=formatted_prompt,
-                        system_prompt=system_prompt,
-                        stream_callback=stream_callback
+            # Chat Input Area
+            input_cols = st.columns([4, 1])
+            with input_cols[1]:
+                # Retrieval Toggle - **IMPORTANT:** Key matches session state variable
+                with input_cols[1]:  # Keep the column layout if you have it
+                    st.checkbox(
+                        "Enable RAG",
+                        key="retrieval_enabled_for_next_turn",  # Key links it to session state
+                        # NO value=... parameter here. Let Streamlit manage it via the key.
+                        help="Check this box *before* sending your message to retrieve context. It turns OFF automatically for the next turn."
                     )
 
-                # Log generation completion
-                logger.info(f"DeepSeek generation complete. Response length: {len(deepseek_response)}")
-                if thinking_content:
-                    logger.info(f"Reasoning process length: {len(thinking_content)}")
+            if prompt := st.chat_input("Ask a question..."):
+                # When the user submits, chat_input returns the text content in 'prompt'.
+                # The script reruns, and this block executes.
+                # The state of the checkbox ('retrieval_enabled_for_next_turn') reflects
+                # how the user left it *before* submitting.
 
-                # Ensure final response is displayed (in case streaming had issues)
-                message_placeholder.markdown(deepseek_response)
+                # Call the central handler function
+                handle_chat_message(prompt, query_engine, llm_manager)
 
-                # If we have thinking content, update to a collapsed expander
-                if thinking_content:
-                    with thinking_placeholder.container():
-                        with st.expander("💭 Reasoning Process", expanded=False):
-                            st.markdown(f'<div class="thinking-box">{thinking_content}</div>', unsafe_allow_html=True)
+                # IMPORTANT: Remove any explicit st.rerun() immediately after calling
+                # handle_chat_message here in the main input handling block.
+                # Let handle_chat_message complete its state updates. Streamlit's
+                # natural rerun cycle after state changes within the handler
+                # (or an optional st.rerun() at the *very end* of handle_chat_message
+                # if absolutely necessary) should manage the UI refresh.
+                # Adding a rerun here can prematurely interrupt the handler or cause issues.
 
-                # Show sources
-                if sources:
-                    with sources_placeholder.container():
-                        with st.expander("View sources", expanded=False):
-                            for i, source in enumerate(sources):
-                                st.markdown(f"**Source {i + 1} (Score: {source['score']:.2f}):**")
-                                st.markdown(f"> {source['text']}")
-                                meta = source['metadata']
-                                st.caption(
-                                    f"Document: {meta.get('file_name', 'N/A')} | Page: {meta.get('page_num', 'N/A')}")
-                                st.markdown("---")
-
-                # Add to chat history
-                st.session_state.chat_history.append({
-                    "role": "assistant",
-                    "content": deepseek_response,
-                    "thinking": thinking_content if thinking_content else None,
-                    "sources": sources
-                })
-
-            # ORIGINAL APHRODITE MODE (keep existing code)
-            else:
-                # Your existing Aphrodite mode code here
-                pass
+        else:
+            st.info("Please start a new conversation or load an existing one from the 'Manage Conversations' tab.")
 
 
 def render_settings_page():
@@ -3490,7 +4849,6 @@ def process_documents(uploaded_files, selected_llm_name, vl_pages, vl_process_al
         vl_process_all: Boolean indicating if all PDF pages should be visually processed
     """
     try:
-        # ... (keep existing initialization, service checks, document loading, chunking) ...
         # Ensure Aphrodite service is running
         if not APHRODITE_SERVICE_AVAILABLE:
             st.error("Aphrodite service module not available. Cannot process.")

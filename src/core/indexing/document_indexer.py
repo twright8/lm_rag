@@ -1,9 +1,6 @@
 """
 Enhanced document indexing module with debugging and fallback mechanisms.
-This version adds:
-1. Detailed debugging
-2. Fallback to BM25-only mode if Qdrant is unreachable
-3. Additional validation for config settings
+Modified to explicitly use enhanced text (with metadata) for embeddings.
 """
 import sys
 import os
@@ -35,9 +32,11 @@ CONFIG_PATH = ROOT_DIR / "config.yaml"
 with open(CONFIG_PATH, "r") as f:
     CONFIG = yaml.safe_load(f)
 
+
 class DocumentIndexer:
     """
     Enhanced document indexer with debugging and fallback mechanisms.
+    Modified to explicitly use enhanced text (with metadata) for embeddings.
     """
 
     def __init__(self, debug_mode=False):
@@ -75,9 +74,9 @@ class DocumentIndexer:
         self._validate_config()
 
         logger.info(f"Initializing EnhancedDocumentIndexer with model={self.embedding_model_name}, "
-                   f"qdrant={self.qdrant_host}:{self.qdrant_port}, "
-                   f"collection={self.qdrant_collection}, "
-                   f"debug_mode={self.debug_mode}")
+                    f"qdrant={self.qdrant_host}:{self.qdrant_port}, "
+                    f"collection={self.qdrant_collection}, "
+                    f"debug_mode={self.debug_mode}")
 
         if self.debug_mode:
             # Log more detailed configuration info
@@ -96,7 +95,8 @@ class DocumentIndexer:
                 socket.gethostbyname(self.qdrant_host)
         except Exception as e:
             logger.warning(f"Unable to resolve Qdrant hostname '{self.qdrant_host}': {e}")
-            logger.warning("If using Docker, make sure the hostname matches your Docker container name or use 'localhost'")
+            logger.warning(
+                "If using Docker, make sure the hostname matches your Docker container name or use 'localhost'")
 
         # Check if configuration paths are absolute
         if not os.path.isabs(str(self.bm25_path)):
@@ -281,6 +281,7 @@ class DocumentIndexer:
     def _index_to_qdrant(self, chunks: List[Dict[str, Any]]) -> bool:
         """
         Index chunks to Qdrant.
+        This version explicitly uses the enhanced text with metadata for embeddings.
 
         Args:
             chunks (list): List of document chunks
@@ -311,7 +312,16 @@ class DocumentIndexer:
 
             # Generate embeddings for chunks
             logger.info("Generating embeddings...")
+
+            # IMPORTANT: This is where we use the enhanced text with metadata for embeddings
+            # We log this to make it explicit that we're using the enhanced text from entity_extractor
             texts = [chunk.get('text', '') for chunk in chunks]
+            logger.info(f"Using enhanced text with summary, red flags, and entities for embedding generation")
+
+            if self.debug_mode and texts:
+                # Log a sample of the enhanced text for verification
+                sample_text = texts[0][:200] + "..." if len(texts[0]) > 200 else texts[0]
+                logger.debug(f"Sample enhanced text for embedding: {sample_text}")
 
             start_time = time.time()
 
@@ -319,11 +329,6 @@ class DocumentIndexer:
             if not texts or len(texts) == 0:
                 logger.error("No texts provided for embedding generation")
                 return False
-
-            # Log the first text (truncated) for debugging
-            if self.debug_mode and texts:
-                sample_text = texts[0][:100] + "..." if len(texts[0]) > 100 else texts[0]
-                logger.debug(f"Sample text for embedding: {sample_text}")
 
             # Use embed register to generate embeddings
             logger.info(f"Generating embeddings for {len(texts)} texts using model {self.embedding_model_name}")
@@ -401,10 +406,12 @@ class DocumentIndexer:
 
                         if hasattr(first_emb, 'shape') and hasattr(first_emb, 'tolist'):
                             # Tensor-like object
-                            vector_sample = first_emb.tolist()[:10] + ['...'] if len(first_emb) > 10 else first_emb.tolist()
+                            vector_sample = first_emb.tolist()[:10] + ['...'] if len(
+                                first_emb) > 10 else first_emb.tolist()
                             sample_data = {
                                 'type': type(first_emb).__name__,
-                                'shape': list(first_emb.shape) if hasattr(first_emb.shape, '__iter__') else first_emb.shape,
+                                'shape': list(first_emb.shape) if hasattr(first_emb.shape,
+                                                                          '__iter__') else first_emb.shape,
                                 'vector_sample': vector_sample,
                                 'norm': float(np.linalg.norm(first_emb)),
                                 'min': float(np.min(first_emb)),
@@ -499,8 +506,8 @@ class DocumentIndexer:
                         id=chunk.get('chunk_id', f"chunk_{i}"),
                         vector=vector,
                         payload={
-                            'text': chunk.get('text', ''),
-                            'original_text': chunk.get('original_text', chunk.get('text', '')),  # Use original_text if available
+                            'text': chunk.get('text', ''),  # This is the enhanced text with metadata
+                            'original_text': chunk.get('original_text', chunk.get('text', '')),  # Original text only
                             'document_id': chunk.get('document_id', ''),
                             'file_name': chunk.get('file_name', ''),
                             'page_num': chunk.get('page_num', None),
@@ -524,7 +531,7 @@ class DocumentIndexer:
             logger.info(f"Indexing {len(points)} points in {total_batches} batches")
 
             for i in range(0, len(points), batch_size):
-                batch = points[i:i+batch_size]
+                batch = points[i:i + batch_size]
 
                 # Index batch
                 client.upsert(
@@ -532,7 +539,7 @@ class DocumentIndexer:
                     points=batch
                 )
 
-                logger.info(f"Indexed batch {i//batch_size + 1}/{total_batches} ({len(batch)} points)")
+                logger.info(f"Indexed batch {i // batch_size + 1}/{total_batches} ({len(batch)} points)")
 
             logger.info(f"Indexed {len(points)} points to Qdrant")
             return True
@@ -582,7 +589,7 @@ class DocumentIndexer:
             'qdrant_collection': self.qdrant_collection,
             'dns_resolution_attempted': True,
             'environment': {k: v for k, v in os.environ.items() if k.lower() in
-                           ['qdrant_host', 'qdrant_port', 'http_proxy', 'https_proxy', 'no_proxy']}
+                            ['qdrant_host', 'qdrant_port', 'http_proxy', 'https_proxy', 'no_proxy']}
         }
 
         try:
@@ -595,7 +602,7 @@ class DocumentIndexer:
 
     def _index_to_bm25(self, chunks: List[Dict[str, Any]]) -> bool:
         """
-        Index chunks to BM25.
+        Index chunks to BM25. Uses enhanced text with metadata for better search results.
 
         Args:
             chunks (list): List of document chunks
@@ -650,11 +657,12 @@ class DocumentIndexer:
             except (LookupError, ImportError):
                 logger.warning("Stopwords not available. Proceeding without stopwords.")
 
-            # Tokenize texts
-            logger.info("Tokenizing texts...")
+            # Tokenize texts - IMPORTANT: Use the enhanced text with metadata here too
+            logger.info("Tokenizing texts using enhanced text with metadata...")
 
             tokenized_texts = []
             for chunk in chunks:
+                # Get the enhanced text with metadata
                 text = chunk.get('text', '').lower()
                 if use_fallback_tokenizers:
                     # Use our fallback tokenizer
@@ -684,7 +692,7 @@ class DocumentIndexer:
                     'file_name': chunk.get('file_name', ''),
                     'page_num': chunk.get('page_num', None),
                     'chunk_idx': chunk.get('chunk_idx', 0),
-                    'text': chunk.get('text', ''),
+                    'text': chunk.get('text', ''),  # Store enhanced text with metadata
                     'original_text': chunk.get('original_text', chunk.get('text', ''))
                 }
                 bm25_metadata.append(metadata)

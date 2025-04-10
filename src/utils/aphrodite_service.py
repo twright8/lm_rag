@@ -344,6 +344,7 @@ def process_classification_request(llm, prompts, schema_definition, multi_label_
         logger.error(f"Error processing classification request: {e}", exc_info=True)
         return {"status": "error", "error": str(e)}
 
+
 def load_aphrodite_model(model_name: str, attempt=0):
     """Load an Aphrodite model generically and create JSON processor."""
     global global_llm, global_logits_processor
@@ -361,16 +362,16 @@ def load_aphrodite_model(model_name: str, attempt=0):
                 model=model_name,
                 max_model_len=max_model_len,
                 quantization=quantization if quantization != "none" else None,
-                dtype="bfloat16", # Consider making this configurable if needed
-                gpu_memory_utilization=0.95, # Adjust if needed
-                enforce_eager=True, # Often needed for stability/correctness
-                enable_prefix_caching=True, # Generally good for performance
-                trust_remote_code=True, # Be aware of security implications
-                #max_num_seqs=1024,
-                #speculative_model="[ngram]",  # [!code highlight]
-                #num_speculative_tokens=5,  # [!code highlight]
-                #ngram_prompt_lookup_max=4,  # [!code highlight]
-                #use_v2_block_manager=True,  # [!code highlight]
+                dtype="bfloat16",  # Consider making this configurable if needed
+                gpu_memory_utilization=0.95,  # Adjust if needed
+                enforce_eager=True,  # Often needed for stability/correctness
+                enable_prefix_caching=True,  # Generally good for performance
+                trust_remote_code=True,  # Be aware of security implications
+                # max_num_seqs=1024,
+                # speculative_model="[ngram]",
+                # num_speculative_tokens=5,
+                # ngram_prompt_lookup_max=4,
+                # use_v2_block_manager=True,
             )
         except RuntimeError as e:
             if "CUDA" in str(e) and attempt < 2:
@@ -378,22 +379,36 @@ def load_aphrodite_model(model_name: str, attempt=0):
                 time.sleep(2)
                 return load_aphrodite_model(model_name, attempt + 1)
             else:
-                raise # Re-raise if not CUDA error or too many attempts
+                raise  # Re-raise if not CUDA error or too many attempts
 
         # Attempt to create JSONLogitsProcessor ONCE upon successful model load
         logits_processor = None
         try:
             from outlines.serve.vllm import JSONLogitsProcessor
-            from pydantic import BaseModel # Define schemas here or import
-            # These need to match the schema defined in entity_extractor.py
+            from pydantic import BaseModel, Field
+            from typing import Optional, List, Literal
+
+            # Updated schema with new fields and Literal types
             class EntityRelationshipItem(BaseModel):
-                from_entity_type: str
-                from_entity_name: str
-                relationship_type: Optional[str] = None
+                from_entity_type: Optional[Literal[
+                    "PERSON", "NGO", "GOVERNMENT_BODY", "COMMERCIAL_COMPANY", "LOCATION", "POSITION", "MONETARY_AMOUNT", "ASSET", "EVENT"]] = None
+                from_entity_name: Optional[str] = None
+                relationship_type: Optional[
+                    Literal["WORKS_FOR", "OWNS", "LOCATED_IN", "CONNECTED_TO", "MET_WITH"]] = None
+                relationship_description: Optional[str] = None
                 to_entity_name: Optional[str] = None
-                to_entity_type: Optional[str] = None
+                to_entity_type: Optional[Literal[
+                    "PERSON", "NGO", "GOVERNMENT_BODY", "COMMERCIAL_COMPANY", "LOCATION", "POSITION", "MONEY", "ASSET", "EVENT"]] = None
+
+            # Add MetaData class
+            class MetaData(BaseModel):
+                summary: Optional[str] = None
+                red_flags: Optional[str] = None
+
+            # Updated EntityRelationshipList with metadata field
             class EntityRelationshipList(BaseModel):
                 entity_relationship_list: List[EntityRelationshipItem]
+                metadata: Optional[MetaData] = None
 
             logger.info("Creating JSONLogitsProcessor for extraction")
             if hasattr(llm, 'llm_engine'):
@@ -401,18 +416,18 @@ def load_aphrodite_model(model_name: str, attempt=0):
                 logger.info("JSONLogitsProcessor created successfully.")
             else:
                 logger.warning("Could not access llm.llm_engine for JSONLogitsProcessor. Extraction might fail.")
-                logits_processor = None # Ensure it's None if creation failed
+                logits_processor = None  # Ensure it's None if creation failed
         except ImportError:
-             logger.warning("Outlines library not installed. JSON forcing for extraction will be disabled.")
-             logits_processor = None
+            logger.warning("Outlines library not installed. JSON forcing for extraction will be disabled.")
+            logits_processor = None
         except Exception as e:
             logger.error(f"Failed to create JSONLogitsProcessor: {e}", exc_info=True)
-            logits_processor = None # Ensure it's None if creation failed
+            logits_processor = None  # Ensure it's None if creation failed
 
         global_llm = llm
-        global_logits_processor = logits_processor # Store it globally
+        global_logits_processor = logits_processor  # Store it globally
         logger.info(f"Aphrodite model {model_name} loaded successfully")
-        return llm # Return only the llm object
+        return llm  # Return only the llm object
     except Exception as e:
         logger.error(f"Error loading Aphrodite model: {e}", exc_info=True)
         return None
@@ -820,7 +835,7 @@ class AphroditeService:
         response = self._send_request(
             "load_model",
             {"model_name": model_name}, # No is_chat_model flag
-            timeout=600 # Increase timeout significantly for model loading
+            timeout=6000 # Increase timeout significantly for model loading
         )
         if response.get("status") == "success":
             logger.info(f"Model {model_name} loaded successfully in service.")
@@ -838,7 +853,7 @@ class AphroditeService:
         return self._send_request(
             "extract_entities",
             {"prompts": prompts},
-            timeout=600 # Long timeout for potentially large batch extraction
+            timeout=6000 # Long timeout for potentially large batch extraction
         )
 
     def generate_chat(self, prompt):
