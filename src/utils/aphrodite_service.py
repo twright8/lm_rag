@@ -687,7 +687,7 @@ class AphroditeService:
         return self._send_request(
             "extract_info",
             {"prompt": prompt, "schema_definition": schema_definition},
-            timeout=300  # Longer timeout for schema-based extraction
+            timeout=6000  # Longer timeout for schema-based extraction
         )
 
     # --- Add this method to the AphroditeService class ---
@@ -807,7 +807,7 @@ class AphroditeService:
                 logger.info(f"Aphrodite service process started (PID: {self.process.pid})")
                 # Optionally wait for a 'ready' signal or check status immediately
                 time.sleep(1) # Brief pause to allow process start
-                status = self.get_status(timeout=15) # Quick status check
+                status = self.get_status(timeout=60) # Quick status check
                 if status.get("status") == "success":
                     logger.info("Service started and responded to status check.")
                     return True
@@ -865,7 +865,7 @@ class AphroditeService:
             timeout=120 # Adjust timeout as needed for chat response generation
         )
 
-    def get_status(self, timeout=10):
+    def get_status(self, timeout=60):
         """Get service status."""
         if not self.is_running():
             return {"status": "not_running", "model_loaded": False}
@@ -889,18 +889,18 @@ class AphroditeService:
         logger.info(f"Attempting graceful shutdown of process {pid}...")
 
         if self.process.is_alive():
-            response = self._send_request("exit", {}, timeout=10) # Send exit command
+            response = self._send_request("exit", {}, timeout=60) # Send exit command
             if response.get("status") != "success":
                  logger.warning(f"Worker did not acknowledge exit command cleanly: {response.get('error')}")
 
             # Give the process time to exit after command
-            self.process.join(timeout=5)
+            self.process.join(timeout=60)
 
             # Force terminate if still alive
             if self.process.is_alive():
                 logger.warning(f"Process {pid} did not exit gracefully, terminating.")
                 self.process.terminate()
-                self.process.join(timeout=5) # Wait for termination
+                self.process.join(timeout=60) # Wait for termination
 
             if self.process.is_alive():
                  logger.error(f"Process {pid} failed to terminate, attempting kill.")
