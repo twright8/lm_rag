@@ -1,0 +1,97 @@
+2025-04-05 12:20:23,466 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:20:23,819 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-05 12:20:23,821 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-05 12:20:23,821 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-05 12:20:23,822 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.22 GB, VMS: 37.43 GB
+2025-04-05 12:20:23,909 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-05 12:20:23,910 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:20:24,003 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-05 12:21:00,199 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:21:00,583 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-05 12:21:00,586 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-05 12:21:00,586 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-05 12:21:00,586 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-05 12:21:00,587 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-05 12:21:00,587 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:21:00,587 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-05 12:21:00,587 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-05 12:21:00,587 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.23 GB, VMS: 37.43 GB
+2025-04-05 12:21:00,676 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-05 12:21:00,677 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:21:19,810 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:21:24,486 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:21:24,564 - __main__ - INFO - Updating CONFIG visualization_type to: static_datamapplot
+2025-04-05 12:21:57,034 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:21:57,443 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-05 12:21:57,445 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-05 12:21:57,446 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-05 12:21:57,446 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-05 12:21:57,446 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-05 12:21:57,446 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:21:57,446 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-05 12:21:57,447 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-05 12:21:57,447 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.23 GB, VMS: 37.43 GB
+2025-04-05 12:21:57,542 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-05 12:21:57,543 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-05 12:23:07,400 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:23:12,290 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-05 12:23:12,616 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-05 12:23:12,617 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING PLOTLY VISUALIZATION ⭐️⭐️⭐️
+2025-04-05 12:23:12,618 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-05 12:23:12,678 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-05 12:23:12,734 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-05 12:23:12,789 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-05 12:23:12,847 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-05 12:23:12,897 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-05 12:23:12,947 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-05 12:23:13,005 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-05 12:23:13,054 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-05 12:23:13,104 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-05 12:23:13,171 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-05 12:23:13,222 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-05 12:23:13,265 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-05 12:23:13,273 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-05 12:23:13,307 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.69s
+2025-04-05 12:23:13,307 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-05 12:23:13,308 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-05 12:23:13,316 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-05 12:23:13,319 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-05 12:23:13,319 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-05 12:23:13,345 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-05 12:23:50,585 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-05 12:23:50,585 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-05 12:23:50,594 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-05 12:23:50,594 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-05 12:26:55,774 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-05 12:26:55,774 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-05 12:26:55,775 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-05 12:26:55,781 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-05 12:26:55,788 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 222.47s
+2025-04-05 12:26:55,789 - src.core.visualization.cluster_map - INFO - Found 9 topics (excluding outliers).
+2025-04-05 12:26:55,789 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-05 12:26:55,789 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-05 12:26:55,793 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-05 12:26:55,903 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.11s
+2025-04-05 12:26:55,903 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-05 12:26:55,905 - src.core.visualization.cluster_map - INFO - Preparing visualization for 665 documents.
+2025-04-05 12:26:55,905 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-05 12:26:55,905 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-05 12:26:56,600 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-05 12:26:56,601 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-05 12:26:56,670 - src.core.visualization.cluster_map - ERROR - Error creating download dataframe: 'Topic'
+2025-04-05 12:26:56,683 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 562, in create_download_dataframe
+    download_df['Topic_Representation'] = download_df['Topic'].map(topic_words_map)
+                                          ~~~~~~~~~~~^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'Topic'
+

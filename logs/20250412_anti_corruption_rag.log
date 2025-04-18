@@ -1,0 +1,318 @@
+2025-04-12 00:08:49,977 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-12 00:08:50,010 - __main__ - INFO - Initializing ConversationStore...
+2025-04-12 00:08:50,014 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-12 00:08:50,016 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-12 00:08:50,024 - src.utils.conversation_store - INFO - Successfully loaded 12 conversations into memory.
+2025-04-12 00:08:50,026 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-12 00:08:50,027 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-12 00:08:50,028 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-12 00:08:50,029 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-12 00:08:50,030 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:08:50,030 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-12 00:08:50,031 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-12 00:08:50,032 - src.core.query_system.query_engine - INFO -   - BGE-M3 Prefetch Limit: 100
+2025-04-12 00:08:50,033 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.34 GB, VMS: 37.55 GB
+2025-04-12 00:08:50,121 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-12 00:08:50,122 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:08:50,801 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-12 00:08:50,803 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:09:06,375 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-12 00:09:06,377 - __main__ - INFO - Initializing ConversationStore...
+2025-04-12 00:09:06,379 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-12 00:09:06,379 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-12 00:09:06,381 - src.utils.conversation_store - INFO - Successfully loaded 12 conversations into memory.
+2025-04-12 00:09:06,382 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-12 00:09:06,383 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-12 00:09:06,384 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-12 00:09:06,385 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-12 00:09:06,385 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:09:06,386 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-12 00:09:06,387 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-12 00:09:06,388 - src.core.query_system.query_engine - INFO -   - BGE-M3 Prefetch Limit: 100
+2025-04-12 00:09:06,389 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.42 GB, VMS: 37.63 GB
+2025-04-12 00:09:06,390 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-12 00:09:06,391 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:09:06,981 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-12 00:09:06,982 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-12 00:09:12,084 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-12 00:09:13,440 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-12 00:09:13,904 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-12 00:09:13,991 - __main__ - INFO - Storing selected LLM for session: Qwen/Qwen2.5-7B-Instruct
+2025-04-12 00:09:13,993 - __main__ - INFO - Starting document processing for 1 files
+2025-04-12 00:09:13,995 - __main__ - INFO - Starting document processing with spreadsheet options. Files: ['Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf']
+2025-04-12 00:09:13,997 - __main__ - INFO - Starting Aphrodite service for document processing
+2025-04-12 00:09:26,539 - __main__ - INFO - Aphrodite service started successfully
+2025-04-12 00:09:26,540 - __main__ - INFO - Saved Aphrodite process info: PID=27565
+2025-04-12 00:09:26,541 - src.core.document_processing.document_loader - INFO - Initializing DocumentLoader
+2025-04-12 00:09:26,542 - src.core.document_processing.document_loader - INFO - Configuring Docling: Artifacts Path='None', Device='AcceleratorDevice.AUTO', Threads=-1
+2025-04-12 00:09:26,549 - src.core.document_processing.document_loader - INFO - Docling DocumentConverter initialized successfully.
+2025-04-12 00:09:26,554 - __main__ - INFO - Loading regular document: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf
+2025-04-12 00:09:26,555 - src.core.document_processing.document_loader - INFO - Loading document: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf (Type: .pdf)
+2025-04-12 00:09:26,556 - src.core.document_processing.document_loader - INFO - Processing with Docling: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf
+2025-04-12 00:09:26,557 - src.core.document_processing.document_loader - INFO - Starting Docling conversion for Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf...
+2025-04-12 00:11:42,686 - src.core.document_processing.document_loader - INFO - Exporting Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf content to Markdown...
+2025-04-12 00:12:10,718 - src.core.document_processing.document_loader - INFO - Docling processing successful for Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf. Word count: 94174, Page count: 246
+2025-04-12 00:12:10,837 - __main__ - INFO - Document loaded: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf, Content items: 1
+2025-04-12 00:12:10,839 - __main__ - INFO - All documents loaded. Shutting down document loader (Docling) to free resources...
+2025-04-12 00:12:10,840 - src.core.document_processing.document_loader - INFO - ===== SHUTTING DOWN DocumentLoader and Unloading Docling Models =====
+2025-04-12 00:12:10,841 - src.core.document_processing.document_loader - INFO - Process memory - RSS: 2.79 GB, VMS: 40.79 GB
+2025-04-12 00:12:10,843 - src.core.document_processing.document_loader - INFO - GPU memory - Allocated: 0.46 GB, Reserved: 0.76 GB, Total: 8.00 GB
+2025-04-12 00:12:10,843 - src.core.document_processing.document_loader - INFO - Unloading Docling DocumentConverter instance...
+2025-04-12 00:12:10,846 - src.core.document_processing.document_loader - INFO - Docling converter reference removed.
+2025-04-12 00:12:10,848 - src.core.document_processing.document_loader - INFO - Running garbage collection...
+2025-04-12 00:12:11,303 - src.core.document_processing.document_loader - INFO - Garbage collection finished.
+2025-04-12 00:12:11,304 - src.core.document_processing.document_loader - INFO - CUDA is available. Clearing PyTorch CUDA cache...
+2025-04-12 00:12:11,326 - src.core.document_processing.document_loader - INFO - PyTorch CUDA cache cleared.
+2025-04-12 00:12:11,327 - src.core.document_processing.document_loader - INFO - Docling models should now be unloaded from memory.
+2025-04-12 00:12:11,328 - src.core.document_processing.document_loader - INFO - Process memory - RSS: 2.75 GB, VMS: 40.74 GB
+2025-04-12 00:12:11,329 - src.core.document_processing.document_loader - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.02 GB, Total: 8.00 GB
+2025-04-12 00:12:11,330 - src.core.document_processing.document_loader - INFO - DocumentLoader shutdown complete.
+2025-04-12 00:12:11,708 - __main__ - INFO - Document loader shut down complete.
+2025-04-12 00:12:11,709 - __main__ - INFO - Process memory - RSS: 2.75 GB, VMS: 40.74 GB
+2025-04-12 00:12:11,710 - __main__ - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.02 GB, Total: 8.00 GB
+2025-04-12 00:12:11,711 - src.core.document_processing.document_chunker - INFO - Initializing DocumentChunker with chunk_size=512, chunk_overlap=100, embedding_model=intfloat/multilingual-e5-small, semantic_threshold=95
+2025-04-12 00:12:11,712 - src.core.document_processing.document_chunker - INFO - Markdown headers to split on: [('#', 'header_1'), ('##', 'header_2'), ('###', 'header_3'), ('####', 'header_4'), ('#####', 'header_5'), ('######', 'header_6')]
+2025-04-12 00:12:11,713 - src.core.document_processing.document_chunker - INFO - Process memory - RSS: 2.75 GB, VMS: 40.74 GB
+2025-04-12 00:12:11,714 - src.core.document_processing.document_chunker - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.02 GB, Total: 8.00 GB
+2025-04-12 00:12:11,715 - __main__ - INFO - Loading chunking model...
+2025-04-12 00:12:11,716 - src.core.document_processing.document_chunker - INFO - ===== LOADING SEMANTIC CHUNKING MODEL =====
+2025-04-12 00:12:11,717 - src.core.document_processing.document_chunker - INFO - Loading embedding model for semantic chunking: intfloat/multilingual-e5-small...
+2025-04-12 00:12:11,717 - src.core.document_processing.document_chunker - INFO - Using Hugging Face cache directory: /home/t/.cache/huggingface
+2025-04-12 00:12:11,718 - src.core.document_processing.document_chunker - INFO - Using Transformers cache directory: /home/t/.cache/huggingface/hub
+2025-04-12 00:12:11,719 - src.core.document_processing.document_chunker - INFO - Using device: cuda
+2025-04-12 00:12:15,761 - src.core.document_processing.document_chunker - INFO - Test embedding generated successfully.
+2025-04-12 00:12:15,763 - src.core.document_processing.document_chunker - INFO - Semantic chunking embedding model loaded successfully in 4.04 seconds
+2025-04-12 00:12:15,764 - src.core.document_processing.document_chunker - INFO - Process memory - RSS: 2.89 GB, VMS: 42.02 GB
+2025-04-12 00:12:15,765 - src.core.document_processing.document_chunker - INFO - GPU memory - Allocated: 0.45 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:12:15,765 - __main__ - INFO - Chunking document 1/1: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf
+2025-04-12 00:12:15,766 - src.core.document_processing.document_chunker - INFO - Starting chunking for document: Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf (ID: c9a6248d-0349-470b-b632-aee47bd62991, Type: .pdf)
+2025-04-12 00:12:15,767 - src.core.document_processing.document_chunker - INFO - Processing 1 content item(s) for Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf.
+2025-04-12 00:12:15,768 - src.core.document_processing.document_chunker - INFO - Processing content item 1/1 (length: 608866 chars) using Markdown Header + Semantic chunking.
+2025-04-12 00:12:15,785 - src.core.document_processing.document_chunker - INFO - MarkdownHeaderTextSplitter created 244 initial structural chunks.
+2025-04-12 00:12:23,144 - src.core.document_processing.document_chunker - INFO - Markdown header + semantic splitting resulted in 502 potential chunks.
+2025-04-12 00:12:23,146 - src.core.document_processing.document_chunker - WARNING - Chunk (length 8299) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,147 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 18 basic chunks.
+2025-04-12 00:12:23,148 - src.core.document_processing.document_chunker - WARNING - Chunk (length 6564) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,149 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 18 basic chunks.
+2025-04-12 00:12:23,150 - src.core.document_processing.document_chunker - WARNING - Chunk (length 6017) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,152 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 22 basic chunks.
+2025-04-12 00:12:23,153 - src.core.document_processing.document_chunker - WARNING - Chunk (length 5972) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,154 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 18 basic chunks.
+2025-04-12 00:12:23,155 - src.core.document_processing.document_chunker - WARNING - Chunk (length 7518) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,156 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 21 basic chunks.
+2025-04-12 00:12:23,157 - src.core.document_processing.document_chunker - WARNING - Chunk (length 7098) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,158 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 22 basic chunks.
+2025-04-12 00:12:23,159 - src.core.document_processing.document_chunker - WARNING - Chunk (length 7084) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,160 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 19 basic chunks.
+2025-04-12 00:12:23,161 - src.core.document_processing.document_chunker - WARNING - Chunk (length 5166) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,164 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 15 basic chunks.
+2025-04-12 00:12:23,165 - src.core.document_processing.document_chunker - WARNING - Chunk (length 5469) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,166 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 14 basic chunks.
+2025-04-12 00:12:23,167 - src.core.document_processing.document_chunker - WARNING - Chunk (length 5139) still exceeds size limit (5120) after semantic split. Applying basic chunking fallback.
+2025-04-12 00:12:23,168 - src.core.document_processing.document_chunker - INFO - RecursiveCharacterTextSplitter created 13 basic chunks.
+2025-04-12 00:12:23,169 - src.core.document_processing.document_chunker - INFO - Applied basic chunking fallback to 10 oversized chunks.
+2025-04-12 00:12:23,170 - src.core.document_processing.document_chunker - INFO - Final processing created 672 chunks from text of length 608866.
+2025-04-12 00:12:23,174 - src.core.document_processing.document_chunker - INFO - Chunking for Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf completed in 7.41s.
+2025-04-12 00:12:23,175 - src.core.document_processing.document_chunker - INFO - Created 672 total chunks: 0 spreadsheet rows, 492 semantic chunks, 0 sentence fallback chunks, 180 basic fallback chunks.
+2025-04-12 00:12:23,176 - src.core.document_processing.document_chunker - INFO - Average chunk size: 881.6 characters.
+2025-04-12 00:12:23,177 - src.core.document_processing.document_chunker - INFO - Process memory - RSS: 2.89 GB, VMS: 42.01 GB
+2025-04-12 00:12:23,178 - src.core.document_processing.document_chunker - INFO - GPU memory - Allocated: 0.45 GB, Reserved: 0.97 GB, Total: 8.00 GB
+2025-04-12 00:12:23,179 - __main__ - INFO - Created 672 chunks for Witness_Statement_of_Nicola_Bartlett_dated_12_June_2023.pdf
+2025-04-12 00:12:23,180 - __main__ - INFO - Shutting down chunking model...
+2025-04-12 00:12:23,181 - src.core.document_processing.document_chunker - INFO - ===== UNLOADING SEMANTIC CHUNKING MODEL =====
+2025-04-12 00:12:23,182 - src.core.document_processing.document_chunker - INFO - Model was on device: cuda
+2025-04-12 00:12:23,182 - src.core.document_processing.document_chunker - INFO - Deleting model reference...
+2025-04-12 00:12:23,183 - src.core.document_processing.document_chunker - INFO - Clearing CUDA cache...
+2025-04-12 00:12:23,189 - src.core.document_processing.document_chunker - INFO - Running garbage collection...
+2025-04-12 00:12:23,870 - src.core.document_processing.document_chunker - INFO - Semantic chunking model unloaded.
+2025-04-12 00:12:23,872 - src.core.document_processing.document_chunker - INFO - Process memory - RSS: 2.89 GB, VMS: 42.01 GB
+2025-04-12 00:12:23,873 - src.core.document_processing.document_chunker - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:12:23,874 - __main__ - INFO - Total chunks generated: 672
+2025-04-12 00:12:23,875 - __main__ - INFO - Creating entity extractor with model Qwen/Qwen2.5-7B-Instruct
+2025-04-12 00:12:23,876 - src.core.extraction.entity_extractor - INFO - Initialized EntityExtractor with model=Qwen/Qwen2.5-7B-Instruct, debug=True, using advanced deduplication.
+2025-04-12 00:12:23,877 - src.core.extraction.entity_extractor - INFO - Process memory - RSS: 2.89 GB, VMS: 42.01 GB
+2025-04-12 00:12:23,878 - src.core.extraction.entity_extractor - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:12:23,879 - __main__ - INFO - Starting entity extraction on 672 chunks (0 visual chunks)
+2025-04-12 00:12:23,880 - src.core.extraction.entity_extractor - INFO - Adding 672 chunks for batch processing (0 spreadsheet rows, 0 visual)
+2025-04-12 00:12:23,881 - src.core.extraction.entity_extractor - INFO - Added 672 chunks to queue. Processing now.
+2025-04-12 00:12:23,882 - src.core.extraction.entity_extractor - INFO - Processing all 672 chunks...
+2025-04-12 00:12:23,883 - src.core.extraction.entity_extractor - INFO - Process memory - RSS: 2.89 GB, VMS: 42.01 GB
+2025-04-12 00:12:23,884 - src.core.extraction.entity_extractor - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:12:23,886 - src.core.extraction.entity_extractor - INFO - Loading designated extraction model: Qwen/Qwen2.5-7B-Instruct
+2025-04-12 00:16:42,634 - src.core.extraction.entity_extractor - INFO - Model Qwen/Qwen2.5-7B-Instruct loaded successfully for extraction.
+2025-04-12 00:16:42,645 - src.core.extraction.entity_extractor - INFO - Processing 672 chunks (0 spreadsheet rows)
+2025-04-12 00:16:42,649 - src.core.extraction.entity_extractor - INFO - Processing in 1 batches of size 1024
+2025-04-12 00:16:42,652 - src.core.extraction.entity_extractor - INFO - Processing batch 1/1 (672 chunks)
+2025-04-12 00:16:42,862 - src.core.extraction.entity_extractor - INFO - Sending batch of 672 prompts to service
+2025-04-12 00:51:42,082 - src.core.extraction.entity_extractor - INFO - Received response from service
+2025-04-12 00:51:42,088 - src.core.extraction.entity_extractor - INFO - Service request/response took 2099.22s
+2025-04-12 00:51:42,131 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 8a6cb0c6-e01c-4243-80d0-8167a4638bfb: from_entity_type='LOCATION' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='UK' to_entity_type='LOCATION'
+2025-04-12 00:51:42,135 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 8a6cb0c6-e01c-4243-80d0-8167a4638bfb: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='indefinite leave to remain' to_entity_type='ASSET'
+2025-04-12 00:51:42,138 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 8a6cb0c6-e01c-4243-80d0-8167a4638bfb: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='June 2015' to_entity_type='ASSET'
+2025-04-12 00:51:42,142 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk c6275a40-a0cd-4c2c-a0ac-a0a6260b18b6: Unterminated string starting at: line 1 column 7120 (char 7119). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": "NCA", ...'
+2025-04-12 00:51:42,146 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f60a03bc-831a-4df7-ac31-b8b68477e864: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,147 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f60a03bc-831a-4df7-ac31-b8b68477e864: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='judge' to_entity_type='POSITION'
+2025-04-12 00:51:42,149 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f60a03bc-831a-4df7-ac31-b8b68477e864: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='PFO' to_entity_type='ASSET'
+2025-04-12 00:51:42,151 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f60a03bc-831a-4df7-ac31-b8b68477e864: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Disclosure Order' to_entity_type='ASSET'
+2025-04-12 00:51:42,152 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f60a03bc-831a-4df7-ac31-b8b68477e864: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='financial institutions, law firms and other relevant third parties' to_entity_type='LOCATION'
+2025-04-12 00:51:42,155 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk a601adb2-7fe6-4e2b-a22a-4b0f8bbfc8a7: Unterminated string starting at: line 1 column 8084 (char 8083). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": null, "...'
+2025-04-12 00:51:42,157 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 17f19836-95a5-4032-90cd-06d46b5aa889: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,159 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 17f19836-95a5-4032-90cd-06d46b5aa889: from_entity_type='ASSET' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,161 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 2809f7e9-f805-4438-93b4-822437c7a384: from_entity_type='COMMERCIAL_COMPANY' from_entity_name=None relationship_type='LOCATED_IN' relationship_description='Used to hold bank accounts' to_entity_name='a number of jurisdictions' to_entity_type='LOCATION'
+2025-04-12 00:51:42,166 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 8a65a829-ba7c-49e2-983a-42f1561140e1: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,169 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d100c56e-8191-48ac-b0d7-9978a7961770: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='income' to_entity_type='ASSET'
+2025-04-12 00:51:42,171 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d9f1ad7b-0146-42bb-8cb5-56a332f7dbb0: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='the KB Companies presentation' to_entity_type='ASSET'
+2025-04-12 00:51:42,175 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk dc1b120f-ef6e-4b21-a5a0-dbac9861f4ac: Unterminated string starting at: line 1 column 7502 (char 7501). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mr Bashirov", "...'
+2025-04-12 00:51:42,179 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 7253097a-69d1-428d-90da-16579bb45d1c: Expecting value: line 1 column 7360 (char 7359). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "My clients", "r...'
+2025-04-12 00:51:42,182 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk ad295f10-673a-49f0-aa03-bc8ac4a7009e: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Azerbaijan' to_entity_type='LOCATION'
+2025-04-12 00:51:42,184 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 515d6647-384e-4a38-8c15-57187a11e29a: Unterminated string starting at: line 1 column 8137 (char 8136). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": "NCA", ...'
+2025-04-12 00:51:42,187 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk fe09d7c4-28b0-406a-8ad6-309bba57ee9b: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,189 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk fe09d7c4-28b0-406a-8ad6-309bba57ee9b: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,191 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk c914ab95-09fd-4015-b2e7-0fda90e51a23: Expecting ',' delimiter: line 1 column 7736 (char 7735). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mr Bashirov", "...'
+2025-04-12 00:51:42,193 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk dddb4c25-8201-44bd-9c34-49c29d3531c3: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,196 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk af8e33be-9df1-454d-be8c-ab6973000483: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description='correspond to the dates and amounts of promissory notes and loan agreements' to_entity_name='promissory notes and loan agreements' to_entity_type='ASSET'
+2025-04-12 00:51:42,202 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 426d05a3-cd35-4f1e-a858-5743d50ef13f: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,208 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk cef345e5-7cbc-4691-8a46-7b95077964ad: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,210 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk cef345e5-7cbc-4691-8a46-7b95077964ad: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,212 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 6b24954a-aaaa-4298-ac05-a903a1c29ecf: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,215 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 05987e3f-8951-4160-8d7e-4e1809fd84bd: Unterminated string starting at: line 1 column 8084 (char 8083). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": null, "...'
+2025-04-12 00:51:42,218 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 571ecc84-631c-42d8-8e48-a5e66c04fd13: Unterminated string starting at: line 1 column 7728 (char 7727). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": "OCCRP"...'
+2025-04-12 00:51:42,221 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk cebaf15a-97c6-4bf8-b1ca-6e77ad1ae042: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='OCCRP' to_entity_type='NGO'
+2025-04-12 00:51:42,225 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk b3026eda-1129-4123-8def-d18e9bab8413: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,228 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f0d73567-9f61-41ac-86c7-e9a941757314: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,230 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk f0d73567-9f61-41ac-86c7-e9a941757314: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,236 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3de4f024-f780-4c9d-bb01-b34b2beb691e: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,237 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3de4f024-f780-4c9d-bb01-b34b2beb691e: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,243 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk fd4bb39b-7674-4180-9dfd-e4a7c26e946a: Unterminated string starting at: line 1 column 8193 (char 8192). Content: '{"entity_relationship_list": [{"from_entity_type": "GOVERNMENT_BODY", "from_entity_name": null, "rel...'
+2025-04-12 00:51:42,246 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 1b520ff2-4185-4318-b408-789f4976b998: Expecting property name enclosed in double quotes: line 1 column 7882 (char 7881). Content: '{ "entity_relationship_list": [ { "from_entity_type": "MONETARY_AMOUNT", "from_entity_name": "GBP 6,...'
+2025-04-12 00:51:42,251 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d5d142ce-ad4a-4e29-98e2-aba5286ad39a: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='FATF' to_entity_type='GOVERNMENT_BODY'
+2025-04-12 00:51:42,254 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d5d142ce-ad4a-4e29-98e2-aba5286ad39a: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='OECD' to_entity_type='GOVERNMENT_BODY'
+2025-04-12 00:51:42,256 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d5d142ce-ad4a-4e29-98e2-aba5286ad39a: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='NCA' to_entity_type='GOVERNMENT_BODY'
+2025-04-12 00:51:42,257 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk d5d142ce-ad4a-4e29-98e2-aba5286ad39a: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Companies House' to_entity_type='GOVERNMENT_BODY'
+2025-04-12 00:51:42,260 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk d8b6da33-c20d-48b0-b408-abee5d66d3eb: Unterminated string starting at: line 1 column 7636 (char 7635). Content: '{ "entity_relationship_list": [ { "from_entity_type": "MONETARY_AMOUNT", "from_entity_name": "USD 5,...'
+2025-04-12 00:51:42,264 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk b8318718-aab7-4d63-883a-517e53f7a78e: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='loan' to_entity_type='MONEY'
+2025-04-12 00:51:42,268 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 78673eba-2fde-426c-9c1c-ef51071c41c6: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,271 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk ece59b5e-90f0-48fe-937f-2371fd76c60e: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,275 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 50bced1a-e51c-4d6c-b26d-07d42da28d05: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,277 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk c6fbfbaa-5b74-4d2d-b404-900c372ccb44: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,283 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 850408fb-b22d-4d6e-ae19-260e8e6eb964: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='DH Leasing' to_entity_type='COMMERCIAL_COMPANY'
+2025-04-12 00:51:42,287 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 20977dcd-6a45-41a0-8884-44568bb45671: Unterminated string starting at: line 1 column 8160 (char 8159). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mr Bashirov", "...'
+2025-04-12 00:51:42,289 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 697bf7ec-d493-4690-a6ed-bc2a8cd95bd3: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Isle of Man' to_entity_type='LOCATION'
+2025-04-12 00:51:42,294 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 40f0dc52-d425-4e61-ac10-52e2ef33c702: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='IBA-Moscow' to_entity_type='COMMERCIAL_COMPANY'
+2025-04-12 00:51:42,296 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 40f0dc52-d425-4e61-ac10-52e2ef33c702: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='transactions' to_entity_type='ASSET'
+2025-04-12 00:51:42,298 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 4c8c6694-796f-4308-a04f-91aeb1235a73: Expecting value: line 1 column 7655 (char 7654). Content: '{ "entity_relationship_list": [ { "from_entity_type": "MONETARY_AMOUNT", "from_entity_name": "EUR 2,...'
+2025-04-12 00:51:42,300 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 1a2f1f00-804c-43d6-933f-ad99ce66d62b: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type='WORKS_FOR' relationship_description='Regulated firms were required to carry out due diligence' to_entity_name='regulated firms' to_entity_type='COMMERCIAL_COMPANY'
+2025-04-12 00:51:42,302 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 1a2f1f00-804c-43d6-933f-ad99ce66d62b: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description='Source of funds and source of wealth' to_entity_name='Mr Hajiyev' to_entity_type='PERSON'
+2025-04-12 00:51:42,304 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 1a2f1f00-804c-43d6-933f-ad99ce66d62b: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description='Income' to_entity_name='Mr Hajiyev' to_entity_type='PERSON'
+2025-04-12 00:51:42,305 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 7eb3c610-3f13-44f0-98cf-a5df3be310e9: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type='WORKS_FOR' relationship_description='Employed' to_entity_name='Tab C1' to_entity_type='LOCATION'
+2025-04-12 00:51:42,312 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3b2e3a4d-8733-4ade-a214-5680e2ba7295: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,316 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 44391110-dd34-4ab9-aace-96af0c7ee72f: Expecting ',' delimiter: line 1 column 7614 (char 7613). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mrs Hajiyeva", ...'
+2025-04-12 00:51:42,317 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 206b7f1c-2385-410e-b43e-1f160a686474: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,319 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 093648b6-7bb6-4783-a96a-e077c2d20405: Unterminated string starting at: line 1 column 7527 (char 7526). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mrs Hajiyeva", ...'
+2025-04-12 00:51:42,321 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk ea348cc8-f865-4428-a3cf-1ae186af2869: Unterminated string starting at: line 1 column 7146 (char 7145). Content: '{ "entity_relationship_list": [ { "from_entity_type": "COMMERCIAL_COMPANY", "from_entity_name": "Glo...'
+2025-04-12 00:51:42,324 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Tea Construction' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,326 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Eroil' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,328 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Mea Oil' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,329 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='TPD Trading Petrol and Drilling' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,330 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Tiara' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,332 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Migao Corporation' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,333 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 9aaade13-f74e-46c4-823c-760b5ff46688: from_entity_type=None from_entity_name='Anglo Asian Mining Plc' relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,336 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 89930070-bae7-4b64-b344-e7fa1d42e454: Unterminated string starting at: line 1 column 6734 (char 6733). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mrs Hajiyeva", ...'
+2025-04-12 00:51:42,339 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 67b521d7-b55b-46d0-847a-ba372683433a: Unterminated string starting at: line 1 column 8328 (char 8327). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Mrs Hajiyeva", ...'
+2025-04-12 00:51:42,341 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 23e08541-c8f7-4431-b1c6-11a497fe1665: Unterminated string starting at: line 1 column 7445 (char 7444). Content: '{"entity_relationship_list": [{"from_entity_type": "ASSET", "from_entity_name": "7.9 12-14 Walton St...'
+2025-04-12 00:51:42,343 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3a449ca5-913b-42ac-9e7f-4116f1355a49: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='BVI' to_entity_type='LOCATION'
+2025-04-12 00:51:42,346 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3379de17-a71d-4b14-9d7a-76ff29ec09f4: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,348 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 3379de17-a71d-4b14-9d7a-76ff29ec09f4: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,349 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 110c055b-ba0c-4676-ac61-1510e9d9f309: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,350 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 2d1e7932-1467-49ec-8c07-6e15e23a7226: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Azerbaijan' to_entity_type='LOCATION'
+2025-04-12 00:51:42,357 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 2059e841-af78-49b9-acd9-b6dc6fdf2dcb: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,362 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk c6f2dbd2-9f06-431f-8358-24a0dcfd60dc: from_entity_type='PERSON' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,363 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk c6f2dbd2-9f06-431f-8358-24a0dcfd60dc: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,364 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 46b07fdc-d626-4cf9-88d0-d250f78c99f6: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,366 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 46b07fdc-d626-4cf9-88d0-d250f78c99f6: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,367 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 50134f50-43e3-45f4-8a66-599278489beb: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,369 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk dc9c07f9-a7f2-40c1-b043-208a8d44d3e3: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,370 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk a2ed9e08-5f57-4984-9324-edd392dbf398: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,379 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk c34e58c9-37ef-4a16-b57e-22e518f06d7d: Unterminated string starting at: line 1 column 8004 (char 8003). Content: '{"entity_relationship_list": [{"from_entity_type": "LOCATION", "from_entity_name": "Guernsey", "rela...'
+2025-04-12 00:51:42,382 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 64246ebd-b88e-4d9c-9604-296d65d9049b: Unterminated string starting at: line 1 column 7469 (char 7468). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": null, "...'
+2025-04-12 00:51:42,384 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 328c764c-7f24-4483-8031-b796024b4a22: Unterminated string starting at: line 1 column 7134 (char 7133). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Ms Mateos", "re...'
+2025-04-12 00:51:42,385 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 91b515f8-4453-4945-96a3-2963c74a7987: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,386 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 91b515f8-4453-4945-96a3-2963c74a7987: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,387 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 6ce8d30e-e5b5-409c-a328-9184530a85c9: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,388 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 6ce8d30e-e5b5-409c-a328-9184530a85c9: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,390 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 75ba828c-3704-40c4-802b-ec4124c2efe4: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,391 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 75ba828c-3704-40c4-802b-ec4124c2efe4: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,392 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk cc79e38f-63dc-416d-a3c1-0a271cf6d338: Unterminated string starting at: line 1 column 7803 (char 7802). Content: '{ "entity_relationship_list": [ { "from_entity_type": "PERSON", "from_entity_name": "Ms Georgiou", "...'
+2025-04-12 00:51:42,393 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 75959f5e-0b46-4ebe-84b6-121bb8c1a514: from_entity_type='COMMERCIAL_COMPANY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,395 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 75959f5e-0b46-4ebe-84b6-121bb8c1a514: from_entity_type='COMMERCIAL_COMPANY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='Mill Ride Golf Club' to_entity_type='ASSET'
+2025-04-12 00:51:42,396 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 75959f5e-0b46-4ebe-84b6-121bb8c1a514: from_entity_type='COMMERCIAL_COMPANY' from_entity_name=None relationship_type='LOCATED_IN' relationship_description='Offshore trust structure' to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,397 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk a9add85f-47ad-406f-9a1b-517897c50cff: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,400 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk a3a4abb7-c496-415c-b693-eb24229220d0: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,401 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk a3a4abb7-c496-415c-b693-eb24229220d0: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,402 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 99d1ee48-287f-48f7-96d6-da2c3f1f409b: Unterminated string starting at: line 1 column 6271 (char 6270). Content: '{"entity_relationship_list": [{"from_entity_type": "MONETARY_AMOUNT", "from_entity_name": "GBP 620,0...'
+2025-04-12 00:51:42,404 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 596afe22-1858-43d2-b0fb-c38fa09ddbe8: Expecting value: line 1 column 7868 (char 7867). Content: '{"entity_relationship_list": [{"from_entity_type": "COMMERCIAL_COMPANY", "from_entity_name": "Semfra...'
+2025-04-12 00:51:42,406 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk a70c50ad-05df-4696-8311-af97aaddf78d: from_entity_type='MONETARY_AMOUNT' from_entity_name=None relationship_type=None relationship_description=None to_entity_name='account number LU190023192776665200' to_entity_type='ASSET'
+2025-04-12 00:51:42,407 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 7d218748-72ed-4f3d-b4d4-15cb82fe352e: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,409 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk 7d218748-72ed-4f3d-b4d4-15cb82fe352e: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,413 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk bfc3c242-abfc-400d-8749-7793b188c913: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,415 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk bfc3c242-abfc-400d-8749-7793b188c913: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,418 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk c4c2c244-ac7c-4a21-9577-a5c0c425f853: from_entity_type='NGO' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,420 - src.core.extraction.entity_extractor - WARNING - Skipping item with missing from_entity details in chunk c4c2c244-ac7c-4a21-9577-a5c0c425f853: from_entity_type='GOVERNMENT_BODY' from_entity_name=None relationship_type=None relationship_description=None to_entity_name=None to_entity_type=None
+2025-04-12 00:51:42,422 - src.core.extraction.entity_extractor - WARNING - Error parsing result for chunk 5730d0b2-5b9c-4aea-93ef-03e79086697a: Unterminated string starting at: line 1 column 7459 (char 7458). Content: '{ "entity_relationship_list": [ { "from_entity_type": "GOVERNMENT_BODY", "from_entity_name": "NCA", ...'
+2025-04-12 00:51:42,423 - src.core.extraction.entity_extractor - INFO - Processed batch results in 0.33s. Total batch time: 2099.77s
+2025-04-12 00:51:42,425 - src.core.extraction.entity_extractor - INFO - Batch Stats: Success=646, Parse Errors=26, Missing Outputs=0
+2025-04-12 00:51:42,429 - src.core.extraction.entity_extractor - INFO - All batch processing completed in 2099.78s
+2025-04-12 00:51:42,474 - src.core.extraction.entity_extractor - INFO - Starting final processing and saving...
+2025-04-12 00:51:42,475 - src.core.extraction.entity_extractor - INFO - Raw counts before deduplication: 4700 entities, 1345 relationships.
+2025-04-12 00:51:42,476 - src.core.extraction.entity_extractor - INFO - Running enhanced entity deduplication...
+2025-04-12 00:51:42,477 - src.core.extraction.entity_extractor - INFO - Starting enhanced entity deduplication on 4700 raw entities...
+2025-04-12 00:51:42,626 - src.core.extraction.entity_extractor - INFO - Normalizing entity names...
+2025-04-12 00:51:42,778 - src.core.extraction.entity_extractor - WARNING - Removed 16 entities with empty normalized names.
+2025-04-12 00:51:42,780 - src.core.extraction.entity_extractor - INFO - Generating candidate pairs using blocking...
+2025-04-12 00:51:43,364 - src.core.extraction.entity_extractor - INFO - Generated 171254 candidate pairs across all types.
+2025-04-12 00:51:43,365 - src.core.extraction.entity_extractor - INFO - Comparing candidate pairs...
+2025-04-12 00:51:59,797 - src.core.extraction.entity_extractor - INFO - Found 142009 potential duplicate pairs after comparison.
+2025-04-12 00:51:59,798 - src.core.extraction.entity_extractor - INFO - Clustering duplicate pairs...
+2025-04-12 00:52:05,027 - src.core.extraction.entity_extractor - INFO - Found 1356 clusters (including singletons).
+2025-04-12 00:52:05,028 - src.core.extraction.entity_extractor - INFO - Choosing canonical entities and merging context...
+2025-04-12 00:52:05,235 - src.core.extraction.entity_extractor - INFO - Enhanced entity deduplication complete. Final entity count: 1356.
+2025-04-12 00:52:05,273 - src.core.extraction.entity_extractor - INFO - Updating relationship IDs based on entity deduplication map...
+2025-04-12 00:52:05,278 - src.core.extraction.entity_extractor - INFO - Updating 1345 raw relationships with canonical entity IDs...
+2025-04-12 00:52:05,280 - src.core.extraction.entity_extractor - INFO - Relationship ID update complete. Kept 1322, Updated IDs in 1244, Skipped 23 (self-loops or missing mappings).
+2025-04-12 00:52:05,282 - src.core.extraction.entity_extractor - INFO - Running relationship deduplication...
+2025-04-12 00:52:05,283 - src.core.extraction.entity_extractor - INFO - Starting relationship deduplication...
+2025-04-12 00:52:05,285 - src.core.extraction.entity_extractor - INFO - Relationship deduplication complete. Removed 119 duplicates. Final count: 1203.
+2025-04-12 00:52:05,286 - src.core.extraction.entity_extractor - INFO - Final counts after deduplication: 1356 entities, 1203 relationships.
+2025-04-12 00:52:05,316 - src.core.extraction.entity_extractor - INFO - Saved 1356 deduplicated entities to /home/t/lm_rag/data/extracted/entities.json
+2025-04-12 00:52:05,331 - src.core.extraction.entity_extractor - INFO - Saved 1203 deduplicated relationships to /home/t/lm_rag/data/extracted/relationships.json
+2025-04-12 00:52:05,334 - __main__ - INFO - Entity extraction complete. Modified chunks: 672
+2025-04-12 00:52:05,817 - __main__ - INFO - QueryEngine LLM model updated to: Qwen/Qwen2.5-7B-Instruct
+2025-04-12 00:52:05,822 - src.core.indexing.document_indexer - INFO - Initializing DocumentIndexer:
+2025-04-12 00:52:05,824 - src.core.indexing.document_indexer - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-12 00:52:05,825 - src.core.indexing.document_indexer - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-12 00:52:05,825 - src.core.indexing.document_indexer - INFO -   - Expected Vector Size: 1024
+2025-04-12 00:52:05,826 - src.core.indexing.document_indexer - INFO -   - Debug Mode: False
+2025-04-12 00:52:05,841 - src.core.indexing.document_indexer - INFO - Process memory - RSS: 2.03 GB, VMS: 42.00 GB
+2025-04-12 00:52:05,849 - src.core.indexing.document_indexer - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:52:05,850 - __main__ - INFO - Loading indexing model...
+2025-04-12 00:52:05,851 - src.core.indexing.document_indexer - INFO - ===== LOADING EMBEDDING MODEL: BAAI/bge-m3 =====
+2025-04-12 00:52:05,852 - src.core.indexing.document_indexer - INFO - Using device: cuda
+2025-04-12 00:52:08,323 - src.core.indexing.document_indexer - INFO - Loaded BGE-M3 model using FlagEmbedding.
+2025-04-12 00:52:08,325 - src.core.indexing.document_indexer - INFO - Embedding model loaded in 2.47 seconds
+2025-04-12 00:52:08,326 - src.core.indexing.document_indexer - INFO - Process memory - RSS: 2.09 GB, VMS: 44.12 GB
+2025-04-12 00:52:08,328 - src.core.indexing.document_indexer - INFO - GPU memory - Allocated: 0.01 GB, Reserved: 0.47 GB, Total: 8.00 GB
+2025-04-12 00:52:08,399 - __main__ - INFO - Indexing 672 chunks
+2025-04-12 00:52:08,400 - src.core.indexing.document_indexer - INFO - Starting indexing process for 672 chunks...
+2025-04-12 00:52:08,401 - src.core.indexing.document_indexer - INFO - Embedding model (BAAI/bge-m3) already loaded.
+2025-04-12 00:52:08,402 - src.core.indexing.document_indexer - INFO - Indexing 672 chunks to BM25
+2025-04-12 00:52:08,415 - src.core.indexing.document_indexer - INFO - Tokenizing enhanced texts for BM25...
+2025-04-12 00:52:08,855 - src.core.indexing.document_indexer - INFO - Creating BM25 index...
+2025-04-12 00:52:08,870 - src.core.indexing.document_indexer - INFO - Saving BM25 index and metadata to /home/t/lm_rag/data/bm25/index.pkl
+2025-04-12 00:52:08,903 - src.core.indexing.document_indexer - INFO - BM25 index saved successfully (672 documents).
+2025-04-12 00:52:08,907 - src.core.indexing.document_indexer - INFO - Indexing 672 chunks to Qdrant collection 'anticorruption_rag_e5_instruct'...
+2025-04-12 00:52:08,966 - src.core.indexing.document_indexer - INFO - Collection 'anticorruption_rag_e5_instruct' already exists. Verifying configuration...
+2025-04-12 00:52:08,988 - src.core.indexing.document_indexer - INFO - Generating embeddings for chunks...
+2025-04-12 00:52:08,989 - src.core.indexing.document_indexer - INFO - Generating BGE-M3 embeddings for 672 texts (dense, sparse, colbert)...
+2025-04-12 00:52:24,163 - src.core.indexing.document_indexer - INFO - BGE-M3 embeddings generated.
+2025-04-12 00:52:24,165 - src.core.indexing.document_indexer - INFO - Embeddings generated in 15.18s
+2025-04-12 00:52:24,167 - src.core.indexing.document_indexer - INFO - Preparing points for Qdrant upsert...

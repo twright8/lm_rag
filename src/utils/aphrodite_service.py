@@ -353,8 +353,15 @@ def load_aphrodite_model(model_name: str, attempt=0):
 
         max_model_len = CONFIG["aphrodite"]["max_model_len"]
         quantization = CONFIG["aphrodite"]["quantization"]
+        load_format = CONFIG["aphrodite"]["load_format"]
+        cpu_offload_gb= CONFIG["aphrodite"]["cpu_offload_gb"]
+        swap_space= CONFIG["aphrodite"]["swap_space"]
+        max_num_seqs= CONFIG["aphrodite"]["max_num_seqs"]
+        enable_chunked_prefill= CONFIG["aphrodite"]["enable_chunked_prefill"]
+        enable_prefix_caching= CONFIG["aphrodite"]["enable_prefix_caching"]
         logger.info(f"Loading Aphrodite model: {model_name}")
         logger.info(f"Parameters: max_model_len={max_model_len}, quantization={quantization}")
+        enforce_eager= CONFIG["aphrodite"]["enforce_eager"]
 
         try:
             # Attempt to load the LLM
@@ -363,15 +370,15 @@ def load_aphrodite_model(model_name: str, attempt=0):
                 max_model_len=max_model_len,
                 quantization=quantization if quantization != "none" else None,
                 dtype="bfloat16",  # Consider making this configurable if needed
-                gpu_memory_utilization=0.95,  # Adjust if needed
-                enforce_eager=True,  # Often needed for stability/correctness
-                enable_prefix_caching=True,  # Generally good for performance
+                gpu_memory_utilization=0.99,  # Adjust if needed
+                enforce_eager=enforce_eager,  # Often needed for stability/correctness
                 trust_remote_code=True,  # Be aware of security implications
-                # max_num_seqs=1024,
-                # speculative_model="[ngram]",
-                # num_speculative_tokens=5,
-                # ngram_prompt_lookup_max=4,
-                # use_v2_block_manager=True,
+                load_format= load_format if load_format != "none" else "auto",
+                cpu_offload_gb = cpu_offload_gb if cpu_offload_gb != "none" else 0,
+                swap_space = swap_space if swap_space != "none" else 4,
+                max_num_seqs = max_num_seqs if max_num_seqs != "none" else 256,
+                enable_chunked_prefill = enable_chunked_prefill if enable_chunked_prefill != "none" else None,
+                enable_prefix_caching = enable_prefix_caching if enable_prefix_caching != "none" else False,
             )
         except RuntimeError as e:
             if "CUDA" in str(e) and attempt < 2:
@@ -862,10 +869,10 @@ class AphroditeService:
         return self._send_request(
             "generate_chat",
             {"prompt": prompt},
-            timeout=120 # Adjust timeout as needed for chat response generation
+            timeout=6000 # Adjust timeout as needed for chat response generation
         )
 
-    def get_status(self, timeout=60):
+    def get_status(self, timeout=6000):
         """Get service status."""
         if not self.is_running():
             return {"status": "not_running", "model_loaded": False}
@@ -889,7 +896,7 @@ class AphroditeService:
         logger.info(f"Attempting graceful shutdown of process {pid}...")
 
         if self.process.is_alive():
-            response = self._send_request("exit", {}, timeout=60) # Send exit command
+            response = self._send_request("exit", {}, timeout=6000) # Send exit command
             if response.get("status") != "success":
                  logger.warning(f"Worker did not acknowledge exit command cleanly: {response.get('error')}")
 

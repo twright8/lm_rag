@@ -1,0 +1,1413 @@
+2025-04-07 12:12:51,365 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:12:51,838 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 12:12:51,841 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 12:12:51,841 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 12:12:51,841 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 12:12:51,841 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 12:12:51,841 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:12:51,841 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 12:12:51,842 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 12:12:51,842 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.22 GB, VMS: 37.43 GB
+2025-04-07 12:12:51,999 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 12:12:52,000 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:12:52,126 - src.core.query_system.query_engine - ERROR - Failed to connect or get collections from Qdrant: [Errno 111] Connection refused
+2025-04-07 12:17:31,605 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:17:31,606 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 12:17:31,609 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 12:17:31,609 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 12:17:31,609 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 12:17:31,609 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 12:17:31,610 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:17:31,610 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 12:17:31,610 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 12:17:31,613 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.23 GB, VMS: 37.45 GB
+2025-04-07 12:17:31,615 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 12:17:31,617 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:17:34,688 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:17:39,327 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:17:39,602 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 12:17:39,602 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING PLOTLY VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 12:17:39,603 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 12:17:39,655 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 12:17:39,704 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 12:17:39,745 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 12:17:39,791 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 12:17:39,832 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 12:17:39,875 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 12:17:39,919 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 12:17:39,963 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 12:17:40,001 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 12:17:40,039 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 12:17:40,075 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 12:17:40,115 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 12:17:40,123 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 12:17:40,164 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.56s
+2025-04-07 12:17:40,164 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 12:17:40,164 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 12:17:40,172 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 12:17:40,176 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 12:17:40,176 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 12:17:40,183 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 12:18:25,090 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 12:18:25,091 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 12:18:25,092 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 12:18:25,092 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 12:23:00,516 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 12:23:00,516 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 12:23:00,517 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 12:23:00,520 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 12:23:00,525 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 320.35s
+2025-04-07 12:23:00,526 - src.core.visualization.cluster_map - INFO - Found 7 topics (excluding outliers).
+2025-04-07 12:23:00,526 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 12:23:00,526 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 12:23:00,536 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 12:23:00,696 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.17s
+2025-04-07 12:23:00,697 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 12:23:00,699 - src.core.visualization.cluster_map - INFO - Preparing visualization for 798 documents.
+2025-04-07 12:23:00,699 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 12:23:00,699 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 12:23:01,285 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 12:23:01,286 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 12:23:01,372 - src.core.visualization.cluster_map - ERROR - Error creating download dataframe: 'Topic'
+2025-04-07 12:23:01,380 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 562, in create_download_dataframe
+    download_df['Topic_Representation'] = download_df['Topic'].map(topic_words_map)
+                                          ~~~~~~~~~~~^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'Topic'
+
+2025-04-07 12:27:05,543 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:27:10,804 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:27:10,892 - __main__ - INFO - Updating CONFIG visualization_type to: static_datamapplot
+2025-04-07 12:54:40,914 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:54:41,279 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 12:54:41,281 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 12:54:41,281 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 12:54:41,281 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 12:54:41,281 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 12:54:41,281 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:54:41,281 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 12:54:41,282 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 12:54:41,282 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.43 GB
+2025-04-07 12:54:41,440 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 12:54:41,441 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 12:54:57,043 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:05,178 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:05,255 - __main__ - INFO - Attempting to update clustering configuration...
+2025-04-07 12:55:09,735 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:15,288 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:17,874 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:18,499 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:18,575 - __main__ - INFO - Attempting to update clustering configuration...
+2025-04-07 12:55:21,010 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:21,305 - __main__ - INFO - Generating map using config type: static_datamapplot
+2025-04-07 12:55:21,313 - src.core.visualization.cluster_map - INFO - CONFIG requests visualization type: static_datamapplot
+2025-04-07 12:55:21,313 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ Attempting STATIC_DATAMAPPLOT visualization generation ⭐️⭐️⭐️
+2025-04-07 12:55:21,313 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 12:55:21,359 - src.core.visualization.cluster_map - ERROR - Error extracting embeddings from Qdrant: 'CollectionInfo' object has no attribute 'vector_params'
+2025-04-07 12:55:21,364 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 184, in extract_embeddings_from_qdrant
+    vector_size = collection_info.vector_params.size # Adjusted for newer client versions? Check your client's API
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pydantic/main.py", line 984, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'CollectionInfo' object has no attribute 'vector_params'
+
+2025-04-07 12:55:21,364 - src.core.visualization.cluster_map - ERROR - No embeddings or text data found in Qdrant
+2025-04-07 12:55:25,099 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:27,916 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:28,507 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:28,762 - __main__ - INFO - Generating map using config type: static_datamapplot
+2025-04-07 12:55:28,770 - src.core.visualization.cluster_map - INFO - CONFIG requests visualization type: static_datamapplot
+2025-04-07 12:55:28,771 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ Attempting STATIC_DATAMAPPLOT visualization generation ⭐️⭐️⭐️
+2025-04-07 12:55:28,771 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 12:55:28,820 - src.core.visualization.cluster_map - ERROR - Error extracting embeddings from Qdrant: 'CollectionInfo' object has no attribute 'vector_params'
+2025-04-07 12:55:28,822 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 184, in extract_embeddings_from_qdrant
+    vector_size = collection_info.vector_params.size # Adjusted for newer client versions? Check your client's API
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pydantic/main.py", line 984, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'CollectionInfo' object has no attribute 'vector_params'
+
+2025-04-07 12:55:28,823 - src.core.visualization.cluster_map - ERROR - No embeddings or text data found in Qdrant
+2025-04-07 12:55:32,122 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:32,196 - __main__ - INFO - Attempting to update clustering configuration...
+2025-04-07 12:55:33,118 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:33,433 - __main__ - INFO - Generating map using config type: static_datamapplot
+2025-04-07 12:55:33,440 - src.core.visualization.cluster_map - INFO - CONFIG requests visualization type: static_datamapplot
+2025-04-07 12:55:33,441 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ Attempting STATIC_DATAMAPPLOT visualization generation ⭐️⭐️⭐️
+2025-04-07 12:55:33,441 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 12:55:33,490 - src.core.visualization.cluster_map - ERROR - Error extracting embeddings from Qdrant: 'CollectionInfo' object has no attribute 'vector_params'
+2025-04-07 12:55:33,492 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 184, in extract_embeddings_from_qdrant
+    vector_size = collection_info.vector_params.size # Adjusted for newer client versions? Check your client's API
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pydantic/main.py", line 984, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'CollectionInfo' object has no attribute 'vector_params'
+
+2025-04-07 12:55:33,493 - src.core.visualization.cluster_map - ERROR - No embeddings or text data found in Qdrant
+2025-04-07 12:55:36,605 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:38,374 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 12:55:38,653 - __main__ - INFO - Generating map using config type: static_datamapplot
+2025-04-07 12:55:38,663 - src.core.visualization.cluster_map - INFO - CONFIG requests visualization type: static_datamapplot
+2025-04-07 12:55:38,663 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ Attempting STATIC_DATAMAPPLOT visualization generation ⭐️⭐️⭐️
+2025-04-07 12:55:38,663 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 12:55:38,713 - src.core.visualization.cluster_map - ERROR - Error extracting embeddings from Qdrant: 'CollectionInfo' object has no attribute 'vector_params'
+2025-04-07 12:55:38,715 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 184, in extract_embeddings_from_qdrant
+    vector_size = collection_info.vector_params.size # Adjusted for newer client versions? Check your client's API
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pydantic/main.py", line 984, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'CollectionInfo' object has no attribute 'vector_params'
+
+2025-04-07 12:55:38,715 - src.core.visualization.cluster_map - ERROR - No embeddings or text data found in Qdrant
+2025-04-07 13:01:31,415 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:01:31,451 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:01:31,454 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:01:31,454 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:01:31,455 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.43 GB
+2025-04-07 13:01:31,537 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:01:31,538 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:01:39,597 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:01:43,561 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:01:43,631 - __main__ - INFO - Updating CONFIG visualization_type to: static_datamapplot
+2025-04-07 13:09:24,363 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:09:24,699 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:09:24,703 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:09:24,703 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:09:24,704 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.45 GB
+2025-04-07 13:09:24,785 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:09:24,786 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:09:31,476 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:09:34,860 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:09:34,932 - __main__ - INFO - Updating CONFIG visualization_type to: static_datamapplot
+2025-04-07 13:13:53,545 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:13:54,449 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:13:54,453 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:13:54,453 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:13:54,453 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:13:54,453 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:13:54,454 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:13:54,454 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:13:54,454 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:13:54,454 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.45 GB
+2025-04-07 13:13:54,552 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:13:54,553 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:14:05,337 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:14:07,107 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:14:07,407 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 13:14:07,408 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:14:07,456 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 13:14:07,574 - src.core.visualization.cluster_map - INFO - Extracted 256 / 50000 points so far
+2025-04-07 13:14:07,683 - src.core.visualization.cluster_map - INFO - Extracted 512 / 50000 points so far
+2025-04-07 13:14:07,795 - src.core.visualization.cluster_map - INFO - Extracted 768 / 50000 points so far
+2025-04-07 13:14:07,905 - src.core.visualization.cluster_map - INFO - Extracted 1024 / 50000 points so far
+2025-04-07 13:14:07,942 - src.core.visualization.cluster_map - INFO - Extracted 1111 / 50000 points so far
+2025-04-07 13:14:07,942 - src.core.visualization.cluster_map - INFO - Reached end of Qdrant scroll.
+2025-04-07 13:14:07,974 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.57s
+2025-04-07 13:14:07,974 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 13:14:07,975 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 13:14:07,983 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 13:14:07,985 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 13:14:07,985 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 13:14:08,005 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 13:14:54,083 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 13:14:54,083 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 13:14:54,089 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 13:14:54,089 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 13:16:48,464 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 13:16:48,469 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 13:16:48,470 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 13:16:48,474 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 13:16:48,480 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 160.50s
+2025-04-07 13:16:48,481 - src.core.visualization.cluster_map - INFO - Found 7 topics (excluding outliers).
+2025-04-07 13:16:48,481 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 13:16:48,481 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 13:16:48,487 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 13:16:48,630 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.15s
+2025-04-07 13:16:48,630 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 13:16:48,633 - src.core.visualization.cluster_map - INFO - Preparing visualization for 630 documents.
+2025-04-07 13:16:48,633 - src.core.visualization.cluster_map - INFO - Attempting to create static DataMapPlot visualization
+2025-04-07 13:16:48,633 - src.core.visualization.cluster_map - ERROR - Could not import create_plot from datamapplot.
+2025-04-07 13:16:48,633 - src.core.visualization.cluster_map - ERROR - Failed to create static DataMapPlot visualization. Check logs.
+2025-04-07 13:16:48,633 - src.core.visualization.cluster_map - ERROR - Failed to create any visualization (requested type: static_datamapplot)
+2025-04-07 13:21:04,059 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:21:04,416 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:21:04,419 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:21:04,419 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:21:04,419 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:21:04,420 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:21:04,420 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:21:04,420 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:21:04,420 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:21:04,420 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.45 GB
+2025-04-07 13:21:04,508 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:21:04,509 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:22:55,302 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:22:56,880 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:22:57,247 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 13:22:57,247 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:22:57,296 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 13:22:57,443 - src.core.visualization.cluster_map - INFO - Extracted 256 / 50000 points so far
+2025-04-07 13:22:57,598 - src.core.visualization.cluster_map - INFO - Extracted 512 / 50000 points so far
+2025-04-07 13:22:57,732 - src.core.visualization.cluster_map - INFO - Extracted 768 / 50000 points so far
+2025-04-07 13:22:57,873 - src.core.visualization.cluster_map - INFO - Extracted 1024 / 50000 points so far
+2025-04-07 13:22:57,942 - src.core.visualization.cluster_map - INFO - Extracted 1111 / 50000 points so far
+2025-04-07 13:22:57,942 - src.core.visualization.cluster_map - INFO - Reached end of Qdrant scroll.
+2025-04-07 13:22:57,978 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.73s
+2025-04-07 13:22:57,978 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 13:22:57,979 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 13:22:57,989 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 13:22:57,991 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 13:22:57,991 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 13:22:58,002 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 13:23:38,216 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 13:23:38,218 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 13:23:38,238 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 13:23:38,238 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 13:25:52,348 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 13:25:52,348 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 13:25:52,348 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 13:25:52,351 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 13:25:52,354 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 174.36s
+2025-04-07 13:25:52,354 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 13:25:52,355 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 13:25:52,355 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 13:25:52,383 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 13:25:52,457 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.10s
+2025-04-07 13:25:52,457 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 13:25:52,459 - src.core.visualization.cluster_map - INFO - Preparing visualization for 793 documents.
+2025-04-07 13:25:52,459 - src.core.visualization.cluster_map - INFO - Attempting to create static DataMapPlot visualization
+2025-04-07 13:25:52,459 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 13:25:52,460 - src.core.visualization.cluster_map - INFO - Generating static plot with 793 points.
+2025-04-07 13:25:52,478 - src.core.visualization.cluster_map - ERROR - Error creating static DataMapPlot visualization: got an unexpected keyword argument 'marker_size'
+2025-04-07 13:25:52,484 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 1192, in create_static_datamap_visualization
+    fig, ax = create_plot(
+              ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 121, in fn_with_config
+    return fn(*bound_args.args, **(bound_args.kwargs | from_config))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/create_plots.py", line 308, in create_plot
+    fig, ax = render_plot(
+              ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 100, in fn_with_config
+    bound_args = sig.bind(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3242, in bind
+    return self._bind(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3231, in _bind
+    raise TypeError(
+TypeError: got an unexpected keyword argument 'marker_size'
+
+2025-04-07 13:25:52,484 - src.core.visualization.cluster_map - ERROR - Failed to create static DataMapPlot visualization. Check logs.
+2025-04-07 13:25:52,484 - src.core.visualization.cluster_map - ERROR - Failed to create any visualization (requested type: static_datamapplot)
+2025-04-07 13:27:42,313 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:27:42,667 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:27:42,669 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:27:42,670 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:27:42,671 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.22 GB, VMS: 37.45 GB
+2025-04-07 13:27:42,774 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:27:42,775 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:27:46,561 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:27:48,348 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:27:48,669 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 13:27:48,671 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:27:48,720 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 13:27:48,853 - src.core.visualization.cluster_map - INFO - Extracted 256 / 50000 points so far
+2025-04-07 13:27:48,953 - src.core.visualization.cluster_map - INFO - Extracted 512 / 50000 points so far
+2025-04-07 13:27:49,056 - src.core.visualization.cluster_map - INFO - Extracted 768 / 50000 points so far
+2025-04-07 13:27:49,159 - src.core.visualization.cluster_map - INFO - Extracted 1024 / 50000 points so far
+2025-04-07 13:27:49,202 - src.core.visualization.cluster_map - INFO - Extracted 1111 / 50000 points so far
+2025-04-07 13:27:49,203 - src.core.visualization.cluster_map - INFO - Reached end of Qdrant scroll.
+2025-04-07 13:27:49,235 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.56s
+2025-04-07 13:27:49,236 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 13:27:49,236 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 13:27:49,245 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 13:27:49,247 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 13:27:49,248 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 13:27:49,251 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 13:28:26,966 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 13:28:26,971 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 13:28:26,982 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 13:28:26,982 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 13:31:06,000 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 13:31:06,000 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 13:31:06,000 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 13:31:06,003 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 13:31:06,008 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 196.76s
+2025-04-07 13:31:06,008 - src.core.visualization.cluster_map - INFO - Found 9 topics (excluding outliers).
+2025-04-07 13:31:06,008 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 13:31:06,008 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 13:31:06,027 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 13:31:06,107 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.10s
+2025-04-07 13:31:06,107 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 13:31:06,109 - src.core.visualization.cluster_map - INFO - Preparing visualization for 731 documents.
+2025-04-07 13:31:06,109 - src.core.visualization.cluster_map - INFO - Attempting to create static DataMapPlot visualization
+2025-04-07 13:31:06,109 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 13:31:06,110 - src.core.visualization.cluster_map - INFO - Generating static plot with 731 points.
+2025-04-07 13:31:09,498 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 13:31:09,498 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 13:31:10,495 - src.core.visualization.cluster_map - INFO - Creating download dataframe...
+2025-04-07 13:31:10,499 - src.core.visualization.cluster_map - INFO - Download dataframe created with columns: ['Document Name', 'Page Number', 'Topic ID', 'Topic Name', 'Topic Keywords', 'Topic Assignment Probability', 'Text Content']
+2025-04-07 13:31:48,681 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:31:50,380 - src.core.visualization.cluster_map - INFO - Creating download dataframe...
+2025-04-07 13:31:50,383 - src.core.visualization.cluster_map - INFO - Download dataframe created with columns: ['Document Name', 'Page Number', 'Topic ID', 'Topic Name', 'Topic Keywords', 'Topic Assignment Probability', 'Text Content']
+2025-04-07 13:31:51,804 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:31:51,884 - __main__ - INFO - Updating CONFIG visualization_type to: datamapplot
+2025-04-07 13:37:49,588 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:37:50,021 - __main__ - INFO - Visualization type changed from static_datamapplot to datamapplot
+2025-04-07 13:37:51,186 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:40:21,010 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:40:21,396 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:40:21,399 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:40:21,400 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:40:21,400 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:40:21,400 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:40:21,400 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:40:21,400 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:40:21,401 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:40:21,401 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.46 GB
+2025-04-07 13:40:21,512 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:40:21,513 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:41:37,171 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:41:37,510 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:41:37,512 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:41:37,513 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:41:37,514 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 13:41:37,596 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:41:37,596 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:42:46,556 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:42:47,876 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:42:49,049 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:42:49,348 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 13:42:49,349 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING PLOTLY VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 13:42:49,349 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:42:49,397 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 13:42:49,465 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 13:42:49,528 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 13:42:49,586 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 13:42:49,635 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 13:42:49,683 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 13:42:49,729 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 13:42:49,777 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 13:42:49,878 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 13:42:49,932 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 13:42:50,011 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 13:42:50,058 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 13:42:50,069 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 13:42:50,101 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.75s
+2025-04-07 13:42:50,101 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 13:42:50,101 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 13:42:50,109 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 13:42:50,112 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 13:42:50,112 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 13:42:50,127 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 13:43:28,864 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 13:43:28,865 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 13:43:28,867 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 13:43:28,867 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 13:45:34,819 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 13:45:34,820 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 13:45:34,820 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 13:45:34,824 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 13:45:34,828 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 164.72s
+2025-04-07 13:45:34,829 - src.core.visualization.cluster_map - INFO - Found 7 topics (excluding outliers).
+2025-04-07 13:45:34,829 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 13:45:34,829 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 13:45:34,833 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 13:45:34,922 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.09s
+2025-04-07 13:45:34,922 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 13:45:34,924 - src.core.visualization.cluster_map - INFO - Preparing visualization for 801 documents.
+2025-04-07 13:45:34,924 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 13:45:34,924 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 13:45:35,630 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 13:45:35,631 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 13:45:35,690 - src.core.visualization.cluster_map - ERROR - Error creating download dataframe: 'Topic'
+2025-04-07 13:45:35,696 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 562, in create_download_dataframe
+    download_df['Topic_Representation'] = download_df['Topic'].map(topic_words_map)
+                                          ~~~~~~~~~~~^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/pandas/core/indexes/range.py", line 417, in get_loc
+    raise KeyError(key)
+KeyError: 'Topic'
+
+2025-04-07 13:53:38,947 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:53:39,310 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:53:39,312 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:53:39,313 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:53:39,314 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.21 GB, VMS: 37.45 GB
+2025-04-07 13:53:39,404 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:53:39,405 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:53:59,692 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:54:01,216 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:54:01,569 - src.core.visualization.cluster_map - INFO - Attempting to generate cluster map. Visualization type: STATIC_DATAMAPPLOT
+2025-04-07 13:54:01,569 - src.core.visualization.cluster_map - INFO - Step 1: Extracting data from Qdrant...
+2025-04-07 13:54:01,570 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:54:01,570 - src.core.visualization.cluster_map - ERROR - Query engine does not have an active Qdrant client.
+2025-04-07 13:55:02,872 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:55:02,872 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:55:02,883 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:55:02,883 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:55:02,884 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.24 GB, VMS: 37.54 GB
+2025-04-07 13:55:02,884 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:55:02,884 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:55:06,873 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:55:07,207 - src.core.visualization.cluster_map - INFO - Attempting to generate cluster map. Visualization type: STATIC_DATAMAPPLOT
+2025-04-07 13:55:07,208 - src.core.visualization.cluster_map - INFO - Step 1: Extracting data from Qdrant...
+2025-04-07 13:55:07,208 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:55:07,209 - src.core.visualization.cluster_map - ERROR - Query engine does not have an active Qdrant client.
+2025-04-07 13:55:45,981 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:55:46,317 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 13:55:46,319 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 13:55:46,320 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 13:55:46,321 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.45 GB
+2025-04-07 13:55:46,399 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 13:55:46,400 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 13:55:49,854 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:55:51,803 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 13:55:52,009 - src.core.visualization.cluster_map - INFO - Attempting to generate cluster map. Visualization type: STATIC_DATAMAPPLOT
+2025-04-07 13:55:52,010 - src.core.visualization.cluster_map - INFO - Step 1: Extracting data from Qdrant...
+2025-04-07 13:55:52,011 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 13:55:52,011 - src.core.visualization.cluster_map - ERROR - Query engine does not have an active Qdrant client.
+2025-04-07 14:07:56,176 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:07:56,524 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:07:56,526 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:07:56,526 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:07:56,527 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 14:07:56,610 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:07:56,610 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:08:02,089 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:08:05,368 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:08:05,672 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 14:08:05,672 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING STATIC DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:08:05,672 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:08:05,725 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:08:05,770 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:08:05,810 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:08:05,859 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:08:05,908 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:08:05,956 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:08:06,002 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:08:06,046 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:08:06,095 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:08:06,139 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:08:06,183 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:08:06,225 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:08:06,232 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:08:06,263 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.59s
+2025-04-07 14:08:06,263 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:08:06,264 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:08:06,272 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:08:06,276 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:08:06,276 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:08:06,288 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:08:48,891 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:08:48,892 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:08:48,896 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:08:48,896 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:11:15,554 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:11:15,560 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:11:15,561 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:11:15,571 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:11:15,575 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 189.30s
+2025-04-07 14:11:15,576 - src.core.visualization.cluster_map - INFO - Found 9 topics (excluding outliers).
+2025-04-07 14:11:15,576 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:11:15,576 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:11:15,578 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:11:15,685 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.11s
+2025-04-07 14:11:15,685 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:11:15,686 - src.core.visualization.cluster_map - INFO - Preparing visualization for 779 documents.
+2025-04-07 14:11:15,686 - src.core.visualization.cluster_map - INFO - Creating Static DataMapPlot visualization
+2025-04-07 14:11:15,686 - src.core.visualization.cluster_map - ERROR - DataMapPlot not installed. Please run: pip install datamapplot
+2025-04-07 14:11:15,703 - src.core.visualization.cluster_map - ERROR - Failed to create Static DataMapPlot visualization
+2025-04-07 14:11:15,703 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 14:11:15,703 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 14:11:16,223 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 14:11:16,224 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 14:13:45,657 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:13:46,000 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:13:46,002 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:13:46,003 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:13:46,003 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:13:46,003 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:13:46,004 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:13:46,004 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:13:46,004 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:13:46,004 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 14:13:46,100 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:13:46,101 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:13:50,844 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:13:53,343 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:13:53,691 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 14:13:53,691 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING STATIC DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:13:53,692 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:13:53,743 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:13:53,797 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:13:53,863 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:13:53,926 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:13:53,992 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:13:54,041 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:13:54,103 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:13:54,171 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:13:54,229 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:13:54,296 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:13:54,359 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:13:54,411 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:13:54,418 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:13:54,450 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.76s
+2025-04-07 14:13:54,451 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:13:54,451 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:13:54,462 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:13:54,465 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:13:54,465 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:13:54,475 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:14:32,630 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:14:32,630 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:14:32,644 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:14:32,644 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:16:46,336 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:16:46,343 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:16:46,343 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:16:46,359 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:16:46,377 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 171.91s
+2025-04-07 14:16:46,378 - src.core.visualization.cluster_map - INFO - Found 9 topics (excluding outliers).
+2025-04-07 14:16:46,378 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:16:46,378 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:16:46,391 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:16:46,483 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.11s
+2025-04-07 14:16:46,483 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:16:46,492 - src.core.visualization.cluster_map - INFO - Preparing visualization for 741 documents.
+2025-04-07 14:16:46,495 - src.core.visualization.cluster_map - INFO - Creating Static DataMapPlot visualization
+2025-04-07 14:16:46,496 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 14:16:46,526 - src.core.visualization.cluster_map - ERROR - Error creating static DataMapPlot visualization: got an unexpected keyword argument 'marker_size'
+2025-04-07 14:16:46,549 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 1157, in create_static_datamap_visualization
+    fig, ax = create_plot(
+              ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 121, in fn_with_config
+    return fn(*bound_args.args, **(bound_args.kwargs | from_config))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/create_plots.py", line 308, in create_plot
+    fig, ax = render_plot(
+              ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 100, in fn_with_config
+    bound_args = sig.bind(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3242, in bind
+    return self._bind(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3231, in _bind
+    raise TypeError(
+TypeError: got an unexpected keyword argument 'marker_size'
+
+2025-04-07 14:16:46,549 - src.core.visualization.cluster_map - ERROR - Failed to create Static DataMapPlot visualization
+2025-04-07 14:16:46,549 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 14:16:46,550 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 14:16:47,525 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 14:16:47,525 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 14:19:36,378 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:19:36,732 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:19:36,734 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:19:36,735 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:19:36,735 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:19:36,735 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:19:36,735 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:19:36,736 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:19:36,736 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:19:36,736 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 14:19:36,853 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:19:36,854 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:19:44,982 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:19:46,923 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:19:47,268 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 14:19:47,268 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING STATIC DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:19:47,269 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:19:47,320 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:19:47,411 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:19:47,523 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:19:47,598 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:19:47,663 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:19:47,722 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:19:47,784 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:19:47,840 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:19:47,900 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:19:47,972 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:19:48,049 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:19:48,113 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:19:48,121 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:19:48,158 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.89s
+2025-04-07 14:19:48,158 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:19:48,158 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:19:48,167 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:19:48,169 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:19:48,169 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:19:48,174 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:20:26,882 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:20:26,883 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:20:26,892 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:20:26,892 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:22:49,701 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:22:49,701 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:22:49,702 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:22:49,705 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:22:49,731 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 181.56s
+2025-04-07 14:22:49,731 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 14:22:49,732 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:22:49,732 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:22:49,742 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:22:49,833 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.10s
+2025-04-07 14:22:49,833 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:22:49,834 - src.core.visualization.cluster_map - INFO - Preparing visualization for 770 documents.
+2025-04-07 14:22:49,834 - src.core.visualization.cluster_map - INFO - Creating Static DataMapPlot visualization
+2025-04-07 14:22:49,834 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 14:22:52,437 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:22:52,438 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:24:08,935 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:24:09,533 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 14:24:09,535 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING STATIC DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:24:09,535 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:24:09,618 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:24:09,715 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:24:09,846 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:24:09,962 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:24:10,059 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:24:09,587 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:24:09,670 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:24:09,738 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:24:09,849 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:24:09,933 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:24:10,022 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:24:10,145 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:24:10,155 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:24:10,210 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.67s
+2025-04-07 14:24:10,210 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:24:10,211 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:24:10,219 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:24:10,247 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:24:10,247 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:24:10,253 - src.core.visualization.cluster_map - INFO - Reusing existing AphroditeRepresentation instance from session state
+2025-04-07 14:24:10,253 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:24:10,254 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:24:10,277 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:24:10,278 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:27:01,463 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:27:01,463 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:27:01,464 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:27:01,467 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:27:01,471 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 171.25s
+2025-04-07 14:27:01,471 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 14:27:01,472 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:27:01,472 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:27:01,473 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:27:01,550 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.08s
+2025-04-07 14:27:01,550 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:27:01,551 - src.core.visualization.cluster_map - INFO - Preparing visualization for 750 documents.
+2025-04-07 14:27:01,552 - src.core.visualization.cluster_map - INFO - Creating Static DataMapPlot visualization
+2025-04-07 14:27:01,552 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 14:27:04,491 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:27:04,491 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:28:10,610 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:28:11,775 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:28:11,860 - __main__ - INFO - Updating CONFIG visualization_type to: datamapplot
+2025-04-07 14:37:23,234 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:37:23,579 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:37:23,582 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:37:23,583 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.22 GB, VMS: 37.43 GB
+2025-04-07 14:37:23,677 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:37:23,678 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:37:26,813 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:37:27,603 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:37:28,942 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:37:29,253 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: datamapplot
+2025-04-07 14:37:29,254 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING INTERACTIVE DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:37:29,255 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:37:29,303 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:37:29,357 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:37:29,406 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:37:29,457 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:37:29,502 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:37:29,546 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:37:29,599 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:37:29,651 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:37:29,694 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:37:29,777 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:37:29,830 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:37:29,893 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:37:29,900 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:37:29,933 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.68s
+2025-04-07 14:37:29,934 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:37:29,934 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:37:29,942 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:37:29,946 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:37:29,946 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:37:29,955 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:38:17,722 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:38:17,722 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:38:17,726 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:38:17,726 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:40:47,245 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:40:47,245 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:40:47,246 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:40:47,249 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:40:47,253 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 197.31s
+2025-04-07 14:40:47,253 - src.core.visualization.cluster_map - INFO - Found 9 topics (excluding outliers).
+2025-04-07 14:40:47,254 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:40:47,254 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:40:47,255 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:40:47,375 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.12s
+2025-04-07 14:40:47,375 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:40:47,377 - src.core.visualization.cluster_map - INFO - Preparing visualization for 750 documents.
+2025-04-07 14:40:47,377 - src.core.visualization.cluster_map - INFO - Creating Interactive DataMapPlot visualization
+2025-04-07 14:40:47,377 - src.core.visualization.cluster_map - INFO - Creating DataMapPlot visualization
+2025-04-07 14:40:47,380 - src.core.visualization.cluster_map - INFO - Loading Google Font for interactive plot: Oswald
+2025-04-07 14:40:47,838 - src.core.visualization.cluster_map - INFO - Added new font as Oswald
+2025-04-07 14:40:47,839 - src.core.visualization.cluster_map - INFO - Using loaded font: Oswald
+2025-04-07 14:40:53,012 - src.core.visualization.cluster_map - ERROR - Error creating DataMapPlot visualization: got an unexpected keyword argument 'add_table_of_contents'
+2025-04-07 14:40:53,017 - src.core.visualization.cluster_map - ERROR - Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/visualization/cluster_map.py", line 1026, in create_datamap_visualization
+    plot = datamapplot.create_interactive_plot(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 121, in fn_with_config
+    return fn(*bound_args.args, **(bound_args.kwargs | from_config))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/create_plots.py", line 673, in create_interactive_plot
+    html_str = render_html(
+               ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/datamapplot/config.py", line 100, in fn_with_config
+    bound_args = sig.bind(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3242, in bind
+    return self._bind(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/inspect.py", line 3231, in _bind
+    raise TypeError(
+TypeError: got an unexpected keyword argument 'add_table_of_contents'
+
+2025-04-07 14:40:53,017 - src.core.visualization.cluster_map - ERROR - Failed to create Interactive DataMapPlot visualization
+2025-04-07 14:40:53,018 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 14:40:53,018 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 14:40:53,968 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 14:40:53,969 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 14:41:40,362 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:41:40,734 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:41:40,736 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:41:40,737 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:41:40,737 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:41:40,737 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:41:40,737 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:41:40,737 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:41:40,738 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:41:40,738 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 14:41:40,855 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:41:40,856 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:41:44,883 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:41:46,343 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:41:46,685 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: datamapplot
+2025-04-07 14:41:46,686 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING INTERACTIVE DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:41:46,686 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:41:46,740 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:41:46,817 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:41:46,888 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:41:46,952 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:41:47,011 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:41:47,073 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:41:47,145 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:41:47,219 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:41:47,276 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:41:47,333 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:41:47,389 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:41:47,445 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:41:47,453 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:41:47,485 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.80s
+2025-04-07 14:41:47,486 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:41:47,486 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:41:47,493 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:41:47,496 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:41:47,496 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:41:47,503 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:42:28,559 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:42:28,560 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:42:28,586 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:42:28,587 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:44:35,051 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:44:35,052 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:44:35,052 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:44:35,056 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:44:35,061 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 167.57s
+2025-04-07 14:44:35,061 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 14:44:35,061 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:44:35,061 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:44:35,079 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:44:35,224 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.16s
+2025-04-07 14:44:35,225 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:44:35,226 - src.core.visualization.cluster_map - INFO - Preparing visualization for 807 documents.
+2025-04-07 14:44:35,226 - src.core.visualization.cluster_map - INFO - Creating Interactive DataMapPlot visualization
+2025-04-07 14:44:35,226 - src.core.visualization.cluster_map - INFO - Creating DataMapPlot visualization
+2025-04-07 14:44:35,229 - src.core.visualization.cluster_map - INFO - Loading Google Font for interactive plot: Oswald
+2025-04-07 14:44:35,669 - src.core.visualization.cluster_map - INFO - Added new font as Oswald
+2025-04-07 14:44:35,670 - src.core.visualization.cluster_map - INFO - Using loaded font: Oswald
+2025-04-07 14:44:40,820 - src.core.visualization.cluster_map - INFO - DataMapPlot visualization created successfully
+2025-04-07 14:44:40,820 - src.core.visualization.cluster_map - INFO - Interactive DataMapPlot visualization created successfully
+2025-04-07 14:45:07,537 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:45:09,222 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:45:10,250 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:45:10,564 - __main__ - INFO - Visualization type changed from datamapplot to static_datamapplot
+2025-04-07 14:45:12,870 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:45:12,966 - __main__ - INFO - Updating CONFIG visualization_type to: static_datamapplot
+2025-04-07 14:46:41,383 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:46:41,744 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 14:46:41,745 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 14:46:41,746 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 14:46:41,746 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 14:46:41,746 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 14:46:41,746 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:46:41,746 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 14:46:41,747 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 14:46:41,747 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 14:46:41,833 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 14:46:41,834 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 14:47:03,966 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:47:05,900 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:47:06,223 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: static_datamapplot
+2025-04-07 14:47:06,224 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING STATIC DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:47:06,225 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:47:06,275 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:47:06,333 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:47:06,387 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:47:06,439 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:47:06,491 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:47:06,537 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:47:06,606 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:47:06,667 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:47:06,719 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:47:06,765 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:47:06,830 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:47:06,879 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:47:06,891 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:47:06,928 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.70s
+2025-04-07 14:47:06,931 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:47:06,931 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:47:06,941 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:47:06,944 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:47:06,945 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:47:06,951 - src.core.visualization.cluster_map - INFO - Creating new AphroditeRepresentation instance for topic refinement
+2025-04-07 14:47:49,545 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:47:49,554 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:47:49,562 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:47:49,562 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:50:11,904 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:50:11,904 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:50:11,905 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:50:11,911 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:50:11,918 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 184.98s
+2025-04-07 14:50:11,919 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 14:50:11,920 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:50:11,920 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:50:11,925 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:50:12,045 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.12s
+2025-04-07 14:50:12,045 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:50:12,047 - src.core.visualization.cluster_map - INFO - Preparing visualization for 761 documents.
+2025-04-07 14:50:12,047 - src.core.visualization.cluster_map - INFO - Creating Static DataMapPlot visualization
+2025-04-07 14:50:12,048 - src.core.visualization.cluster_map - INFO - Creating static DataMapPlot visualization
+2025-04-07 14:50:12,048 - src.core.visualization.cluster_map - INFO - Loading Google Font: Oswald
+2025-04-07 14:50:12,459 - src.core.visualization.cluster_map - INFO - Added new font as Oswald
+2025-04-07 14:50:12,460 - src.core.visualization.cluster_map - INFO - Using loaded font: Oswald
+2025-04-07 14:50:16,535 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:50:16,535 - src.core.visualization.cluster_map - INFO - Static DataMapPlot visualization created successfully
+2025-04-07 14:50:33,176 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:50:34,379 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:50:35,397 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:50:35,728 - __main__ - INFO - Visualization type changed from static_datamapplot to datamapplot
+2025-04-07 14:50:36,768 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:50:36,842 - __main__ - INFO - Updating CONFIG visualization_type to: datamapplot
+2025-04-07 14:50:38,238 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:50:38,579 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: datamapplot
+2025-04-07 14:50:38,581 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING INTERACTIVE DATAMAPPLOT VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:50:38,581 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:50:38,630 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:50:38,679 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:50:38,758 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:50:38,807 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:50:38,865 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:50:38,926 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:50:38,998 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:50:39,070 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:50:39,142 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:50:39,195 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:50:39,280 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:50:39,336 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:50:39,344 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:50:39,378 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.80s
+2025-04-07 14:50:39,378 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:50:39,379 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:50:39,388 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:50:39,390 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:50:39,390 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:50:39,392 - src.core.visualization.cluster_map - INFO - Reusing existing AphroditeRepresentation instance from session state
+2025-04-07 14:50:39,392 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:50:39,393 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:50:39,393 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:50:39,394 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 14:54:24,252 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 14:54:24,252 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 14:54:24,253 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 14:54:24,257 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 14:54:24,261 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 224.87s
+2025-04-07 14:54:24,262 - src.core.visualization.cluster_map - INFO - Found 8 topics (excluding outliers).
+2025-04-07 14:54:24,262 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 14:54:24,262 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 14:54:24,265 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 14:54:24,377 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.11s
+2025-04-07 14:54:24,377 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 14:54:24,379 - src.core.visualization.cluster_map - INFO - Preparing visualization for 782 documents.
+2025-04-07 14:54:24,379 - src.core.visualization.cluster_map - INFO - Creating Interactive DataMapPlot visualization
+2025-04-07 14:54:24,379 - src.core.visualization.cluster_map - INFO - Creating DataMapPlot visualization
+2025-04-07 14:54:24,382 - src.core.visualization.cluster_map - INFO - Loading Google Font for interactive plot: Oswald
+2025-04-07 14:54:24,753 - src.core.visualization.cluster_map - INFO - Added new font as Oswald
+2025-04-07 14:54:24,753 - src.core.visualization.cluster_map - INFO - Using loaded font: Oswald
+2025-04-07 14:54:30,571 - src.core.visualization.cluster_map - INFO - DataMapPlot visualization created successfully
+2025-04-07 14:54:30,573 - src.core.visualization.cluster_map - INFO - Interactive DataMapPlot visualization created successfully
+2025-04-07 14:57:38,017 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:57:39,551 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:57:40,799 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:57:41,385 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:57:41,485 - __main__ - INFO - Updating CONFIG visualization_type to: plotly
+2025-04-07 14:57:41,834 - __main__ - INFO - Visualization type changed from datamapplot to plotly
+2025-04-07 14:57:42,487 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 14:57:42,871 - src.core.visualization.cluster_map - INFO - VISUALIZATION TYPE FROM CONFIG: plotly
+2025-04-07 14:57:42,872 - src.core.visualization.cluster_map - INFO - ⭐️⭐️⭐️ USING PLOTLY VISUALIZATION ⭐️⭐️⭐️
+2025-04-07 14:57:42,873 - src.core.visualization.cluster_map - INFO - Extracting embeddings and text data from Qdrant
+2025-04-07 14:57:42,941 - src.core.visualization.cluster_map - INFO - Collection found with vector size: 1024
+2025-04-07 14:57:43,039 - src.core.visualization.cluster_map - INFO - Extracted 100 points so far
+2025-04-07 14:57:43,115 - src.core.visualization.cluster_map - INFO - Extracted 200 points so far
+2025-04-07 14:57:43,191 - src.core.visualization.cluster_map - INFO - Extracted 300 points so far
+2025-04-07 14:57:43,249 - src.core.visualization.cluster_map - INFO - Extracted 400 points so far
+2025-04-07 14:57:43,316 - src.core.visualization.cluster_map - INFO - Extracted 500 points so far
+2025-04-07 14:57:43,386 - src.core.visualization.cluster_map - INFO - Extracted 600 points so far
+2025-04-07 14:57:43,470 - src.core.visualization.cluster_map - INFO - Extracted 700 points so far
+2025-04-07 14:57:43,538 - src.core.visualization.cluster_map - INFO - Extracted 800 points so far
+2025-04-07 14:57:43,582 - src.core.visualization.cluster_map - INFO - Extracted 900 points so far
+2025-04-07 14:57:43,636 - src.core.visualization.cluster_map - INFO - Extracted 1000 points so far
+2025-04-07 14:57:43,688 - src.core.visualization.cluster_map - INFO - Extracted 1100 points so far
+2025-04-07 14:57:43,697 - src.core.visualization.cluster_map - INFO - Extracted 1111 points so far
+2025-04-07 14:57:43,734 - src.core.visualization.cluster_map - INFO - Extracted 1111 embeddings in 0.86s
+2025-04-07 14:57:43,734 - src.core.visualization.cluster_map - INFO - Embeddings shape: (1111, 1024)
+2025-04-07 14:57:43,735 - src.core.visualization.cluster_map - INFO - Sample embedding: [ 0.03277205 -0.00971871 -0.0326805  -0.04604564  0.01768287]...
+2025-04-07 14:57:43,747 - src.core.visualization.cluster_map - INFO - Creating topic model
+2025-04-07 14:57:43,751 - src.core.visualization.cluster_map - INFO - Processing 1111 documents for BERTopic fitting.
+2025-04-07 14:57:43,751 - src.core.visualization.cluster_map - INFO - Instantiating fresh model components for this run.
+2025-04-07 14:57:43,755 - src.core.visualization.cluster_map - INFO - Reusing existing AphroditeRepresentation instance from session state
+2025-04-07 14:57:43,755 - src.core.visualization.cluster_map - INFO - Creating new BERTopic model instance.
+2025-04-07 14:57:43,756 - src.core.visualization.cluster_map - INFO - Fitting BERTopic model on 1111 documents with precomputed embeddings.
+2025-04-07 14:57:43,758 - src.core.visualization.cluster_map - INFO - Embeddings shape for fit: (1111, 1024)
+2025-04-07 14:57:43,758 - src.core.visualization.cluster_map - INFO - Number of texts for fit: 1111
+2025-04-07 15:02:23,003 - src.core.visualization.cluster_map - INFO - BERTopic fit_transform complete.
+2025-04-07 15:02:23,032 - src.core.visualization.cluster_map - INFO - Mapping topic results back to original document indices.
+2025-04-07 15:02:23,033 - src.core.visualization.cluster_map - INFO - Getting topic information from BERTopic model.
+2025-04-07 15:02:23,037 - src.core.visualization.cluster_map - INFO - Creating final document information DataFrame.
+2025-04-07 15:02:23,041 - src.core.visualization.cluster_map - INFO - Created topic model and mapped results in 279.29s
+2025-04-07 15:02:23,042 - src.core.visualization.cluster_map - INFO - Found 10 topics (excluding outliers).
+2025-04-07 15:02:23,043 - src.core.visualization.cluster_map - INFO - Creating visualization embeddings
+2025-04-07 15:02:23,043 - src.core.visualization.cluster_map - INFO - Visualization UMAP parameters: n_neighbors=15, n_components=2, min_dist=0.7, spread=1.5, metric=cosine
+2025-04-07 15:02:23,045 - src.core.visualization.cluster_map - INFO - Fitting UMAP on 1111 embeddings for visualization
+2025-04-07 15:02:23,182 - src.core.visualization.cluster_map - INFO - Created visualization embeddings in 0.14s
+2025-04-07 15:02:23,182 - src.core.visualization.cluster_map - INFO - Visualization embeddings shape: (1111, 2)
+2025-04-07 15:02:23,184 - src.core.visualization.cluster_map - INFO - Preparing visualization for 689 documents.
+2025-04-07 15:02:23,184 - src.core.visualization.cluster_map - INFO - Creating Plotly visualization
+2025-04-07 15:02:23,184 - src.core.visualization.cluster_map - INFO - Creating interactive cluster map
+2025-04-07 15:02:23,985 - src.core.visualization.cluster_map - INFO - Interactive cluster map created successfully
+2025-04-07 15:02:23,985 - src.core.visualization.cluster_map - INFO - Plotly visualization created successfully
+2025-04-07 15:14:12,752 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:13,161 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:14:13,165 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:14:13,165 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:14:13,165 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:14:13,165 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:14:13,165 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:14:13,166 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:14:13,166 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:14:13,166 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.22 GB, VMS: 37.43 GB
+2025-04-07 15:14:13,349 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 15:14:13,350 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:14:21,224 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:23,411 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:33,649 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:40,152 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:41,105 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:43,110 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:45,001 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:45,898 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:48,315 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:53,239 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:14:54,227 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:15:04,811 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:15:05,044 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:15:05,048 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:15:05,049 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:15:05,641 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:15:24,572 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 18.93 seconds
+2025-04-07 15:15:24,574 - src.core.query_system.query_engine - INFO - Process memory - RSS: 2.40 GB, VMS: 40.88 GB
+2025-04-07 15:15:24,576 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 2.10 GB, Reserved: 3.93 GB, Total: 8.00 GB
+2025-04-07 15:15:24,630 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:15:24,658 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:15:24,686 - src.core.query_system.query_engine - INFO - BM25 search returned 11 results
+2025-04-07 15:15:24,687 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Can you ...'
+2025-04-07 15:15:25,729 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:15:25,731 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:15:25,731 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:15:25,732 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:15:25,833 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 1 results.
+2025-04-07 15:15:25,834 - src.core.query_system.query_engine - INFO - Retrieval completed in 20.79s. Returning 1 final results.
+2025-04-07 15:23:36,439 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:23:36,833 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:23:36,835 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:23:36,835 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:23:36,836 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 15:23:36,918 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 15:23:36,920 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:24:10,947 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:24:11,192 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:24:22,058 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:24:22,266 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:24:22,269 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:24:22,269 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:24:22,761 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:24:39,085 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 16.32 seconds
+2025-04-07 15:24:39,086 - src.core.query_system.query_engine - INFO - Process memory - RSS: 2.35 GB, VMS: 40.81 GB
+2025-04-07 15:24:39,087 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 2.10 GB, Reserved: 3.93 GB, Total: 8.00 GB
+2025-04-07 15:24:39,088 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:24:39,122 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:24:39,144 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:24:39,145 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Tell me ...'
+2025-04-07 15:24:39,791 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:24:39,792 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:24:39,793 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:24:39,794 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:24:39,873 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 2 results.
+2025-04-07 15:24:39,875 - src.core.query_system.query_engine - INFO - Retrieval completed in 17.61s. Returning 2 final results.
+2025-04-07 15:24:39,877 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-reasoner
+2025-04-07 15:24:39,878 - src.utils.deepseek_manager - INFO - Using reasoner: True
+2025-04-07 15:24:39,879 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:25:12,894 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 626
+2025-04-07 15:25:12,896 - __main__ - INFO - DeepSeek generation complete. Response length: 626
+2025-04-07 15:45:43,809 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:45:44,158 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:45:44,160 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:45:44,161 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.20 GB, VMS: 37.43 GB
+2025-04-07 15:45:44,244 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-07 15:45:44,245 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:45:48,947 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:45:50,475 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:45:54,454 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:46:00,733 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:46:00,941 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:46:00,945 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:46:00,946 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:46:01,432 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:46:19,264 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 17.83 seconds
+2025-04-07 15:46:19,266 - src.core.query_system.query_engine - INFO - Process memory - RSS: 2.39 GB, VMS: 40.88 GB
+2025-04-07 15:46:19,267 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 2.10 GB, Reserved: 3.93 GB, Total: 8.00 GB
+2025-04-07 15:46:19,268 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:46:19,296 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:46:19,320 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:46:19,321 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: What do ...'
+2025-04-07 15:46:20,159 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:46:20,160 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:46:20,161 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:46:20,162 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:46:20,242 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 0 results.
+2025-04-07 15:46:20,243 - src.core.query_system.query_engine - INFO - Retrieval completed in 19.30s. Returning 0 final results.
+2025-04-07 15:46:20,246 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-reasoner
+2025-04-07 15:46:20,248 - src.utils.deepseek_manager - INFO - Using reasoner: True
+2025-04-07 15:46:20,249 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:46:43,095 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 338
+2025-04-07 15:46:43,096 - src.utils.deepseek_manager - INFO - Reasoning process length: 1530
+2025-04-07 15:46:43,098 - __main__ - INFO - DeepSeek generation complete. Response length: 338
+2025-04-07 15:46:43,099 - __main__ - INFO - Reasoning process length: 1530
+2025-04-07 15:47:07,205 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:10,283 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:10,928 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:12,973 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:14,801 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:18,766 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:47:28,184 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:28,416 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:47:28,425 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:47:28,427 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Are ther...'
+2025-04-07 15:47:28,532 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:47:28,534 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:47:28,535 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:47:28,535 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:47:28,587 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 0 results.
+2025-04-07 15:47:28,588 - src.core.query_system.query_engine - INFO - Retrieval completed in 0.17s. Returning 0 final results.
+2025-04-07 15:47:28,590 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:47:28,591 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:47:28,593 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:47:33,840 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 139
+2025-04-07 15:47:33,842 - __main__ - INFO - DeepSeek generation complete. Response length: 139
+2025-04-07 15:47:44,810 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:47:45,028 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:47:45,038 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:47:45,040 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Are ther...'
+2025-04-07 15:47:45,135 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:47:45,136 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:47:45,137 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:47:45,138 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:47:45,189 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 2 results.
+2025-04-07 15:47:45,190 - src.core.query_system.query_engine - INFO - Retrieval completed in 0.16s. Returning 2 final results.
+2025-04-07 15:47:45,193 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:47:45,195 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:47:45,196 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:47:55,007 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 635
+2025-04-07 15:47:55,009 - __main__ - INFO - DeepSeek generation complete. Response length: 635
+2025-04-07 15:50:33,459 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:50:33,461 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:50:33,463 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:50:33,465 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:50:33,466 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:50:33,467 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:50:33,468 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:50:33,469 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:50:33,470 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:50:33,471 - src.core.query_system.query_engine - INFO - Process memory - RSS: 2.87 GB, VMS: 42.72 GB
+2025-04-07 15:50:33,473 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 2.12 GB, Reserved: 3.93 GB, Total: 8.00 GB
+2025-04-07 15:50:33,475 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:50:35,378 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:50:35,582 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:50:44,060 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:50:44,278 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:50:44,281 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:50:44,283 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:50:44,285 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:51:01,727 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 17.44 seconds
+2025-04-07 15:51:01,728 - src.core.query_system.query_engine - INFO - Process memory - RSS: 4.38 GB, VMS: 46.46 GB
+2025-04-07 15:51:01,730 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 4.22 GB, Reserved: 6.05 GB, Total: 8.00 GB
+2025-04-07 15:51:01,731 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:51:01,754 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:51:01,758 - src.core.query_system.query_engine - INFO - BM25 search returned 8 results
+2025-04-07 15:51:01,758 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Who is J...'
+2025-04-07 15:51:01,883 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:51:01,885 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:51:01,886 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:51:01,887 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:51:01,957 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 0 results.
+2025-04-07 15:51:01,958 - src.core.query_system.query_engine - INFO - Retrieval completed in 17.68s. Returning 0 final results.
+2025-04-07 15:51:01,962 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:51:01,964 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:51:01,965 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:51:13,188 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 141
+2025-04-07 15:51:13,190 - __main__ - INFO - DeepSeek generation complete. Response length: 141
+2025-04-07 15:51:23,990 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:51:24,233 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:51:24,242 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:51:24,244 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: James Do...'
+2025-04-07 15:51:24,374 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:51:24,376 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:51:24,377 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:51:24,378 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:51:24,431 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 0 results.
+2025-04-07 15:51:24,432 - src.core.query_system.query_engine - INFO - Retrieval completed in 0.19s. Returning 0 final results.
+2025-04-07 15:51:24,434 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:51:24,436 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:51:24,437 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:51:30,141 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 174
+2025-04-07 15:51:30,143 - __main__ - INFO - DeepSeek generation complete. Response length: 174
+2025-04-07 15:51:36,769 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:51:36,771 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:51:36,774 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:51:36,777 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:51:36,778 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:51:36,779 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:51:36,781 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:51:36,782 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:51:35,992 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:51:35,993 - src.core.query_system.query_engine - INFO - Process memory - RSS: 3.81 GB, VMS: 46.64 GB
+2025-04-07 15:51:35,994 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 4.23 GB, Reserved: 6.05 GB, Total: 8.00 GB
+2025-04-07 15:51:35,996 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:51:39,005 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:51:39,265 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:51:47,816 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:51:48,064 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:51:48,068 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:51:48,070 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:51:48,072 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:51:57,867 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 9.79 seconds
+2025-04-07 15:51:57,868 - src.core.query_system.query_engine - INFO - Process memory - RSS: 5.20 GB, VMS: 47.70 GB
+2025-04-07 15:51:57,869 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 6.34 GB, Reserved: 8.19 GB, Total: 8.00 GB
+2025-04-07 15:51:57,870 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:51:57,881 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:51:57,884 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:51:57,885 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Who is J...'
+2025-04-07 15:51:59,577 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:51:59,579 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:51:59,580 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:51:59,581 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:51:59,928 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 0 results.
+2025-04-07 15:51:59,929 - src.core.query_system.query_engine - INFO - Retrieval completed in 11.86s. Returning 0 final results.
+2025-04-07 15:51:59,931 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:51:59,933 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:51:59,934 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:52:05,370 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 145
+2025-04-07 15:52:05,372 - __main__ - INFO - DeepSeek generation complete. Response length: 145
+2025-04-07 15:52:07,789 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:52:07,791 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:52:07,794 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:52:07,796 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:52:07,797 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:52:07,798 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:52:07,799 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:52:07,800 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:52:07,801 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:52:07,802 - src.core.query_system.query_engine - INFO - Process memory - RSS: 5.21 GB, VMS: 47.88 GB
+2025-04-07 15:52:07,804 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 6.35 GB, Reserved: 8.19 GB, Total: 8.00 GB
+2025-04-07 15:52:07,805 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:52:09,719 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:52:28,301 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:52:28,566 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:52:39,109 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:52:39,365 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-chat
+2025-04-07 15:52:39,369 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:52:39,371 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:52:39,374 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:52:51,952 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 12.58 seconds
+2025-04-07 15:52:51,956 - src.core.query_system.query_engine - INFO - Process memory - RSS: 6.61 GB, VMS: 52.78 GB
+2025-04-07 15:52:51,958 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 8.45 GB, Reserved: 10.30 GB, Total: 8.00 GB
+2025-04-07 15:52:51,959 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:52:51,979 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:52:51,991 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:52:51,993 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: tell me ...'
+2025-04-07 15:52:52,845 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:52:52,847 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:52:52,848 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:52:52,849 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:52:52,993 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 5 results.
+2025-04-07 15:52:52,994 - src.core.query_system.query_engine - INFO - Retrieval completed in 13.62s. Returning 5 final results.
+2025-04-07 15:52:52,998 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-chat
+2025-04-07 15:52:53,003 - src.utils.deepseek_manager - INFO - Using reasoner: False
+2025-04-07 15:52:53,004 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:53:07,450 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 1073
+2025-04-07 15:53:07,458 - __main__ - INFO - DeepSeek generation complete. Response length: 1073
+2025-04-07 15:53:25,766 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:28,265 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:29,879 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:31,030 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:31,576 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:34,059 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:41,090 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:41,499 - __main__ - INFO - No Aphrodite process info found in session state.
+2025-04-07 15:53:41,518 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-07 15:53:41,537 - src.core.query_system.query_engine - INFO - Initializing QueryEngine with:
+2025-04-07 15:53:41,930 - src.core.query_system.query_engine - INFO -   - Embedding Model: intfloat/multilingual-e5-large-instruct
+2025-04-07 15:53:41,934 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:53:41,936 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:53:41,937 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-07 15:53:41,938 - src.core.query_system.query_engine - INFO -   - Reranking Enabled: True
+2025-04-07 15:53:41,939 - src.core.query_system.query_engine - INFO - Process memory - RSS: 5.48 GB, VMS: 53.17 GB
+2025-04-07 15:53:41,941 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 6.37 GB, Reserved: 10.30 GB, Total: 8.00 GB
+2025-04-07 15:53:41,942 - __main__ - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-07 15:53:57,935 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:53:58,197 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:54:12,457 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-07 15:54:12,678 - src.utils.deepseek_manager - INFO - DeepSeek manager initialized with model: deepseek-reasoner
+2025-04-07 15:54:12,689 - src.core.query_system.query_engine - INFO - Embedding/reranking models not loaded, loading now...
+2025-04-07 15:54:12,691 - src.core.query_system.query_engine - INFO - ===== STARTING EMBEDDING/RERANKING MODEL LOAD (embed register) =====
+2025-04-07 15:54:12,692 - src.core.query_system.query_engine - INFO - Loading embedding (intfloat/multilingual-e5-large-instruct) and reranking (BAAI/bge-reranker-v2-m3) models on cuda
+2025-04-07 15:54:30,771 - src.core.query_system.query_engine - INFO - Embed register with model(s) ['intfloat/multilingual-e5-large-instruct', 'BAAI/bge-reranker-v2-m3'] loaded in 18.08 seconds
+2025-04-07 15:54:30,773 - src.core.query_system.query_engine - INFO - Process memory - RSS: 6.40 GB, VMS: 55.94 GB
+2025-04-07 15:54:30,774 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 8.47 GB, Reserved: 11.26 GB, Total: 8.00 GB
+2025-04-07 15:54:30,778 - src.core.query_system.query_engine - INFO - Loading BM25 index from /home/t/lm_rag/data/bm25/index.pkl
+2025-04-07 15:54:30,806 - src.core.query_system.query_engine - INFO - BM25 index loaded with 1111 documents
+2025-04-07 15:54:30,817 - src.core.query_system.query_engine - INFO - BM25 search returned 15 results
+2025-04-07 15:54:30,819 - src.core.query_system.query_engine - INFO - Formatted E5 query for embedding: 'Instruct: Given a web search query, retrieve relevant passages that answer the query
+Query: Tell me ...'
+2025-04-07 15:54:31,026 - src.core.query_system.query_engine - INFO - Vector search returned 15 results
+2025-04-07 15:54:31,027 - src.core.query_system.query_engine - INFO - Fusion returned 10 results
+2025-04-07 15:54:31,028 - src.core.query_system.query_engine - INFO - Applying reranking...
+2025-04-07 15:54:31,029 - src.core.query_system.query_engine - INFO - Reranking 10 results using model: BAAI/bge-reranker-v2-m3
+2025-04-07 15:54:31,092 - src.core.query_system.query_engine - INFO - Reranking completed. Returning 5 results.
+2025-04-07 15:54:31,093 - src.core.query_system.query_engine - INFO - Retrieval completed in 18.40s. Returning 5 final results.
+2025-04-07 15:54:31,096 - src.utils.deepseek_manager - INFO - Generating with DeepSeek API using model: deepseek-reasoner
+2025-04-07 15:54:31,097 - src.utils.deepseek_manager - INFO - Using reasoner: True
+2025-04-07 15:54:31,098 - src.utils.deepseek_manager - INFO - Starting streaming generation
+2025-04-07 15:55:10,620 - src.utils.deepseek_manager - INFO - Streaming generation complete. Response length: 1486
+2025-04-07 15:55:10,621 - src.utils.deepseek_manager - INFO - Reasoning process length: 2354
+2025-04-07 15:55:10,623 - __main__ - INFO - DeepSeek generation complete. Response length: 1486
+2025-04-07 15:55:10,625 - __main__ - INFO - Reasoning process length: 2354

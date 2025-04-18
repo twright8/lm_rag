@@ -23,7 +23,8 @@ sys.path.append(str(ROOT_DIR))
 from src.utils.logger import setup_logger
 from src.utils.resource_monitor import log_memory_usage
 from src.utils.aphrodite_service import get_service
-
+from transformers import AutoTokenizer
+import traceback # For better error logging
 # Initialize logger
 logger = setup_logger(__name__)
 
@@ -48,26 +49,32 @@ class DocumentClassifier:
             model_name (str, optional): Name of the model to use for classification
             debug (bool, optional): Enable debugging output
         """
-        # Set debug mode
         self.debug = debug
-
-        # Set model name
         if model_name:
             self.model_name = model_name
         else:
-            # Use the standard model as default
             self.model_name = CONFIG["models"]["extraction_models"]["text_standard"]
 
-        # Storage paths for results
         self.classification_data_path = ROOT_DIR / "data" / "classification"
         self.classification_data_path.mkdir(parents=True, exist_ok=True)
 
-        # Aphrodite service reference
         self.aphrodite_service = get_service()
+
+        # --- NEW: Load Tokenizer ---
+        self.tokenizer = None
+        try:
+            logger.info(f"Loading tokenizer for model: {self.model_name}")
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
+            if self.tokenizer.chat_template is None:
+                logger.warning(
+                    f"Tokenizer for {self.model_name} does not have a chat_template defined. Falling back to manual formatting (potential errors).")
+            else:
+                logger.info(f"Tokenizer for {self.model_name} loaded successfully with chat template.")
+        except Exception as e:
+            logger.error(f"Failed to load tokenizer for {self.model_name}: {e}", exc_info=True)
 
         logger.info(f"Initialized DocumentClassifier with model={self.model_name}, debug={debug}")
         log_memory_usage(logger)
-
     def ensure_model_loaded(self):
         """
         Ensure the designated classification model is loaded in the service.
@@ -114,166 +121,134 @@ class DocumentClassifier:
             logger.warning("No chunks provided for classification")
             return []
 
-        # Ensure model is loaded
+        if not self.tokenizer:
+             logger.error("Tokenizer not loaded. Cannot perform classification.")
+             return []
+        if self.tokenizer.chat_template is None:
+             logger.error(f"Tokenizer {self.model_name} has no chat template. Cannot format prompts correctly.")
+             return []
+
         if not self.ensure_model_loaded():
             logger.error("Failed to load model for classification")
             return []
 
         try:
-            # Create formatted schema definition for prompt
             schema_definition_formatted = ""
             for field_name, field_info in schema.items():
                 allowed_values = field_info.get("values", [])
                 description = field_info.get("description", "")
-
                 values_str = ", ".join([f'"{val}"' for val in allowed_values])
                 multi_label_str = " (allows multiple values)" if field_name in multi_label_fields else ""
-
                 schema_definition_formatted += f"- {field_name}: {description}{multi_label_str}\n"
                 schema_definition_formatted += f"  Allowed values: [{values_str}]\n\n"
 
-            # Create JSON example based on schema and multi-label configuration
             example = {}
             for field_name, field_info in schema.items():
                 allowed_values = field_info.get("values", [])
-                if not allowed_values:
-                    continue
-
+                if not allowed_values: continue
                 if field_name in multi_label_fields:
-                    # For multi-label fields, choose 1-2 random values
                     num_values = min(2, len(allowed_values))
-                    if num_values > 0:
-                        example[field_name] = random.sample(allowed_values, num_values)
+                    if num_values > 0: example[field_name] = random.sample(allowed_values, num_values)
                 else:
-                    # For single-label fields, choose one value
-                    if allowed_values:
-                        example[field_name] = allowed_values[0]
-
-            # Format the example JSON
+                    if allowed_values: example[field_name] = allowed_values[0]
             json_example = json.dumps(example, indent=2)
 
-            # Prepare prompts for all chunks
-            prompts = []
+            prompts_for_service = []
+            chunk_mapping = [] # Map prompt index back to original chunk
+
+            logger.info(f"Preparing classification prompts for {len(chunks)} chunks...")
             for chunk in chunks:
                 chunk_text = chunk.get('text', '')
                 if not chunk_text.strip():
+                    logger.warning(f"Skipping empty chunk {chunk.get('chunk_id', 'N/A')}")
                     continue
 
-                # Format the prompt for classification
-                formatted_prompt = self._format_classification_prompt(
+                # 1. Create structured messages
+                messages = self._format_classification_prompt(
                     chunk_text, schema_definition_formatted, json_example, user_instructions
                 )
 
-                # Format as ChatML for Aphrodite
-                chat_prompt = f"""<|im_start|>system
-You are an expert document classifier. Your task is to analyze the provided text and categorize it according to the specified schema.
-Always classify according to the schema exactly, using only the allowed values.
-Provide your response in valid JSON format matching the required schema.
-<|im_end|>
-<|im_start|>user
-{formatted_prompt}<|im_end|>
-<|im_start|>assistant
-"""
-                prompts.append(chat_prompt)
+                # 2. Apply chat template
+                try:
+                    final_prompt_string = self.tokenizer.apply_chat_template(
+                        messages,
+                        tokenize=False,
+                        add_generation_prompt=True # Add assistant prompt marker
+                    )
+                    prompts_for_service.append(final_prompt_string)
+                    chunk_mapping.append(chunk)
+                except Exception as template_err:
+                    logger.error(f"Error applying chat template for chunk {chunk.get('chunk_id', 'N/A')}: {template_err}", exc_info=True)
+                    # Skip this chunk
 
-            # Process chunks in batches
-            logger.info(f"Processing {len(prompts)} classification prompts")
+            if not prompts_for_service:
+                 logger.warning("No valid prompts were generated after applying templates.")
+                 return []
 
-            # Call the classify_chunks method on the service
+            logger.info(f"Sending {len(prompts_for_service)} formatted prompts for classification.")
+
+            # Call the service's classify_chunks method
+            # Note: Pass schema and multi_label_fields separately for potential internal validation/guidance
             response = self.aphrodite_service.classify_chunks(
-                prompts=prompts,
-                schema_definition=schema,
-                multi_label_fields=list(multi_label_fields)
+                prompts=prompts_for_service, # List of formatted strings
+                schema_definition=schema, # Original schema dict
+                multi_label_fields=list(multi_label_fields) # Pass multi-label info
             )
 
             if response.get("status") != "success":
                 error_msg = response.get("error", "Unknown error")
-                logger.error(f"Error classifying chunks: {error_msg}")
-                return []
+                logger.error(f"Error classifying chunks batch: {error_msg}")
+                return [] # Or handle partial results
 
-            # Process classification results
             results = response.get("results", [])
-            if len(results) != len(chunks):
-                logger.warning(f"Mismatch between number of results ({len(results)}) and chunks ({len(chunks)})")
+            if len(results) != len(prompts_for_service):
+                logger.warning(f"Result count mismatch: Expected {len(prompts_for_service)}, Got {len(results)}")
+                while len(results) < len(prompts_for_service):
+                    results.append({"status": "error", "error": "Missing result from service"})
 
             # Combine classifications with original chunk data
             classified_documents = []
-            for i, (chunk, result_data) in enumerate(zip(chunks, results)):
-                if result_data.get("status") == "success":
-                    # Extract the classification data
-                    classification_data = result_data.get("result", {})
+            processed_count = 0
+            error_count = 0
+            for i, result_data in enumerate(results):
+                original_chunk = chunk_mapping[i] # Get the corresponding chunk
 
-                    # Combine with chunk metadata
+                if isinstance(result_data, dict) and result_data.get("status") == "success":
+                    classification_data = result_data.get("result", {})
                     classified_doc = {
-                        "chunk_id": chunk.get("chunk_id", f"chunk_{i}"),
-                        "document_id": chunk.get("document_id", "unknown"),
-                        "file_name": chunk.get("file_name", "unknown"),
-                        "page_num": chunk.get("page_num", None),
-                        "text": chunk.get("text", ""),
+                        "chunk_id": original_chunk.get("chunk_id", f"chunk_{i}"),
+                        "document_id": original_chunk.get("document_id", "unknown"),
+                        "file_name": original_chunk.get("file_name", "unknown"),
+                        "page_num": original_chunk.get("page_num", None),
+                        "text": original_chunk.get("text", ""),
                         "classification": classification_data,
-                        # Flatten classification fields for easier data handling
+                        # Flatten fields for easier access if needed later
                         **{f"class_{k}": v for k, v in classification_data.items()}
                     }
-
                     classified_documents.append(classified_doc)
+                    processed_count += 1
                 else:
                     # Handle error cases
                     error = result_data.get("error", "Unknown classification error")
-                    logger.warning(f"Classification error for chunk {i}: {error}")
-
-                    # Add the chunk with error information
+                    logger.warning(f"Classification error for chunk {original_chunk.get('chunk_id', i)}: {error}")
+                    error_count += 1
                     classified_doc = {
-                        "chunk_id": chunk.get("chunk_id", f"chunk_{i}"),
-                        "document_id": chunk.get("document_id", "unknown"),
-                        "file_name": chunk.get("file_name", "unknown"),
-                        "page_num": chunk.get("page_num", None),
-                        "text": chunk.get("text", ""),
+                        "chunk_id": original_chunk.get("chunk_id", f"chunk_{i}"),
+                        "document_id": original_chunk.get("document_id", "unknown"),
+                        "file_name": original_chunk.get("file_name", "unknown"),
+                        "page_num": original_chunk.get("page_num", None),
+                        "text": original_chunk.get("text", ""),
                         "classification": {"error": error},
                         "class_error": error
                     }
-
                     classified_documents.append(classified_doc)
 
-            logger.info(f"Successfully classified {len(classified_documents)} chunks")
+            logger.info(f"Classification complete. Success: {processed_count}, Errors: {error_count}. Total results: {len(classified_documents)}")
             return classified_documents
 
         except Exception as e:
-            logger.error(f"Error in document classification: {e}", exc_info=True)
-            return []
-
-    def _format_classification_prompt(self, text: str, schema_definition: str,
-                                      json_example: str, user_instructions: str) -> str:
-        """
-        Format the classification prompt for the LLM.
-
-        Args:
-            text: Text to classify
-            schema_definition: Formatted schema definition
-            json_example: Example JSON output
-            user_instructions: User-provided instructions
-
-        Returns:
-            str: Formatted prompt
-        """
-        # Format the full prompt
-        prompt = f"""I need you to classify the provided text according to the specified schema.
-
-## CLASSIFICATION SCHEMA:
-{schema_definition}
-
-## EXPECTED OUTPUT FORMAT:
-The classification should be provided as valid JSON that matches this example structure:
-{json_example}
-
-## USER INSTRUCTIONS:
-{user_instructions}
-
-## TEXT TO CLASSIFY:
-{text}
-
-Please classify this text according to the schema. Respond ONLY with valid JSON.
-"""
-        return prompt
+            logger.error(f"Critical error during document classification: {e}", exc_info=True)
+            return [] # Return empty list on major failure
 
     def export_to_csv(self, classified_docs: List[Dict[str, Any]], file_path: str) -> bool:
         """

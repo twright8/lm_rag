@@ -1,0 +1,24 @@
+[2025-03-31 09:15:58] INFO - Initialized EntityExtractor with model=Qwen/Qwen2.5-1.5B-Instruct
+
+[2025-03-31 09:15:58] INFO - Starting extraction model load
+
+[2025-03-31 09:16:01] INFO - Is Visual Language model: False
+
+[2025-03-31 09:16:01] INFO - Loading LLM: Qwen/Qwen2.5-1.5B-Instruct with quantization: fp5
+
+[2025-03-31 09:16:20] INFO - Creating JSONLogitsProcessor with direct engine access
+
+[2025-03-31 09:16:36] INFO - Extraction model loaded successfully in 34.83 seconds
+
+[2025-03-31 09:16:36] INFO - Model configuration details:
+DATA: {
+  "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "max_model_len": 1300,
+  "max_new_tokens": 512,
+  "temperature": 0.1,
+  "quantization": "fp5",
+  "llm_type": "LLM",
+  "has_llm_engine": true,
+  "processor_type": "JSONLogitsProcessor"
+}
+

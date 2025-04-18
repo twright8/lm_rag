@@ -1,0 +1,176 @@
+document_processing:
+  chunk_size: 512
+  chunk_overlap: 100
+  ocr_engine: easyocr
+  semantic_chunking_threshold: 95
+  parallelism_workers:
+    chunker_pages: 4
+models:
+  chunking_model: intfloat/multilingual-e5-small
+  embedding_model: BAAI/bge-m3
+  # embedding_model: intfloat/multilingual-e5-large-instruct
+  reranking_model: BAAI/bge-reranker-v2-m3
+  extraction_models:
+    text_small: Qwen/Qwen2.5-3B-Instruct
+    text_standard: Qwen/Qwen2.5-7B-Instruct
+    text_large: microsoft/phi-4
+    visual_language: Qwen/Qwen-VL-Chat
+  chat_model: Qwen/Qwen2.5-3B-Instruct
+aphrodite:
+  max_model_len: 4096
+  quantization: fp5
+  enforce_eager: true
+  use_flash_attention: true
+  compile_model: false
+  load_format: "none"
+  cpu_offload_gb: 0
+  swap_space: 4
+  max_num_seqs: 128
+  enable_chunked_prefill: true
+  enable_prefix_caching: false
+  extraction_temperature: 0.1
+  extraction_max_new_tokens: 3048
+  chat_temperature: 0.7
+  chat_max_new_tokens: 1024
+  top_p: 0.9
+  classification_temperature: 0.1
+  classification_max_tokens: 512
+  request_timeout: 900
+qdrant:
+  host: localhost
+  port: 6333
+  collection_name: anticorruption_rag_e5_instruct
+  vector_size: 1024
+  upsert_batch_size: 128  # How many points to send to Qdrant in one client request (adjust based on Qdrant performance/network)
+  sparse_on_disk: false
+  timeout: 90000
+retrieval:
+  top_k_vector: 100
+  top_k_bm25: 100
+  top_k_hybrid: 50
+  top_k_rerank: 10
+  vector_weight: 0.7
+  bm25_weight: 0.3
+  use_reranking: true
+  minimum_score_threshold: 0.01
+  bge_m3_prefetch_limit: 100
+
+extraction:
+  deduplication_threshold: 85
+  data_path: data/extracted
+  schema_version: '1.0'
+  batch_size: 128
+  information_extraction:
+    batch_size: 1024
+    max_chunks: 10000
+    max_results: 10000
+    default_model: text_small
+storage:
+  bm25_index_path: data/bm25/index.pkl
+  extracted_data_path: data/extracted
+logging:
+  level: INFO
+  log_file: anti_corruption_rag.log
+  console_level: DEBUG
+ui:
+  theme_color: '#2E3440'
+  secondary_color: '#81A1C1'
+  accent_color: '#A3BE8C'
+  show_advanced_settings: true
+  default_page: Upload & Process
+  topic_filter:
+    default_results: 1000
+    max_results: 10000
+clustering:
+  umap:
+    n_neighbors: 8
+    n_components: 10
+    min_dist: 0.0
+    metric: cosine
+  hdbscan:
+    min_cluster_size: 17
+    min_samples: 5
+    prediction_data: true
+  visualization:
+    umap:
+      n_neighbors: 15
+      n_components: 2
+      min_dist: 0.7
+      spread: 1.5
+      metric: cosine
+  vectorizer:
+    stop_words: english
+    ngram_range:
+    - 1
+    - 2
+  topics:
+    nr_topics: auto
+    seed_topic_list: []
+  visualization_type: datamapplot
+  datamapplot:
+    height: 800
+    width: 100%
+    marker_size: 8
+    darkmode: false
+    cvd_safer: true
+    enable_table_of_contents: true
+    cluster_boundary_polygons: true
+    color_label_text: true
+    polygon_alpha: 2.5
+    font_family: Oswald
+    glow:
+      n_levels: 16
+      kernel: exponential
+      kernel_bandwidth: 0.2
+  static_datamapplot:
+    darkmode: false
+    cvd_safer: true
+    color_label_text: true
+    marker_size: 8
+    font_family: Oswald
+    dpi: 300
+    label_wrap_width: 16
+    noise_label: Noise/Outlier
+    color_label_arrows: true
+    title: Static Document Cluster Map
+    figsize:
+    - 12
+    - 12
+classification:
+  max_chunks_for_listing: 10000
+  batch_size: 1024
+deepseek:
+  use_api: true
+  api_key: sk-3987fd2bb67c452b9ed6d6344063cb76
+  api_url: https://api.deepseek.com/v1
+  use_reasoner: true
+  chat_model: deepseek-chat
+  reasoning_model: deepseek-reasoner
+  temperature: 0.6
+  max_tokens: 4096
+conversation:
+  max_history_turns: 5
+  persist_retrieved_context: true
+  auto_save_on_turn: true
+indexing: # Add this section if it doesn't exist
+  processing_batch_size: 128 # How many chunks to embed/prep in memory at once (adjust based on RAM)
+  fallback_to_bm25_only: true # Existing setting
+  auto_recreate_collection: false # Existing safety setting
+# NEW: Configure LLM backends for different tasks
+llm_backends:
+  entity_extraction: aphrodite       # Options: aphrodite, gemini
+  information_extraction: aphrodite  # Options: aphrodite, gemini
+  rag_query_generation: aphrodite    # Options: aphrodite, deepseek, gemini
+  # classification: aphrodite        # Uncomment and configure if you add classification later
+
+# NEW: Gemini configuration (uses OPENROUTER_API_KEY from environment)
+gemini:
+  model: "google/gemini-2.5-pro-exp-03-25:free" # Or specify another compatible model
+  base_url: "https://openrouter.ai/api/v1"
+  # Optional headers for OpenRouter ranking
+  site_url: "<YOUR_SITE_URL>" # Optional, replace or remove
+  site_name: "<YOUR_SITE_NAME>" # Optional, replace or remove
+  request_timeout: 120 # Timeout for API calls in seconds
+
+
+

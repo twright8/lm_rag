@@ -22,7 +22,7 @@ if CONFIG_PATH.exists():
         print(f"Error loading config: {e}")
 
 # Fallback logging configuration
-DEFAULT_LOG_LEVEL = "INFO"
+DEFAULT_LOG_LEVEL = "DEBUG"
 DEFAULT_LOG_FILE = "anti_corruption_rag.log"
 
 # Get logging settings from config

@@ -10,7 +10,9 @@ from pathlib import Path
 import uuid
 import yaml
 import pandas as pd
-import io
+import torch # Add this import
+from src.utils.resource_monitor import log_memory_usage
+import gc
 from typing import List, Dict, Any, Union, Optional
 
 # Add project root to path
@@ -79,7 +81,7 @@ class DocumentLoader:
             docling_config = CONFIG.get("docling", {})
             artifacts_path = docling_config.get("artifacts_path", None) # For offline models
             accel_device_str = docling_config.get("accelerator_device", "AUTO").upper()
-            num_threads = docling_config.get("num_threads", 4)
+            num_threads = docling_config.get("num_threads", -1)
 
             # Map string to AcceleratorDevice enum
             accel_device_map = {
@@ -124,7 +126,55 @@ class DocumentLoader:
         except Exception as e:
             logger.error(f"Failed to initialize Docling DocumentConverter: {e}", exc_info=True)
             self.docling_converter = None # Ensure it's None if init fails
+    def shutdown(self):
+        """
+        Explicitly unloads the Docling converter and attempts to free memory,
+        including clearing the CUDA cache if CUDA is available.
+        Call this after you are finished processing all documents with this loader instance.
+        """
+        logger.info("===== SHUTTING DOWN DocumentLoader and Unloading Docling Models =====")
+        log_memory_usage(logger) # Optional: log memory
 
+        if not DOCLING_AVAILABLE:
+            logger.info("Docling was not available, nothing to unload.")
+            return
+
+        if self.docling_converter is not None:
+            logger.info("Unloading Docling DocumentConverter instance...")
+            try:
+                # Step 1: Remove the reference to the converter object
+                # This makes it eligible for garbage collection.
+                del self.docling_converter
+                self.docling_converter = None
+                logger.info("Docling converter reference removed.")
+
+                # Step 2: Explicitly run garbage collection
+                # This encourages Python to reclaim the memory sooner.
+                logger.info("Running garbage collection...")
+                gc.collect()
+                logger.info("Garbage collection finished.")
+
+                # Step 3: Clear PyTorch CUDA cache if CUDA is available
+                # This is crucial for freeing GPU memory managed by PyTorch,
+                # assuming Docling uses PyTorch for its CUDA backend.
+                if torch.cuda.is_available():
+                    logger.info("CUDA is available. Clearing PyTorch CUDA cache...")
+                    torch.cuda.empty_cache()
+                    logger.info("PyTorch CUDA cache cleared.")
+                else:
+                    logger.info("CUDA not available or Docling not using CUDA backend via PyTorch, skipping CUDA cache clear.")
+
+                logger.info("Docling models should now be unloaded from memory.")
+
+            except Exception as e:
+                logger.error(f"An error occurred during Docling shutdown: {e}", exc_info=True)
+                # Ensure the reference is cleared even if other steps fail
+                self.docling_converter = None
+        else:
+            logger.info("Docling converter was already None or not initialized.")
+
+        log_memory_usage(logger) # Optional: log memory
+        logger.info("DocumentLoader shutdown complete.")
     def load_document_with_options(self, file_path: Union[str, Path], options: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         """
         Load a document with custom options, primarily for spreadsheets.

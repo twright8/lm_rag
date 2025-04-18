@@ -1,6 +1,10 @@
+# --- START OF REWRITTEN FILE: src/core/indexing/document_indexer.py ---
 """
-Enhanced document indexing module with debugging and fallback mechanisms.
-Modified to explicitly use enhanced text (with metadata) for embeddings.
+Refactored document indexing module implementing end-to-end batching.
+Handles OOM issues by processing embedding, point preparation, and Qdrant upsert
+in configurable batches. Includes detailed logging and progress bars.
+Supports BGE-M3 (dense, sparse) and E5/Dense models. ColBERT support removed for stability.
+Uses settings from config.yaml.
 """
 import sys
 import os
@@ -15,6 +19,11 @@ import numpy as np
 from typing import List, Dict, Any, Union, Optional, Tuple
 import socket
 import json
+from tqdm import tqdm # Import standard tqdm
+
+# Qdrant models
+from qdrant_client import QdrantClient, models as rest
+from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
 
 # Add project root to path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
@@ -23,700 +32,666 @@ sys.path.append(str(ROOT_DIR))
 # Import utils
 from src.utils.logger import setup_logger
 from src.utils.resource_monitor import log_memory_usage
+from src.core.indexing.fallback_tokenizers import simple_sent_tokenize, simple_word_tokenize
+
+# Conditional imports for embedding models
+try:
+    from embed import BatchedInference # Assuming this is the library for E5/Dense
+    BATCHED_INFERENCE_AVAILABLE = True
+except ImportError:
+    BATCHED_INFERENCE_AVAILABLE = False
+try:
+    from FlagEmbedding import BGEM3FlagModel
+    FLAG_EMBEDDING_AVAILABLE = True
+except ImportError:
+    FLAG_EMBEDDING_AVAILABLE = False
+
+# Import httpx for specific timeout exception
+try:
+    from httpx import TimeoutException as HTTPXTimeoutException
+except ImportError:
+    class HTTPXTimeoutException(Exception): pass
 
 # Initialize logger
 logger = setup_logger(__name__)
 
 # Load configuration
 CONFIG_PATH = ROOT_DIR / "config.yaml"
-with open(CONFIG_PATH, "r") as f:
-    CONFIG = yaml.safe_load(f)
+try:
+    with open(CONFIG_PATH, "r") as f:
+        CONFIG = yaml.safe_load(f)
+except FileNotFoundError:
+    logger.error(f"Configuration file not found at {CONFIG_PATH}. Using defaults.")
+    CONFIG = {}
+except Exception as e:
+     logger.error(f"Error loading configuration: {e}. Using defaults.")
+     CONFIG = {}
 
 
+# --- Helper function for BGE-M3 sparse vectors ---
+def _create_sparse_vector_qdrant_format(sparse_data: Dict[Union[str, int], float]) -> Optional[rest.SparseVector]:
+    """Convert BGE-M3 sparse output to Qdrant sparse vector format."""
+    if not sparse_data:
+        return None
+    sparse_indices = []
+    sparse_values = []
+    processed_count = 0
+    skipped_non_digit = 0
+    for key, value in sparse_data.items():
+        try:
+            float_value = float(value)
+            if float_value > 0:
+                if isinstance(key, str) and key.isdigit(): key_int = int(key)
+                elif isinstance(key, int): key_int = key
+                else: skipped_non_digit += 1; continue
+                sparse_indices.append(key_int)
+                sparse_values.append(float_value)
+                processed_count += 1
+        except (ValueError, TypeError) as e:
+             logger.warning(f"Skipping invalid sparse data item: key='{key}', value='{value}', error='{e}'")
+             continue
+    if skipped_non_digit > 0: logger.warning(f"Skipped {skipped_non_digit} sparse vector keys that were not integers.")
+    if not sparse_indices: logger.debug(f"Sparse data provided, but no valid positive entries found. Input keys sample: {list(sparse_data.keys())[:10]}"); return None
+    logger.debug(f"Created sparse vector with {len(sparse_indices)} non-zero elements.")
+    return rest.SparseVector(indices=sparse_indices, values=sparse_values)
+
+
+# --- Main DocumentIndexer Class ---
 class DocumentIndexer:
     """
-    Enhanced document indexer with debugging and fallback mechanisms.
-    Modified to explicitly use enhanced text (with metadata) for embeddings.
+    Indexes documents to BM25 and Qdrant using end-to-end batching for memory efficiency.
+    Supports BGE-M3 (dense+sparse) and E5 (dense only). ColBERT is disabled.
     """
 
     def __init__(self, debug_mode=False):
-        """
-        Initialize document indexer with debug mode option.
+        self.debug_mode = debug_mode or CONFIG.get("debug_mode", False) # Allow config override
 
-        Args:
-            debug_mode (bool): Enable additional debugging
-        """
-        self.debug_mode = debug_mode
+        # --- Qdrant Configuration ---
+        qdrant_config = CONFIG.get("qdrant", {})
+        self.qdrant_host = qdrant_config.get("host", "localhost")
+        self.qdrant_port = qdrant_config.get("port", 6333)
+        self.qdrant_collection = qdrant_config.get("collection_name", "default_collection")
+        self.qdrant_timeout = qdrant_config.get("timeout", 900)
+        self.qdrant_upsert_batch_size = qdrant_config.get("upsert_batch_size", 128)
+        self.qdrant_sparse_on_disk = qdrant_config.get("sparse_on_disk", True)
 
-        # Vector DB configuration
-        self.qdrant_host = CONFIG["qdrant"]["host"]
-        self.qdrant_port = CONFIG["qdrant"]["port"]
-        self.qdrant_collection = CONFIG["qdrant"]["collection_name"]
+        # --- Indexing Configuration ---
+        indexing_config = CONFIG.get("indexing", {})
+        self.processing_batch_size = indexing_config.get("processing_batch_size", 64) # Batch for embed/prep
+        self.fallback_to_bm25_only = indexing_config.get("fallback_to_bm25_only", True)
+        self.auto_recreate_collection = indexing_config.get("auto_recreate_collection", False)
 
-        # Add fallback settings
-        self.fallback_to_bm25_only = CONFIG.get("indexing", {}).get("fallback_to_bm25_only", True)
+        # --- Embedding Model Configuration ---
+        models_config = CONFIG.get("models", {})
+        self.embedding_model_name = models_config.get("embedding_model", "BAAI/bge-m3") # Default to BGE-M3
+        self.is_bge_m3 = "bge-m3" in self.embedding_model_name.lower()
+        self.expected_vector_size = qdrant_config.get("vector_size", 1024) # Use Qdrant config first
+        self.bge_m3_batch_size = models_config.get("bge_m3_batch_size", 12) # Batch size for BGE model itself
+        self.bge_m3_max_length = models_config.get("bge_m3_max_length", 8192)
 
-        # Embedding model configuration
-        self.embedding_model_name = CONFIG["models"]["embedding_model"]
-
-        # BM25 configuration
-        self.bm25_path = ROOT_DIR / CONFIG["storage"]["bm25_index_path"]
+        # --- BM25 Configuration ---
+        storage_config = CONFIG.get("storage", {})
+        self.bm25_path = ROOT_DIR / storage_config.get("bm25_index_path", "data/bm25/index.pkl")
         self.bm25_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Debug directory
+        # --- Debug Directory ---
         self.debug_dir = ROOT_DIR / "debug"
         if self.debug_mode:
             self.debug_dir.mkdir(parents=True, exist_ok=True)
 
-        # Initialize embedding model
-        self.embed_register = None
-
+        # --- Internal State ---
+        self.embedding_model_instance = None
         self._validate_config()
 
-        logger.info(f"Initializing EnhancedDocumentIndexer with model={self.embedding_model_name}, "
-                    f"qdrant={self.qdrant_host}:{self.qdrant_port}, "
-                    f"collection={self.qdrant_collection}, "
-                    f"debug_mode={self.debug_mode}")
+        logger.info(f"Initializing DocumentIndexer:")
+        logger.info(f"  - Processing Batch Size: {self.processing_batch_size}")
+        logger.info(f"  - Embedding Model: {self.embedding_model_name} ({'BGE-M3 Mode (Dense + Sparse)' if self.is_bge_m3 else 'E5/Dense Mode'})")
+        logger.info(f"  - Qdrant:")
+        logger.info(f"    - Host: {self.qdrant_host}:{self.qdrant_port}")
+        logger.info(f"    - Collection: {self.qdrant_collection}")
+        logger.info(f"    - Timeout: {self.qdrant_timeout}s")
+        logger.info(f"    - Upsert Batch Size: {self.qdrant_upsert_batch_size}")
+        if self.is_bge_m3: logger.info(f"    - Sparse On Disk: {self.qdrant_sparse_on_disk}")
+        logger.info(f"  - Expected Vector Size: {self.expected_vector_size}")
+        logger.info(f"  - Auto Recreate Collection: {self.auto_recreate_collection}")
+        logger.info(f"  - Debug Mode: {self.debug_mode}")
 
-        if self.debug_mode:
-            # Log more detailed configuration info
-            self._log_debug_info()
-
+        if self.debug_mode: self._log_debug_info()
         log_memory_usage(logger)
 
     def _validate_config(self):
-        """
-        Validate configuration settings and log warnings for potential issues.
-        """
-        # Check if Qdrant hostname is valid
-        try:
-            # Try to resolve the hostname to check DNS
-            if self.qdrant_host not in ('localhost', '127.0.0.1'):
-                socket.gethostbyname(self.qdrant_host)
-        except Exception as e:
-            logger.warning(f"Unable to resolve Qdrant hostname '{self.qdrant_host}': {e}")
-            logger.warning(
-                "If using Docker, make sure the hostname matches your Docker container name or use 'localhost'")
+        """Validate config and library availability."""
+        try: # Basic connectivity check hint
+            if self.qdrant_host not in ('localhost', '127.0.0.1'): socket.gethostbyname(self.qdrant_host)
+        except Exception as e: logger.warning(f"Unable to resolve Qdrant hostname '{self.qdrant_host}': {e}")
+        if not os.path.isabs(str(self.bm25_path)): logger.warning(f"BM25 path {self.bm25_path} is not absolute.")
 
-        # Check if configuration paths are absolute
-        if not os.path.isabs(str(self.bm25_path)):
-            logger.warning(f"BM25 path {self.bm25_path} is not absolute, may cause issues")
+        if self.is_bge_m3 and not FLAG_EMBEDDING_AVAILABLE:
+             logger.error("BGE-M3 specified, but 'FlagEmbedding' not installed. `pip install FlagEmbedding`")
+             raise ImportError("FlagEmbedding library not installed.")
+        if not self.is_bge_m3 and not BATCHED_INFERENCE_AVAILABLE:
+             logger.error("E5/Dense model specified, but 'embed' library (BatchedInference) not found.")
+             raise ImportError("BatchedInference library not installed.")
 
     def _log_debug_info(self):
-        """
-        Log detailed debugging information.
-        """
-        logger.info(f"Debug mode ON - logging detailed information")
-
-        # Log config file location
+        """Log detailed debugging information."""
+        logger.debug(f"--- Debug Info ---")
         logger.debug(f"Config file path: {CONFIG_PATH}")
-
-        # Log directory information
         logger.debug(f"Root directory: {ROOT_DIR}")
         logger.debug(f"BM25 index path: {self.bm25_path}")
         logger.debug(f"Debug directory: {self.debug_dir}")
-
-        # Log Qdrant connection info
-        logger.debug(f"Qdrant connection: {self.qdrant_host}:{self.qdrant_port}")
-
-        # Attempt to ping Qdrant host
+        logger.debug(f"Qdrant connection: {self.qdrant_host}:{self.qdrant_port}, Timeout: {self.qdrant_timeout}")
+        try: logger.debug(f"Qdrant host resolution: {self.qdrant_host} -> {socket.gethostbyname(self.qdrant_host)}")
+        except Exception as e: logger.debug(f"Qdrant host resolution failed: {e}")
+        debug_config_path = self.debug_dir / "config_dump_indexer.json"
         try:
-            result = socket.gethostbyname(self.qdrant_host)
-            logger.debug(f"Qdrant host resolution: {self.qdrant_host} -> {result}")
-        except Exception as e:
-            logger.debug(f"Qdrant host resolution failed: {e}")
-
-        # Save all config to debug file
-        debug_config_path = self.debug_dir / "config_dump.json"
-        with open(debug_config_path, 'w') as f:
-            json.dump(CONFIG, f, indent=2, default=str)
-
-        logger.debug(f"Config dump saved to: {debug_config_path}")
+            def safe_default(obj): return str(obj) if isinstance(obj, Path) else f"<<Non-serializable: {type(obj).__name__}>>"
+            with open(debug_config_path, 'w') as f: json.dump(CONFIG, f, indent=2, default=safe_default)
+            logger.debug(f"Config dump saved to: {debug_config_path}")
+        except Exception as e: logger.error(f"Failed to save config dump: {e}")
+        logger.debug(f"--- End Debug Info ---")
 
     def load_model(self):
-        """
-        Load the embedding model if not already loaded.
-        """
-        if self.embed_register is not None:
-            logger.info("Embedding model already loaded, skipping load")
+        """Load the embedding model based on configuration."""
+        if self.embedding_model_instance is not None:
+            logger.info(f"Embedding model ({self.embedding_model_name}) already loaded.")
             return
-
-        logger.info("===== STARTING MODEL LOAD =====")
-
+        logger.info(f"===== LOADING EMBEDDING MODEL: {self.embedding_model_name} =====")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        logger.info(f"Using device: {device}")
+        start_time = time.time()
         try:
-            from embed import BatchedInference
-
-            # Determine device
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-
-            logger.info(f"Loading embedding model: {self.embedding_model_name}")
-            logger.info(f"Device: {device}")
-
-            # Time the model loading
-            start_time = time.time()
-
-            self.embed_register = BatchedInference(
-                model_id=self.embedding_model_name,
-                engine="torch",
-                device=device
-            )
+            if self.is_bge_m3:
+                if not FLAG_EMBEDDING_AVAILABLE: raise ImportError("FlagEmbedding not installed")
+                use_fp16 = torch.cuda.is_available() # Use FP16 only if CUDA is available
+                logger.info(f"Loading BGE-M3 with use_fp16={use_fp16}")
+                self.embedding_model_instance = BGEM3FlagModel(self.embedding_model_name, use_fp16=use_fp16, device=device)
+                logger.info("Loaded BGE-M3 model using FlagEmbedding.")
+                try: # Update expected vector size from loaded model
+                    model_dim = self.embedding_model_instance.model.config.hidden_size
+                    if model_dim != self.expected_vector_size:
+                        logger.warning(f"Overriding expected vector size from config ({self.expected_vector_size}) with loaded BGE-M3 dimension: {model_dim}")
+                        self.expected_vector_size = model_dim
+                except Exception as e: logger.warning(f"Could not get vector size from BGE-M3 model config: {e}")
+            else: # E5/Dense Mode
+                if not BATCHED_INFERENCE_AVAILABLE: raise ImportError("BatchedInference not installed")
+                self.embedding_model_instance = BatchedInference(model_id=self.embedding_model_name, engine="torch", device=device)
+                logger.info("Loaded E5/Dense model using BatchedInference.")
+                # Attempt to get size for E5 if library provides it, otherwise rely on config
+                # e.g., if hasattr(self.embedding_model_instance, 'dim'): self.expected_vector_size = self.embedding_model_instance.dim
 
             elapsed_time = time.time() - start_time
-            logger.info(f"Embedding model loaded successfully in {elapsed_time:.2f} seconds")
-
+            logger.info(f"Embedding model loaded in {elapsed_time:.2f} seconds")
             log_memory_usage(logger)
-
         except Exception as e:
-            logger.error(f"Error loading embedding model: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            raise
+            logger.error(f"Error loading embedding model {self.embedding_model_name}: {e}", exc_info=True)
+            self.embedding_model_instance = None; raise
 
     def shutdown(self):
-        """
-        Unload the embedding model to free up resources.
-        """
-        if self.embed_register is not None:
-            logger.info("===== STARTING MODEL UNLOAD =====")
-
+        """Unload the embedding model to free up resources."""
+        if self.embedding_model_instance is not None:
+            logger.info("===== STARTING EMBEDDING MODEL UNLOAD =====")
+            model_name = self.embedding_model_name
             try:
-                # Stop the register
-                logger.info("Stopping embed register...")
-                self.embed_register.stop()
-            except AttributeError as ae:
-                logger.warning(f"Attribute error when stopping embed register: {ae}")
-                # Continue with cleanup
-
-            # Delete the register reference
-            logger.info("Deleting register reference...")
-            del self.embed_register
-            self.embed_register = None
-
-            # Clean up CUDA memory
-            if torch.cuda.is_available():
-                logger.info("Clearing CUDA cache...")
-                torch.cuda.empty_cache()
-
-            # Force garbage collection
-            logger.info("Running garbage collection...")
-            gc.collect()
-
-            logger.info("===== MODEL UNLOAD COMPLETE =====")
-
-            log_memory_usage(logger)
-
-    def index_documents(self, chunks: List[Dict[str, Any]]) -> None:
-        """
-        Index document chunks to Qdrant and BM25.
-
-        Args:
-            chunks (list): List of document chunks
-        """
-        if not chunks:
-            logger.warning("No chunks to index")
-            return
-
-        logger.info(f"Indexing {len(chunks)} chunks")
-
-        # Debug: save chunks to file
-        if self.debug_mode:
-            chunks_path = self.debug_dir / "chunks_to_index.json"
-            try:
-                # Create a copy with minimal info to avoid huge files
-                minimal_chunks = []
-                for chunk in chunks:
-                    minimal_chunk = {
-                        'chunk_id': chunk.get('chunk_id', ''),
-                        'text_length': len(chunk.get('text', '')),
-                        'metadata': chunk.get('metadata', {})
-                    }
-                    minimal_chunks.append(minimal_chunk)
-
-                with open(chunks_path, 'w') as f:
-                    json.dump(minimal_chunks, f, indent=2)
-                logger.debug(f"Saved chunk info to: {chunks_path}")
+                if self.is_bge_m3 and hasattr(self.embedding_model_instance, 'model'):
+                    logger.info("Unloading BGE-M3 (FlagEmbedding) model components...")
+                    if hasattr(self.embedding_model_instance.model, 'cpu'):
+                        try: self.embedding_model_instance.model.cpu(); logger.debug("Moved BGE-M3 model to CPU.")
+                        except Exception as cpu_err: logger.warning(f"Could not move BGE-M3 model to CPU: {cpu_err}")
+                    if hasattr(self.embedding_model_instance, 'model'): del self.embedding_model_instance.model
+                    if hasattr(self.embedding_model_instance, 'tokenizer'): del self.embedding_model_instance.tokenizer
+                    logger.info("Deleted BGE-M3 model/tokenizer references.")
+                elif not self.is_bge_m3 and hasattr(self.embedding_model_instance, 'stop'):
+                    logger.info("Calling BatchedInference stop()...")
+                    self.embedding_model_instance.stop(); logger.info("BatchedInference stopped.")
+                else: logger.warning(f"No specific unload method found for model type of {model_name}.")
+                del self.embedding_model_instance
+                self.embedding_model_instance = None
+                if torch.cuda.is_available(): logger.info("Clearing CUDA cache..."); torch.cuda.empty_cache()
+                logger.info("Running garbage collection..."); gc.collect()
+                logger.info("===== EMBEDDING MODEL UNLOAD COMPLETE =====")
+                log_memory_usage(logger)
             except Exception as e:
-                logger.debug(f"Error saving chunks debug info: {e}")
+                 logger.error(f"Error during model shutdown for {model_name}: {e}", exc_info=True)
+                 self.embedding_model_instance = None
+        else: logger.info("Embedding model already unloaded or not loaded.")
 
+    def _generate_embeddings(self, texts: List[str]) -> Union[Dict[str, Any], List[np.ndarray]]:
+        """
+        Generate embeddings for a list of texts based on the loaded model type.
+        For BGE-M3, returns dense and sparse. ColBERT is disabled.
+        For E5/Dense, returns only dense.
+        """
+        if self.embedding_model_instance is None: raise RuntimeError("Embedding model not loaded.")
+        if not texts: return {} if self.is_bge_m3 else [] # Handle empty input
+
+        start_time_emb = time.time()
+        logger.info(f"Generating embeddings for {len(texts)} texts using {self.embedding_model_name}...")
         try:
-            # Ensure embedding model is loaded
-            self.load_model()
-
-            # First always index to BM25 (this is local files, should work regardless)
-            bm25_success = self._index_to_bm25(chunks)
-
-            # Then try to index to Qdrant
-            qdrant_success = False
-            try:
-                qdrant_success = self._index_to_qdrant(chunks)
-            except Exception as e:
-                logger.error(f"Error indexing to Qdrant: {e}")
-                import traceback
-                logger.error(traceback.format_exc())
-
-                if self.debug_mode:
-                    error_path = self.debug_dir / "qdrant_error.txt"
-                    with open(error_path, 'w') as f:
-                        f.write(f"Error: {str(e)}\n\n")
-                        f.write(traceback.format_exc())
-                    logger.debug(f"Saved Qdrant error to: {error_path}")
-
-            # Log overall status
-            if qdrant_success and bm25_success:
-                logger.info(f"Indexing completed successfully for {len(chunks)} chunks (Qdrant and BM25)")
-            elif bm25_success:
-                if self.fallback_to_bm25_only:
-                    logger.warning(f"Indexing completed with fallback mode (BM25 only)")
-                else:
-                    logger.error(f"Indexing incomplete - BM25 succeeded but Qdrant failed")
-            else:
-                logger.error(f"Indexing failed completely - neither Qdrant nor BM25 succeeded")
-
-        except Exception as e:
-            logger.error(f"Error indexing documents: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            raise
-
-    def _index_to_qdrant(self, chunks: List[Dict[str, Any]]) -> bool:
-        """
-        Index chunks to Qdrant.
-        This version explicitly uses the enhanced text with metadata for embeddings.
-
-        Args:
-            chunks (list): List of document chunks
-
-        Returns:
-            bool: Success status
-        """
-        logger.info(f"Indexing {len(chunks)} chunks to Qdrant")
-
-        try:
-            from qdrant_client import QdrantClient
-            from qdrant_client.http import models as rest
-
-            # Debug: test connection before full indexing
-            if self.debug_mode:
-                logger.debug(f"Testing Qdrant connection to {self.qdrant_host}:{self.qdrant_port}")
-                try:
-                    client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port, timeout=10)
-                    # Simple ping/health check
-                    response = client.http.health_api.health_check()
-                    logger.debug(f"Qdrant connection test successful: {response}")
-                except Exception as e:
-                    logger.error(f"Qdrant connection test failed: {e}")
-                    raise RuntimeError(f"Cannot connect to Qdrant server: {e}")
-
-            # Connect to Qdrant
-            client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port, timeout=30)
-
-            # Generate embeddings for chunks
-            logger.info("Generating embeddings...")
-
-            # IMPORTANT: This is where we use the enhanced text with metadata for embeddings
-            # We log this to make it explicit that we're using the enhanced text from entity_extractor
-            texts = [chunk.get('text', '') for chunk in chunks]
-            logger.info(f"Using enhanced text with summary, red flags, and entities for embedding generation")
-
-            if self.debug_mode and texts:
-                # Log a sample of the enhanced text for verification
-                sample_text = texts[0][:200] + "..." if len(texts[0]) > 200 else texts[0]
-                logger.debug(f"Sample enhanced text for embedding: {sample_text}")
-
-            start_time = time.time()
-
-            # Add validation for texts
-            if not texts or len(texts) == 0:
-                logger.error("No texts provided for embedding generation")
-                return False
-
-            # Use embed register to generate embeddings
-            logger.info(f"Generating embeddings for {len(texts)} texts using model {self.embedding_model_name}")
-            future = self.embed_register.embed(
-                sentences=texts,
-                model_id=self.embedding_model_name
-            )
-
-            # Get embeddings and validate - result() returns a tuple (embeddings, token_usage)
-            result = future.result()
-
-            # Check if result is a tuple (embeddings, token_usage) as expected from infinity embedding
-            if isinstance(result, tuple) and len(result) >= 1:
-                logger.info(f"Got result tuple from embed: {len(result)} items")
-                embeddings = result[0]  # First item is the embeddings list
-            else:
-                embeddings = result  # Fall back to treating result as embeddings directly
-
-            logger.info(f"Embeddings result type: {type(embeddings)}")
-
-            # Validate embeddings
-            if not embeddings or len(embeddings) == 0:
-                logger.error("No embeddings returned from model")
-                return False
-
-            # Handle both list of arrays and single array cases
-            if len(embeddings) == 1 and isinstance(embeddings, list):
-                logger.info(f"Single embedding in a list format: {type(embeddings[0])}")
-
-                # Special handling for potentially nested structure
-                first_item = embeddings[0]
-
-                # If first_item is an int or float, we have a problem
-                if isinstance(first_item, (int, float)):
-                    logger.error(f"Invalid embedding: got scalar value {first_item}")
-                    return False
-
-                # If first_item is a list, check its length to verify it's an actual embedding
-                if isinstance(first_item, list) and len(first_item) < 2:
-                    logger.error(f"Invalid embedding list: too short {first_item}")
-                    return False
-
-                # If first_item is a numpy array, check shape
-                if hasattr(first_item, 'shape'):
-                    logger.info(f"Embedding shape: {first_item.shape}")
-
-            # More detailed logging of the embeddings structure
-            logger.info(f"Embeddings type: {type(embeddings)}, length: {len(embeddings)}")
-            if embeddings and len(embeddings) > 0:
-                logger.info(f"First embedding type: {type(embeddings[0])}")
-
-                # Log a short preview of the first embedding
-                first_emb = embeddings[0]
-                if hasattr(first_emb, 'tolist'):
-                    preview = str(first_emb.tolist()[:3]) + "..." if len(first_emb) > 3 else str(first_emb.tolist())
-                    logger.info(f"First embedding preview: {preview}")
-                elif isinstance(first_emb, list):
-                    preview = str(first_emb[:3]) + "..." if len(first_emb) > 3 else str(first_emb)
-                    logger.info(f"First embedding preview: {preview}")
-
-            elapsed_time = time.time() - start_time
-            logger.info(f"Generated {len(embeddings)} embeddings in {elapsed_time:.2f}s")
-
-            # Create or get collection
-            vector_size = len(embeddings[0])
-            logger.info(f"Vector size: {vector_size}")
-
-            # Debug - save a sample embedding
-            if self.debug_mode:
-                try:
-                    emb_sample_path = self.debug_dir / "embedding_sample.json"
-                    with open(emb_sample_path, 'w') as f:
-                        # Handle different embedding formats
-                        first_emb = embeddings[0]
-
-                        if hasattr(first_emb, 'shape') and hasattr(first_emb, 'tolist'):
-                            # Tensor-like object
-                            vector_sample = first_emb.tolist()[:10] + ['...'] if len(
-                                first_emb) > 10 else first_emb.tolist()
-                            sample_data = {
-                                'type': type(first_emb).__name__,
-                                'shape': list(first_emb.shape) if hasattr(first_emb.shape,
-                                                                          '__iter__') else first_emb.shape,
-                                'vector_sample': vector_sample,
-                                'norm': float(np.linalg.norm(first_emb)),
-                                'min': float(np.min(first_emb)),
-                                'max': float(np.max(first_emb)),
-                                'mean': float(np.mean(first_emb))
-                            }
-                        elif isinstance(first_emb, list):
-                            # List object
-                            vector_sample = first_emb[:10] + ['...'] if len(first_emb) > 10 else first_emb
-                            sample_data = {
-                                'type': 'list',
-                                'length': len(first_emb),
-                                'vector_sample': vector_sample,
-                                'first_element_type': type(first_emb[0]).__name__ if first_emb else 'unknown'
-                            }
-                        else:
-                            # Unknown format
-                            sample_data = {
-                                'type': type(first_emb).__name__,
-                                'string_representation': str(first_emb)[:100]
-                            }
-
-                        json.dump(sample_data, f, indent=2)
-                    logger.debug(f"Saved embedding sample to: {emb_sample_path}")
-                except Exception as e:
-                    logger.debug(f"Error saving embedding sample: {e}")
-
-            # Check if collection exists
-            try:
-                collections = client.get_collections().collections
-                collection_names = [collection.name for collection in collections]
-
-                if self.qdrant_collection not in collection_names:
-                    # Create collection
-                    logger.info(f"Creating collection: {self.qdrant_collection}")
-                    client.create_collection(
-                        collection_name=self.qdrant_collection,
-                        vectors_config=rest.VectorParams(
-                            size=vector_size,
-                            distance=rest.Distance.COSINE
-                        )
-                    )
-            except Exception as e:
-                logger.error(f"Error checking/creating collection: {e}")
-                if self.debug_mode:
-                    # Try to diagnose the connection more thoroughly
-                    self._diagnose_qdrant_connection()
-                raise
-
-            # Prepare points for indexing
-            points = []
-
-            for i, (chunk, embedding_item) in enumerate(zip(chunks, embeddings)):
-                # Extract metadata
-                metadata = chunk.get('metadata', {})
-
-                # Handle different possible types of embeddings
-                try:
-                    if isinstance(embedding_item, (int, float)):
-                        logger.error(f"Embedding item {i} is a scalar value: {embedding_item}")
-                        raise ValueError(f"Invalid embedding format: got scalar value at index {i}")
-
-                    # Check if we have a numpy array
-                    if hasattr(embedding_item, 'tolist'):
-                        vector = embedding_item.tolist()
-                        logger.debug(f"Converted numpy array to list for chunk {i}")
-                    # Check if we already have a list
-                    elif isinstance(embedding_item, list):
-                        # Verify this is actually a vector and not another containing structure
-                        if embedding_item and all(isinstance(x, (int, float)) for x in embedding_item[:5]):
-                            vector = embedding_item
-                            logger.debug(f"Using list embedding for chunk {i}")
-                        else:
-                            logger.error(f"Embedding item {i} is not a valid vector: {str(embedding_item)[:50]}")
-                            raise ValueError(f"Invalid embedding format: not a numeric vector at index {i}")
-                    else:
-                        logger.error(f"Unknown embedding type at index {i}: {type(embedding_item)}")
-                        raise ValueError(f"Unexpected embedding format: {type(embedding_item)}")
-
-                    # Final check on vector dimensions
-                    if len(vector) < 10:  # Arbitrary minimum size for a reasonable embedding
-                        logger.error(f"Vector at index {i} is too small: {len(vector)} dimensions")
-                        raise ValueError(f"Vector dimension too small: {len(vector)} at index {i}")
-                except Exception as e:
-                    logger.error(f"Error processing embedding for chunk {i}: {e}")
-                    # Skip this item rather than failing the entire batch
-                    continue
-
-                try:
-                    # Create the point
-                    point = rest.PointStruct(
-                        id=chunk.get('chunk_id', f"chunk_{i}"),
-                        vector=vector,
-                        payload={
-                            'text': chunk.get('text', ''),  # This is the enhanced text with metadata
-                            'original_text': chunk.get('original_text', chunk.get('text', '')),  # Original text only
-                            'document_id': chunk.get('document_id', ''),
-                            'file_name': chunk.get('file_name', ''),
-                            'page_num': chunk.get('page_num', None),
-                            'chunk_idx': chunk.get('chunk_idx', i),
-                            'metadata': metadata
-                        }
-                    )
-
-                    # Add the point to our collection
-                    points.append(point)
-
-                except Exception as e:
-                    logger.error(f"Error creating point for chunk {i}: {e}")
-                    # Skip problematic points
-                    continue
-
-            # Index points in batches
-            batch_size = 100
-            total_batches = (len(points) + batch_size - 1) // batch_size
-
-            logger.info(f"Indexing {len(points)} points in {total_batches} batches")
-
-            for i in range(0, len(points), batch_size):
-                batch = points[i:i + batch_size]
-
-                # Index batch
-                client.upsert(
-                    collection_name=self.qdrant_collection,
-                    points=batch
+            if self.is_bge_m3:
+                # *** MODIFIED: Disable ColBERT ***
+                output = self.embedding_model_instance.encode(
+                    texts, batch_size=self.bge_m3_batch_size, max_length=self.bge_m3_max_length,
+                    return_dense=True, return_sparse=True, return_colbert_vecs=False # <-- Changed
                 )
+                # --- Validation (Updated) ---
+                if not isinstance(output, dict): raise TypeError(f"BGE-M3 output type error: {type(output)}")
+                # *** MODIFIED: Remove ColBERT from validation ***
+                missing = [k for k in ['dense_vecs', 'lexical_weights'] if k not in output] # <-- Changed
+                if missing: raise ValueError(f"BGE-M3 output missing keys: {missing}")
+                # *** MODIFIED: Remove ColBERT from validation loop ***
+                for key in ['dense_vecs', 'lexical_weights']: # <-- Changed
+                    val = output.get(key)
+                    if val is None or len(val) != len(texts):
+                        v_len = len(val) if val is not None else 'None'
+                        v_type = type(val)
+                        msg = f"BGE-M3 '{key}' output error. Expected len {len(texts)}, Got {v_len} (Type: {v_type})"
+                        logger.error(msg)
+                        raise ValueError(msg)
+                logger.info(f"BGE-M3 embeddings (dense, sparse) generated in {time.time() - start_time_emb:.2f}s")
+                return output
+            else: # E5/Dense
+                result = self.embedding_model_instance.embed(sentences=texts) # Assuming embed method
+                if hasattr(result, 'result') and callable(result.result): embeddings = result.result()
+                else: embeddings = result
+                dense_embeddings = embeddings[0] if isinstance(embeddings, tuple) and len(embeddings) >= 1 else embeddings
 
-                logger.info(f"Indexed batch {i // batch_size + 1}/{total_batches} ({len(batch)} points)")
-
-            logger.info(f"Indexed {len(points)} points to Qdrant")
-            return True
-
+                if not isinstance(dense_embeddings, (list, np.ndarray)) or len(dense_embeddings) != len(texts):
+                    raise ValueError(f"E5 output length mismatch: Got {len(dense_embeddings)} (Type: {type(dense_embeddings)}), Expected {len(texts)}")
+                if len(dense_embeddings) > 0:
+                    vec_len = len(dense_embeddings[0])
+                    if vec_len != self.expected_vector_size:
+                         logger.warning(f"E5 vector size mismatch: Got {vec_len}, Expected {self.expected_vector_size}.")
+                logger.info(f"E5/Dense embeddings generated in {time.time() - start_time_emb:.2f}s")
+                return dense_embeddings
         except Exception as e:
-            logger.error(f"Error indexing to Qdrant: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
+             logger.error(f"Error during embedding generation: {e}", exc_info=True)
+             raise
+
+    def _get_qdrant_vectors_config(self) -> Union[rest.VectorParams, Dict[str, rest.VectorParams]]:
+        """
+        Get the appropriate Qdrant vector configuration based on the model.
+        BGE-M3 uses named "dense" vector. E5 uses default vector. ColBERT removed.
+        """
+        distance = rest.Distance.COSINE
+        if self.is_bge_m3:
+            # *** MODIFIED: Remove ColBERT ***
+            return {
+                "dense": rest.VectorParams(size=self.expected_vector_size, distance=distance),
+                # "colbert": removed
+            }
+        else: # E5/Dense - Uses the default, unnamed vector configuration
+            return rest.VectorParams(size=self.expected_vector_size, distance=distance)
+
+    def _get_qdrant_sparse_config(self) -> Optional[Dict[str, rest.SparseVectorParams]]:
+         """Get sparse vector config, only applicable for BGE-M3."""
+         if self.is_bge_m3:
+              logger.info(f"Configuring sparse vectors with on_disk={self.qdrant_sparse_on_disk}")
+              return {"sparse": rest.SparseVectorParams(index=rest.SparseIndexParams(on_disk=self.qdrant_sparse_on_disk))}
+         return None # No sparse vectors for E5
+
+    def _ensure_qdrant_collection(self, client: QdrantClient) -> bool:
+        """
+        Checks if collection exists and has compatible config, recreates if necessary and allowed.
+        Handles different schemas for BGE-M3 (dense+sparse) and E5 (dense only).
+        """
+        try:
+            logger.debug(f"Ensuring Qdrant collection '{self.qdrant_collection}' exists and is compatible...")
+            collections = client.get_collections().collections
+            collection_exists = any(c.name == self.qdrant_collection for c in collections)
+            needs_recreate = False
+            target_vectors_config = self._get_qdrant_vectors_config()
+            target_sparse_config = self._get_qdrant_sparse_config()
+
+            if collection_exists:
+                logger.info(f"Collection '{self.qdrant_collection}' exists. Verifying configuration...")
+                collection_info = client.get_collection(collection_name=self.qdrant_collection)
+                current_vectors_config = collection_info.config.params.vectors
+                current_sparse_config = collection_info.config.params.sparse_vectors
+
+                # --- Configuration Comparison Logic ---
+                if self.is_bge_m3:
+                    # Check if current config is a dict and has "dense" key (as required by target_vectors_config)
+                    if not isinstance(current_vectors_config, dict) or "dense" not in current_vectors_config:
+                        logger.warning("Collection vector config type is not Dict or missing 'dense' key, incompatible with BGE-M3 (dense+sparse).")
+                        needs_recreate = True
+                    # Check if "colbert" key exists unexpectedly (since we removed it)
+                    elif "colbert" in current_vectors_config:
+                         logger.warning("Collection has 'colbert' vector config, but ColBERT is now disabled.")
+                         needs_recreate = True
+                    # Check dense vector size
+                    elif current_vectors_config["dense"].size != self.expected_vector_size:
+                        logger.warning(f"Collection vector size mismatch (Dense:{current_vectors_config['dense'].size} vs Expected:{self.expected_vector_size}).")
+                        needs_recreate = True
+                    # Check sparse vector presence/absence
+                    elif target_sparse_config and (not current_sparse_config or "sparse" not in current_sparse_config):
+                        logger.warning("Collection missing required 'sparse' vector config for BGE-M3.")
+                        needs_recreate = True
+                    elif not target_sparse_config and current_sparse_config:
+                         # This case shouldn't happen with current logic, but good to have
+                         logger.warning("Collection has sparse config, but BGE-M3 sparse vectors are not configured (should be).")
+                         needs_recreate = True
+                    # Optional: Check sparse index params if needed (e.g., on_disk)
+                    elif target_sparse_config and current_sparse_config and target_sparse_config["sparse"].index.on_disk != current_sparse_config["sparse"].index.on_disk:
+                         logger.warning(f"Collection sparse index 'on_disk' mismatch (Current: {current_sparse_config['sparse'].index.on_disk} vs Target: {target_sparse_config['sparse'].index.on_disk}).")
+                         needs_recreate = True
+
+                else: # E5/Dense
+                    # Check if current config is NOT a dict (E5 uses default unnamed vector)
+                    if isinstance(current_vectors_config, dict):
+                        logger.warning("Collection has named vector config (like BGE-M3), expected default vector for E5.")
+                        needs_recreate = True
+                    # Check vector size
+                    elif current_vectors_config.size != self.expected_vector_size:
+                        logger.warning(f"Collection vector size mismatch ({current_vectors_config.size} vs {self.expected_vector_size}).")
+                        needs_recreate = True
+                    # Check if sparse config exists unexpectedly
+                    elif current_sparse_config:
+                        logger.warning("Collection has sparse config, but current model (E5) is dense-only.")
+                        needs_recreate = True
+                    # Optional: Check distance metric
+
+                if needs_recreate:
+                    logger.warning(f"Recreation needed for collection '{self.qdrant_collection}'.")
+                    if not self.auto_recreate_collection:
+                        logger.error("Collection needs recreation, but 'auto_recreate_collection' is false. Aborting indexing.")
+                        return False
+                    logger.info(f"Recreating collection '{self.qdrant_collection}'...")
+                    client.recreate_collection(
+                        collection_name=self.qdrant_collection,
+                        vectors_config=target_vectors_config,
+                        sparse_vectors_config=target_sparse_config, # Pass None if E5
+                        timeout=self.qdrant_timeout + 60 # Allow extra time for recreation
+                    )
+                    logger.info("Collection recreated.")
+            else: # Collection doesn't exist
+                logger.info(f"Creating collection '{self.qdrant_collection}'...")
+                client.create_collection(
+                    collection_name=self.qdrant_collection,
+                    vectors_config=target_vectors_config,
+                    sparse_vectors_config=target_sparse_config # Pass None if E5
+                )
+                logger.info("Collection created.")
+            return True
+        except Exception as e:
+            logger.error(f"Error ensuring Qdrant collection: {e}", exc_info=True)
             return False
 
-    def _diagnose_qdrant_connection(self):
-        """
-        Run additional diagnostics on Qdrant connection.
-        """
-        logger.debug("Running Qdrant connection diagnostics...")
 
-        # 1. Check DNS resolution
-        try:
-            ip_address = socket.gethostbyname(self.qdrant_host)
-            logger.debug(f"DNS resolution: {self.qdrant_host} -> {ip_address}")
-        except socket.gaierror as e:
-            logger.debug(f"DNS resolution failed: {e}")
+    def _process_and_index_qdrant_batch(self, processing_batch_chunks: List[Dict[str, Any]]) -> bool:
+        """
+        Processes a single batch: generates embeddings, prepares points, and upserts to Qdrant.
+        Handles BGE-M3 (dense+sparse) and E5 (dense) point structures. ColBERT removed.
+        """
+        if not processing_batch_chunks:
+            logger.debug("Empty chunk batch received, skipping Qdrant processing.")
+            return True
+        if self.embedding_model_instance is None:
+             logger.error("Embedding model not loaded for Qdrant batch processing!")
+             return False
 
-        # 2. Try TCP connection to the port
+        batch_start_time = time.time()
+        num_chunks_in_batch = len(processing_batch_chunks)
+        logger.info(f"Processing Qdrant batch with {num_chunks_in_batch} chunks...")
+
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(5)
-            result = s.connect_ex((self.qdrant_host, self.qdrant_port))
-            if result == 0:
-                logger.debug(f"TCP connection to {self.qdrant_host}:{self.qdrant_port} successful")
+            # --- 1. Generate Embeddings for THIS Processing Batch ---
+            texts = [chunk.get('text', '') for chunk in processing_batch_chunks]
+            if not any(texts): logger.warning("Processing batch contains no text, skipping embedding."); return True
+            embeddings_output = self._generate_embeddings(texts) # Handles both types
+
+            # --- 2. Prepare Points for THIS Processing Batch ---
+            points_to_upsert = []
+            logger.info(f"Preparing {num_chunks_in_batch} points for Qdrant upsert...")
+            skipped_count = 0
+            preparation_start_time = time.time()
+
+            for i, chunk in enumerate(processing_batch_chunks):
+                chunk_id = chunk.get('chunk_id', f"generated_chunk_{batch_start_time}_{i}")
+                payload = {'text': chunk.get('text', ''),'original_text': chunk.get('original_text', ''),
+                           'document_id': chunk.get('document_id', ''), 'file_name': chunk.get('file_name', ''),
+                           'page_num': chunk.get('page_num', None), 'chunk_idx': chunk.get('chunk_idx', i),
+                           'metadata': chunk.get('metadata', {})}
+                if 'file_name' in payload and 'file_name' not in payload['metadata']: payload['metadata']['file_name'] = payload['file_name']
+
+                vector_payload = None # Initialize vector_payload
+                text_length = len(payload.get('text', ''))
+                sparse_vector_size = 0
+                dense_ok = False
+                try:
+                    if self.is_bge_m3:
+                        # *** MODIFIED: Get only dense and sparse ***
+                        dense_vec = embeddings_output['dense_vecs'][i]
+                        sparse_weights = embeddings_output['lexical_weights'][i]
+                        # colbert_vecs removed
+
+                        if dense_vec is None or len(dense_vec) != self.expected_vector_size:
+                            raise ValueError(f"BGE-M3 Dense vector size mismatch/None")
+
+                        # *** MODIFIED: Construct named vector payload ***
+                        vector_payload = {"dense": dense_vec.tolist()} # Start with dense
+                        qdrant_sparse = _create_sparse_vector_qdrant_format(sparse_weights)
+                        if qdrant_sparse:
+                            vector_payload["sparse"] = qdrant_sparse # Add sparse if valid
+                            sparse_vector_size = len(qdrant_sparse.indices)
+                        else:
+                             # Optionally log if sparse vector creation failed for a chunk
+                             logger.debug(f"Chunk {chunk_id}: No valid sparse vector created.")
+                        # colbert vector removed
+                        dense_ok = True
+                        logger.debug(f"Prepared BGE-M3 point - ID: {chunk_id}, TextLen: {text_length}, DenseOK: {dense_ok}, SparseSize: {sparse_vector_size}")
+
+                    else: # E5/Dense
+                        dense_vec = embeddings_output[i]
+                        if dense_vec is None or len(dense_vec) != self.expected_vector_size:
+                            raise ValueError(f"E5 Dense vector size mismatch/None")
+                        # *** MODIFIED: E5 uses default unnamed vector ***
+                        vector_payload = list(dense_vec)
+                        dense_ok = True
+                        logger.debug(f"Prepared E5 point - ID: {chunk_id}, TextLen: {text_length}, DenseOK: {dense_ok}")
+
+                    # Create PointStruct with the appropriate vector_payload format
+                    points_to_upsert.append(rest.PointStruct(id=chunk_id, vector=vector_payload, payload=payload))
+
+                except Exception as point_err:
+                     logger.error(f"Error preparing chunk {chunk_id} for upsert: {point_err}", exc_info=False)
+                     skipped_count += 1; continue
+            preparation_duration = time.time() - preparation_start_time
+            logger.info(f"Point preparation finished in {preparation_duration:.2f}s. Prepared: {len(points_to_upsert)}, Skipped: {skipped_count}")
+            if skipped_count > 0: logger.warning(f"Skipped {skipped_count} chunks in this batch due to errors.")
+            if not points_to_upsert: logger.warning("No valid points were prepared for this Qdrant batch."); return True
+
+            # --- 3. Upsert THIS Batch to Qdrant (using internal client batches) ---
+            client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port, timeout=self.qdrant_timeout)
+
+            total_qdrant_batches = (len(points_to_upsert) + self.qdrant_upsert_batch_size - 1) // self.qdrant_upsert_batch_size
+            logger.info(f"Upserting {len(points_to_upsert)} points to Qdrant server in {total_qdrant_batches} client batches (size: {self.qdrant_upsert_batch_size})...")
+
+            batch_success = True # Assume success for the whole processing batch unless a client batch fails
+            for i in tqdm(range(0, len(points_to_upsert), self.qdrant_upsert_batch_size),
+                          desc=f"Upserting Qdrant Batches", total=total_qdrant_batches, unit="client_batch", leave=False, ncols=100):
+                client_batch = points_to_upsert[i : i + self.qdrant_upsert_batch_size]
+                client_batch_num = (i // self.qdrant_upsert_batch_size) + 1
+                first_id = client_batch[0].id if client_batch else "N/A"
+                logger.info(f"--> Sending Qdrant client batch {client_batch_num}/{total_qdrant_batches} ({len(client_batch)} points), starting with ID: {first_id}...")
+                start_upsert_time = time.time()
+                try:
+                    response = client.upsert(collection_name=self.qdrant_collection, points=client_batch, wait=True)
+                    end_upsert_time = time.time()
+                    if response and response.status == rest.UpdateStatus.COMPLETED:
+                         logger.info(f"<-- Successfully upserted Qdrant client batch {client_batch_num} in {end_upsert_time - start_upsert_time:.2f}s")
+                    else:
+                         logger.warning(f"<-- Qdrant client batch {client_batch_num} status not COMPLETED: {response.status if response else 'No response'}. Time: {end_upsert_time - start_upsert_time:.2f}s")
+                         batch_success = False # Mark failure if any client batch fails
+                except (HTTPXTimeoutException, ResponseHandlingException, ConnectionError, UnexpectedResponse) as net_err: # Catch more potential errors
+                     logger.error(f"NETWORK/TIMEOUT ERROR upserting Qdrant client batch {client_batch_num}: {type(net_err).__name__} - {net_err}", exc_info=True)
+                     batch_success = False; break # Stop processing this outer batch on network/timeout error
+                except Exception as upsert_err:
+                     logger.error(f"GENERAL ERROR upserting Qdrant client batch {client_batch_num}: {upsert_err}", exc_info=True)
+                     batch_success = False; break # Stop processing this outer batch on general error
+
+            # Log memory usage after a processing batch is done
+            log_memory_usage(logger)
+            gc.collect() # Explicitly request garbage collection
+
+            total_batch_duration = time.time() - batch_start_time
+            logger.info(f"Finished processing Qdrant batch in {total_batch_duration:.2f}s. Overall success for this batch: {batch_success}")
+            return batch_success
+
+        except Exception as e:
+            logger.error(f"Unexpected error during single batch Qdrant processing: {e}", exc_info=True)
+            return False
+
+    def index_documents(self, all_chunks: List[Dict[str, Any]]) -> None:
+        """
+        Index document chunks to BM25 and Qdrant using end-to-end batching.
+        Ensures Qdrant collection schema matches the selected embedding model (BGE-M3 or E5).
+        """
+        if not all_chunks: logger.warning("No chunks to index"); return
+        num_chunks = len(all_chunks)
+        logger.info(f"===== STARTING INDEXING PROCESS FOR {num_chunks} CHUNKS =====")
+        start_indexing_time = time.time()
+
+        # --- Debug Info ---
+        if self.debug_mode:
+            chunks_path = self.debug_dir / f"chunks_to_index_sample_{num_chunks}.json"
+            try:
+                minimal_chunks = [{'index': idx, 'chunk_id': c.get('chunk_id', f'missing_{idx}'),
+                                   'text_length': len(c.get('text', '')), 'metadata_keys': list(c.get('metadata', {}).keys())}
+                                  for idx, c in enumerate(all_chunks[:min(num_chunks, 50)])]
+                with open(chunks_path, 'w') as f: json.dump(minimal_chunks, f, indent=2)
+                logger.debug(f"Saved chunk info sample (first 50) to: {chunks_path}")
+            except Exception as e: logger.error(f"Error saving chunks debug info: {e}")
+
+        try:
+            # --- 1. Load Model Once ---
+            self.load_model()
+            if self.embedding_model_instance is None: logger.error("Embedding model failed to load. Aborting."); return
+
+            # --- 2. BM25 Indexing (Process all chunks at once) ---
+            # Only relevant if E5 model might be used.
+            logger.info("Starting BM25 indexing...")
+            start_bm25_time = time.time()
+            bm25_success = self._index_to_bm25(all_chunks)
+            end_bm25_time = time.time()
+            logger.info(f"BM25 indexing took {end_bm25_time - start_bm25_time:.2f}s (Success: {bm25_success})")
+
+            # --- 3. Qdrant Indexing (Process in batches) ---
+            overall_qdrant_success = True # Track success across all batches
+            qdrant_processing_start_time = time.time()
+
+            # Ensure collection exists AND IS COMPATIBLE before starting batch processing
+            try:
+                 client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port, timeout=self.qdrant_timeout)
+                 if not self._ensure_qdrant_collection(client): # This now handles schema validation
+                      logger.error("Failed to ensure Qdrant collection exists or is compatible with the current model. Aborting Qdrant indexing.")
+                      overall_qdrant_success = False
+                 del client # Close connection
+                 gc.collect()
+            except Exception as client_err:
+                 logger.error(f"Failed to connect to Qdrant or ensure collection: {client_err}", exc_info=True)
+                 overall_qdrant_success = False
+
+            if overall_qdrant_success: # Only proceed if collection is okay
+                logger.info(f"Starting Qdrant processing in batches of {self.processing_batch_size}...")
+                total_processing_batches = (num_chunks + self.processing_batch_size - 1) // self.processing_batch_size
+
+                for i in tqdm(range(0, num_chunks, self.processing_batch_size),
+                              desc="Processing Chunks", total=total_processing_batches, unit="batch", ncols=100):
+                    batch_chunks = all_chunks[i : i + self.processing_batch_size]
+                    processing_batch_num = (i // self.processing_batch_size) + 1
+                    logger.info(f"--- Starting Processing Batch {processing_batch_num}/{total_processing_batches} ({len(batch_chunks)} chunks) ---")
+
+                    if not batch_chunks: continue
+
+                    qdrant_batch_success = self._process_and_index_qdrant_batch(batch_chunks)
+
+                    if not qdrant_batch_success:
+                        overall_qdrant_success = False
+                        logger.error(f"Failed to process Qdrant batch {processing_batch_num}. Check logs for details.")
+                        if not self.fallback_to_bm25_only:
+                            logger.error("Fallback to BM25 is disabled. Aborting remaining batches.")
+                            break # Stop processing more batches if one fails and no fallback
+                        else:
+                             logger.warning("Fallback to BM25 is enabled. Continuing with next batch despite Qdrant failure.")
             else:
-                logger.debug(f"TCP connection failed with error code: {result}")
-            s.close()
+                 # This case handles if _ensure_qdrant_collection failed
+                 logger.error("Skipping Qdrant processing due to earlier collection error.")
+                 if not self.fallback_to_bm25_only:
+                     logger.error("Qdrant skipped and fallback disabled. Indexing considered failed.")
+                     # If BM25 succeeded earlier, the final status will reflect partial success.
+
+
+            qdrant_processing_duration = time.time() - qdrant_processing_start_time
+            logger.info(f"Qdrant processing finished in {qdrant_processing_duration:.2f}s (Overall Success: {overall_qdrant_success})")
+
+            # --- Final Status Logging ---
+            end_indexing_time = time.time()
+            total_time = end_indexing_time - start_indexing_time
+            logger.info(f"===== INDEXING PROCESS COMPLETE IN {total_time:.2f}s =====")
+            if overall_qdrant_success and bm25_success:
+                logger.info(f"RESULT: Successfully indexed {num_chunks} chunks to Qdrant and BM25.")
+            elif bm25_success and not overall_qdrant_success:
+                if self.fallback_to_bm25_only:
+                    logger.warning(f"RESULT (Fallback): Indexed {num_chunks} chunks to BM25 only due to Qdrant errors.")
+                else:
+                    logger.error(f"RESULT (FAILED): BM25 succeeded but Qdrant failed (fallback disabled).")
+            elif not bm25_success and overall_qdrant_success:
+                 logger.error(f"RESULT (FAILED): Qdrant succeeded but BM25 failed. Check BM25 logs.")
+            else: # Neither succeeded fully
+                logger.error(f"RESULT (FAILED): Neither Qdrant nor BM25 succeeded completely.")
+
         except Exception as e:
-            logger.debug(f"Socket connection error: {e}")
+            logger.error(f"Fatal error during index_documents orchestration: {e}", exc_info=True)
+        finally:
+             # Ensure model is unloaded after the whole indexing run
+             self.shutdown()
+             logger.info("Index_documents call finished.")
 
-        # 3. Check environment variables
-        logger.debug(f"Environment variables:")
-        for var in ['QDRANT_HOST', 'QDRANT_PORT', 'HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY']:
-            logger.debug(f"  {var}: {os.environ.get(var, 'Not set')}")
-
-        # 4. Save diagnostic info to file
-        diagnostic_info = {
-            'timestamp': time.time(),
-            'qdrant_host': self.qdrant_host,
-            'qdrant_port': self.qdrant_port,
-            'qdrant_collection': self.qdrant_collection,
-            'dns_resolution_attempted': True,
-            'environment': {k: v for k, v in os.environ.items() if k.lower() in
-                            ['qdrant_host', 'qdrant_port', 'http_proxy', 'https_proxy', 'no_proxy']}
-        }
-
-        try:
-            diag_path = self.debug_dir / "qdrant_diagnostics.json"
-            with open(diag_path, 'w') as f:
-                json.dump(diagnostic_info, f, indent=2)
-            logger.debug(f"Saved diagnostics to: {diag_path}")
-        except Exception as e:
-            logger.debug(f"Error saving diagnostics: {e}")
 
     def _index_to_bm25(self, chunks: List[Dict[str, Any]]) -> bool:
-        """
-        Index chunks to BM25. Uses enhanced text with metadata for better search results.
-
-        Args:
-            chunks (list): List of document chunks
-
-        Returns:
-            bool: Success status
-        """
-        logger.info(f"Indexing {len(chunks)} chunks to BM25")
-
+        """Index chunks to BM25. (Assumes processing all chunks at once is feasible)."""
+        logger.info(f"Starting BM25 indexing for {len(chunks)} chunks...")
+        if not chunks: logger.warning("No chunks provided for BM25 indexing."); return True
         try:
-            import nltk
             from rank_bm25 import BM25Okapi
-            from nltk.tokenize import word_tokenize
-
-            # Import our fallback tokenizers for use if needed
-            from src.core.indexing.fallback_tokenizers import simple_sent_tokenize, simple_word_tokenize
-
-            # Flag to track if we need to use fallback tokenizers
-            use_fallback_tokenizers = False
-
-            # Ensure NLTK tokenizer is available
-            try:
-                nltk.data.find('tokenizers/punkt')
+            use_fallback = False
+            try: nltk.data.find('tokenizers/punkt'); nltk.data.find('corpora/stopwords')
             except LookupError:
-                logger.warning("NLTK punkt not found, attempting to download")
-                try:
-                    nltk.download('punkt', quiet=True)
-                except Exception as e:
-                    logger.warning(f"Could not download punkt: {e}. Will use fallback tokenizer.")
-                    use_fallback_tokenizers = True
+                logger.warning("NLTK punkt/stopwords not found. Downloading...")
+                try: nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True)
+                except Exception as e: logger.warning(f"NLTK download failed: {e}. Using fallback."); use_fallback = True
+            stop_words = set() if use_fallback else set(nltk.corpus.stopwords.words('english'))
 
-            # Manually download punkt if punkt_tab is used internally
-            try:
-                import nltk.tokenize.punkt
-                if not hasattr(nltk.tokenize.punkt, '_PunktSentenceTokenizer'):
-                    logger.warning("punkt_tab may be missing, attempting to download")
-                    nltk.download('punkt_tab', quiet=True)
-            except Exception as e:
-                logger.warning(f"Error checking punkt_tab: {e}. Will try to download.")
-                try:
-                    nltk.download('punkt_tab', quiet=True)
-                except Exception as e2:
-                    logger.warning(f"Could not download punkt_tab: {e2}. Will use fallback tokenizer.")
-                    use_fallback_tokenizers = True
-
-            # Load stopwords if available, otherwise use empty set
-            stop_words = set()
-            try:
-                from nltk.corpus import stopwords
-                nltk.data.find('corpora/stopwords')
-                stop_words = set(stopwords.words('english'))
-            except (LookupError, ImportError):
-                logger.warning("Stopwords not available. Proceeding without stopwords.")
-
-            # Tokenize texts - IMPORTANT: Use the enhanced text with metadata here too
-            logger.info("Tokenizing texts using enhanced text with metadata...")
-
+            logger.info("Tokenizing texts for BM25...")
             tokenized_texts = []
-            for chunk in chunks:
-                # Get the enhanced text with metadata
+            for chunk in tqdm(chunks, desc="Tokenizing for BM25", unit="chunk", ncols=100, leave=False):
                 text = chunk.get('text', '').lower()
-                if use_fallback_tokenizers:
-                    # Use our fallback tokenizer
-                    tokens = simple_word_tokenize(text)
-                    logger.info(f"Using fallback tokenizer: got {len(tokens)} tokens")
-                else:
-                    # Try NLTK's tokenizer, fall back if it fails
-                    try:
-                        tokens = word_tokenize(text)
-                    except Exception as tokenize_err:
-                        logger.warning(f"Error using word_tokenize: {tokenize_err}, falling back to custom tokenizer")
-                        tokens = simple_word_tokenize(text)
-                # Apply stopword filtering
-                filtered_tokens = [token for token in tokens if token not in stop_words]
-                tokenized_texts.append(filtered_tokens)
+                if not text: tokenized_texts.append([]); continue
+                tokens = simple_word_tokenize(text) if use_fallback else nltk.tokenize.word_tokenize(text)
+                filtered = [t for t in tokens if t.isalnum() and t not in stop_words]
+                tokenized_texts.append(filtered if filtered else (tokens if tokens else [])) # Keep original if filter removes all
 
-            # Create BM25 index
-            logger.info("Creating BM25 index...")
+            logger.info("Creating BM25 index object...")
             bm25_index = BM25Okapi(tokenized_texts)
+            logger.info("Preparing BM25 metadata...")
+            # Store the tokenized texts along with the index and metadata
+            bm25_metadata = [{'chunk_id': c.get('chunk_id',''), 'document_id': c.get('document_id',''),
+                              'file_name': c.get('file_name',''), 'page_num': c.get('page_num'), 'chunk_idx': c.get('chunk_idx'),
+                              'text': c.get('text', ''), # Store the full text used for tokenization
+                              'original_text': c.get('original_text', '')} # Store original text if needed
+                             for c in chunks]
 
-            # Prepare metadata
-            bm25_metadata = []
-            for chunk in chunks:
-                metadata = {
-                    'chunk_id': chunk.get('chunk_id', ''),
-                    'document_id': chunk.get('document_id', ''),
-                    'file_name': chunk.get('file_name', ''),
-                    'page_num': chunk.get('page_num', None),
-                    'chunk_idx': chunk.get('chunk_idx', 0),
-                    'text': chunk.get('text', ''),  # Store enhanced text with metadata
-                    'original_text': chunk.get('original_text', chunk.get('text', ''))
-                }
-                bm25_metadata.append(metadata)
-
-            # Save BM25 index
-            logger.info(f"Saving BM25 index to {self.bm25_path}")
-
-            # Create directory if it doesn't exist
+            logger.info(f"Saving BM25 index, tokenized texts, and metadata to {self.bm25_path}")
             self.bm25_path.parent.mkdir(parents=True, exist_ok=True)
-
-            # Save index, tokenized texts, and metadata
+            # Save all three components: index, tokenized texts, metadata
             with open(self.bm25_path, 'wb') as f:
                 pickle.dump((bm25_index, tokenized_texts, bm25_metadata), f)
 
-            # Save stopwords for consistency in retrieval
-            stopwords_path = self.bm25_path.parent / "stopwords.pkl"
-            with open(stopwords_path, 'wb') as f:
-                pickle.dump(stop_words, f)
-
-            logger.info(f"BM25 index saved successfully with {len(tokenized_texts)} documents")
+            logger.info(f"BM25 index saved successfully ({len(tokenized_texts)} documents).")
             return True
-
         except Exception as e:
-            logger.error(f"Error indexing to BM25: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
+            logger.error(f"Error indexing to BM25: {e}", exc_info=True)
             return False
+
+# --- END OF REWRITTEN FILE: src/core/indexing/document_indexer.py ---

@@ -1,0 +1,823 @@
+[2025-03-31 12:42:32] INFO - Initialized EntityExtractor with model=Qwen/Qwen2.5-3B-Instruct
+
+[2025-03-31 12:42:32] INFO - Starting extraction model load
+
+[2025-03-31 12:42:36] INFO - Is Visual Language model: False
+
+[2025-03-31 12:42:36] INFO - Loading LLM: Qwen/Qwen2.5-3B-Instruct with quantization: fp8
+
+[2025-03-31 12:43:04] INFO - Setting up JSONLogitsProcessor
+
+[2025-03-31 12:43:20] INFO - Successfully created JSONLogitsProcessor with engine
+
+[2025-03-31 12:43:20] INFO - Extraction model loaded successfully in 44.13 seconds
+
+[2025-03-31 12:43:20] INFO - Model configuration details:
+DATA: {
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "max_model_len": 1300,
+  "max_new_tokens": 512,
+  "temperature": 0.1,
+  "quantization": "fp8",
+  "llm_type": "LLM",
+  "has_llm_engine": true,
+  "processor_type": "JSONLogitsProcessor",
+  "sampling_params": {
+    "temperature": 0.1,
+    "max_tokens": 512,
+    "has_logits_processor": true
+  }
+}
+
+[2025-03-31 12:43:20] INFO - Received a list of 77 chunks instead of a single chunk. Processing as batch.
+
+[2025-03-31 12:43:20] INFO - Adding 77 chunks for batch processing (0 visual chunks)
+
+[2025-03-31 12:43:20] INFO - Queued chunk 7c92dd46-bfde-43ae-8221-1d0653a4fedc
+DATA: {
+  "chunk_id": "7c92dd46-bfde-43ae-8221-1d0653a4fedc",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 397,
+  "text_preview": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag. Global markets, v..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 1dce1d1c-e543-461c-bd8d-2c782de3b569
+DATA: {
+  "chunk_id": "1dce1d1c-e543-461c-bd8d-2c782de3b569",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 492,
+  "text_preview": "Europe, however, was a different story. The ever-shifting regulatory landscape, \nparticularly within..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk fcaa7c04-32d4-42c8-b2c3-076633b3d3b9
+DATA: {
+  "chunk_id": "fcaa7c04-32d4-42c8-b2c3-076633b3d3b9",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 442,
+  "text_preview": "The case involved Acme Logistics \nCorp. (789 Shipping Lane, Brooklyn, NY 11220; DOS ID: 9876543). Th..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk afa3cb0f-d065-4c77-ab16-bf4d30ed495a
+DATA: {
+  "chunk_id": "afa3cb0f-d065-4c77-ab16-bf4d30ed495a",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 492,
+  "text_preview": "(UK Company Number: \n01234567; Registered Office: 10 Downing Street, London, SW1A 2AA \u2013 a placeholde..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9db4087f-9391-4ba7-b2e8-e3d37101b178
+DATA: {
+  "chunk_id": "9db4087f-9391-4ba7-b2e8-e3d37101b178",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 511,
+  "text_preview": "This venture will focus on \nAI solutions for the financial sector \u2013 a high-growth area we're betting..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk ef6ee963-e926-4f6c-b85b-b730061d46ee
+DATA: {
+  "chunk_id": "ef6ee963-e926-4f6c-b85b-b730061d46ee",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 180,
+  "text_preview": "We're in preliminary discussions with Renewable Energy \nSystems Ltd., an Irish company. Details (add..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 369e2a0a-2b5b-460b-a589-ed8ce36c9e9e
+DATA: {
+  "chunk_id": "369e2a0a-2b5b-460b-a589-ed8ce36c9e9e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 191,
+  "text_preview": "Absolutely. Our partnership with Global Aid \nFoundation (Charity Number: 1122334; 50 Humanitarian Wa..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk b6cb860e-7f2c-4977-baca-8c8dc9da7830
+DATA: {
+  "chunk_id": "b6cb860e-7f2c-4977-baca-8c8dc9da7830",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 402,
+  "text_preview": "Internally, we're striving for carbon neutrality by 2030. Electric vehicle fleets, renewable \nenergy..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 538e79d3-f4ec-4f2d-8e30-1cae8031399e
+DATA: {
+  "chunk_id": "538e79d3-f4ec-4f2d-8e30-1cae8031399e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 518,
+  "text_preview": "The internal audit? Some areas for improvement in compliance. No major breaches, \nthankfully. But en..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 4e6b4124-2927-486c-85ce-7a7d2a1f23cb
+DATA: {
+  "chunk_id": "4e6b4124-2927-486c-85ce-7a7d2a1f23cb",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 479,
+  "text_preview": "A mixed performance. North American Sales Corp. (100 Sales Avenue, \nChicago, IL 60601; Illinois File..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 0a7a3ddc-ad11-4b72-8a88-120b57099260
+DATA: {
+  "chunk_id": "0a7a3ddc-ad11-4b72-8a88-120b57099260",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 458,
+  "text_preview": "(Cayman Islands; \nrepresentative office: 50 George Town Boulevard, Grand Cayman). The dispute \nconce..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk e9f50a7d-a71b-4d01-af53-42e870ec16e1
+DATA: {
+  "chunk_id": "e9f50a7d-a71b-4d01-af53-42e870ec16e1",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 490,
+  "text_preview": "We're offering competitive packages, flexible work, and growth opportunities. Partnerships with univ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 4d8667b6-f944-45dd-a7ee-7a790a0a57bd
+DATA: {
+  "chunk_id": "4d8667b6-f944-45dd-a7ee-7a790a0a57bd",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 185,
+  "text_preview": "(1 Blockchain Blvd, San Francisco, CA 94105 \u2013 California registered, \nbut no ID publicly available) ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk ae443ed2-6c9a-4525-adfb-85fe8b8e83e4
+DATA: {
+  "chunk_id": "ae443ed2-6c9a-4525-adfb-85fe8b8e83e4",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 195,
+  "text_preview": "Increased brand awareness and \ncustomer engagement were the results. Social media, online advertisin..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 4529811c-3546-4e04-aa67-defc1750a142
+DATA: {
+  "chunk_id": "4529811c-3546-4e04-aa67-defc1750a142",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 188,
+  "text_preview": "Marketing Masters Ltd. (UK Company Number: 09876543; 30 Digital Drive, London, E1 \n6AN) was a key pa..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 8ef69f5f-18a4-4dcc-80ed-2cc72ce6f6b8
+DATA: {
+  "chunk_id": "8ef69f5f-18a4-4dcc-80ed-2cc72ce6f6b8",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 434,
+  "text_preview": "Revenue and profits exceeded expectations. Cost \nsavings through operational efficiencies and strate..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk e6447947-b27e-431d-bac8-03b00c4f0700
+DATA: {
+  "chunk_id": "e6447947-b27e-431d-bac8-03b00c4f0700",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 405,
+  "text_preview": "R&D continues to make significant progress. We're investing heavily in innovation. New \nproduct deve..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 26e3b8fa-d495-4e3c-8a97-c06668d68015
+DATA: {
+  "chunk_id": "26e3b8fa-d495-4e3c-8a97-c06668d68015",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 510,
+  "text_preview": "Navigating the local regulations, however, \nproved to be a significant undertaking, requiring extens..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 0df0c12e-bbba-4170-9052-3f6ad6a81f2e
+DATA: {
+  "chunk_id": "0df0c12e-bbba-4170-9052-3f6ad6a81f2e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 469,
+  "text_preview": "We are now implementing a much more rigorous vetting process \nfor all new international partnerships..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 53742626-9939-487d-a8bb-20013825d32e
+DATA: {
+  "chunk_id": "53742626-9939-487d-a8bb-20013825d32e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 363,
+  "text_preview": "It necessitates building strong, trusting relationships with our \nsuppliers, many of whom are smalle..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9cf067c1-dab7-4440-bad0-a8c2627d7a63
+DATA: {
+  "chunk_id": "9cf067c1-dab7-4440-bad0-a8c2627d7a63",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 443,
+  "text_preview": "A prime example of this \ncollaborative approach is our ongoing partnership with Eco-Friendly Packagi..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk cb680741-4f69-41b2-8d7c-e6cbf21a473f
+DATA: {
+  "chunk_id": "cb680741-4f69-41b2-8d7c-e6cbf21a473f",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 350,
+  "text_preview": "We \nbelieve their Irish Company Registration Office (CRO) number begins with the digit 6, \nbut we ar..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 6a4be8fe-a14d-4baf-80c1-f7c2c319642b
+DATA: {
+  "chunk_id": "6a4be8fe-a14d-4baf-80c1-f7c2c319642b",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 418,
+  "text_preview": "drive significant positive change within our packaging supply chain. This is a core \nelement of our ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk a155d0bc-16f5-4878-9d96-d15d155f835a
+DATA: {
+  "chunk_id": "a155d0bc-16f5-4878-9d96-d15d155f835a",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 366,
+  "text_preview": "The goal \nis to create a truly circular economy for our packaging, minimizing waste and \nmaximizing ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9b795bff-b843-4eec-9376-7a217b1df6f1
+DATA: {
+  "chunk_id": "9b795bff-b843-4eec-9376-7a217b1df6f1",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 390,
+  "text_preview": "This plan meticulously outlines \nour key strategic priorities and objectives for the next five years..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 8d8d304a-5b62-4e8a-b84e-50a36150118a
+DATA: {
+  "chunk_id": "8d8d304a-5b62-4e8a-b84e-50a36150118a",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 497,
+  "text_preview": "We firmly believe that these three interconnected areas are absolutely \ncritical to our long-term su..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 60ae2e7e-3e1f-4346-af85-5942fd341492
+DATA: {
+  "chunk_id": "60ae2e7e-3e1f-4346-af85-5942fd341492",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 476,
+  "text_preview": "We have managed to obtain their LEI (Legal Entity Identifier), which is \n213800ABC123DEF456GH, a cru..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 5ec9cbac-b5ca-4054-814b-d762f1fe7b22
+DATA: {
+  "chunk_id": "5ec9cbac-b5ca-4054-814b-d762f1fe7b22",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 315,
+  "text_preview": "A minor, yet frustrating, setback occurred recently when we experienced an unforeseen \ndelay in a si..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 48203af7-3191-488f-9d22-996906b1388f
+DATA: {
+  "chunk_id": "48203af7-3191-488f-9d22-996906b1388f",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 490,
+  "text_preview": "Their DOT \nnumber is readily available on public record, of course, but the specific, intricate deta..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 2ea902f7-ffd9-40b8-b294-a373e54b871d
+DATA: {
+  "chunk_id": "2ea902f7-ffd9-40b8-b294-a373e54b871d",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 258,
+  "text_preview": "This incident has prompted a comprehensive review \nof our logistics and transportation processes. We..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk cd6e2376-560a-425a-b054-2494e29c6357
+DATA: {
+  "chunk_id": "cd6e2376-560a-425a-b054-2494e29c6357",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 623,
+  "text_preview": "concerns from the investment community. The call was exceptionally well-received, \nand we garnered o..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk ee630d58-e8f5-4537-a15b-827380cd1d78
+DATA: {
+  "chunk_id": "ee630d58-e8f5-4537-a15b-827380cd1d78",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 240,
+  "text_preview": "The presentation included a comprehensive \nand in-depth analysis of our current market position, hig..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk fb7138f3-c9ea-466e-962f-63474455b03f
+DATA: {
+  "chunk_id": "fb7138f3-c9ea-466e-962f-63474455b03f",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 507,
+  "text_preview": "A significant portion of the call was dedicated to a lively and \ninsightful question-and-answer sess..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 60dda8d9-5acc-4948-a49d-af020ad28891
+DATA: {
+  "chunk_id": "60dda8d9-5acc-4948-a49d-af020ad28891",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 491,
+  "text_preview": "However, it is safe to say that their operations are firmly situated within the \ndynamic and rapidly..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk d4eb0c8e-863c-440c-85b7-27ae7a5a54e7
+DATA: {
+  "chunk_id": "d4eb0c8e-863c-440c-85b7-27ae7a5a54e7",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 262,
+  "text_preview": "We are very \npleased with the outcome. Short paragraph here: We remain optimistic. Another short one..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk c8aa867d-8c1d-4034-a8bf-58af5a0222a6
+DATA: {
+  "chunk_id": "c8aa867d-8c1d-4034-a8bf-58af5a0222a6",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 401,
+  "text_preview": "The regulatory environment is constantly changing. We are closely monitoring \ndevelopments in severa..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 54c03e75-ecdb-4360-abd8-da0e4850a65b
+DATA: {
+  "chunk_id": "54c03e75-ecdb-4360-abd8-da0e4850a65b",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 501,
+  "text_preview": "We have dedicated \nteams of legal and regulatory experts who are constantly monitoring the landscape..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 884bf81c-d5f5-4216-8369-53bd33596001
+DATA: {
+  "chunk_id": "884bf81c-d5f5-4216-8369-53bd33596001",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 43,
+  "text_preview": "This includes protecting the privacy of our"
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 1eb31eb6-ee25-4f4f-ad93-46629d4a0758
+DATA: {
+  "chunk_id": "1eb31eb6-ee25-4f4f-ad93-46629d4a0758",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 510,
+  "text_preview": "customers and employees, and ensuring that our products and services are safe and \nreliable. We are ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 3b034675-eb57-4452-b019-7af1f2ff60bb
+DATA: {
+  "chunk_id": "3b034675-eb57-4452-b019-7af1f2ff60bb",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 383,
+  "text_preview": "We are \nalso committed to engaging with our stakeholders on a regular basis, and we welcome \ntheir f..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 49376b99-8405-4a93-9bc4-32975e8d708d
+DATA: {
+  "chunk_id": "49376b99-8405-4a93-9bc4-32975e8d708d",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 447,
+  "text_preview": "Our internal communications team has been working diligently on improving \ntransparency and informat..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk a19122d1-c1d1-48d0-aec2-a010c4b53fba
+DATA: {
+  "chunk_id": "a19122d1-c1d1-48d0-aec2-a010c4b53fba",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 403,
+  "text_preview": "This involves utilizing a variety of communication channels, \nincluding regular email updates, compa..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk e65049b8-995f-47b4-9ea5-f3eb7b05958b
+DATA: {
+  "chunk_id": "e65049b8-995f-47b4-9ea5-f3eb7b05958b",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 493,
+  "text_preview": "A key challenge is overcoming language barriers and cultural differences, and \nwe are providing reso..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk b97719c8-51ab-4692-b514-e6b4ae2970d8
+DATA: {
+  "chunk_id": "b97719c8-51ab-4692-b514-e6b4ae2970d8",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 165,
+  "text_preview": "New entrants are emerging, and existing \nplayers are becoming more aggressive. We are closely monito..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 71c7f602-98d0-4bf2-99c8-ce289f7b0de3
+DATA: {
+  "chunk_id": "71c7f602-98d0-4bf2-99c8-ce289f7b0de3",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 503,
+  "text_preview": "A recent market analysis revealed some interesting trends. Consumer preferences are \nshifting, and t..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 16aabe72-e8c0-4609-98b4-2e7e5f3fd6e3
+DATA: {
+  "chunk_id": "16aabe72-e8c0-4609-98b4-2e7e5f3fd6e3",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 266,
+  "text_preview": "We are also \nexploring new market segments and expanding our product offerings to meet the \nevolving..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk a3a944aa-7f31-4411-a101-e4d8fb2e90bc
+DATA: {
+  "chunk_id": "a3a944aa-7f31-4411-a101-e4d8fb2e90bc",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 118,
+  "text_preview": "market research and consumer insights to better understand the changing needs and \npreferences of ou..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 69bc1b11-36b9-4407-b29f-c63d96b381c8
+DATA: {
+  "chunk_id": "69bc1b11-36b9-4407-b29f-c63d96b381c8",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 479,
+  "text_preview": "This information is crucial for guiding our product \ndevelopment and marketing strategies. We recent..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 21a0f98a-8aae-4b19-afa7-7d13a2b2612f
+DATA: {
+  "chunk_id": "21a0f98a-8aae-4b19-afa7-7d13a2b2612f",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 459,
+  "text_preview": "Securing this contract was a significant \nachievement, as it ensures a stable supply of essential ma..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9550acfd-1165-4ae9-a8fc-6c0f6589b6dd
+DATA: {
+  "chunk_id": "9550acfd-1165-4ae9-a8fc-6c0f6589b6dd",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 402,
+  "text_preview": "This is a testament to the hard work and dedication of our procurement team. They \nworked tirelessly..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9e4039c8-2198-47dd-9397-b44b2dd9a5ef
+DATA: {
+  "chunk_id": "9e4039c8-2198-47dd-9397-b44b2dd9a5ef",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 461,
+  "text_preview": "We have a \nteam of experienced lawyers who are dedicated to ensuring that we comply with all \napplic..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 245112c0-69bb-498b-80fe-cb254339da56
+DATA: {
+  "chunk_id": "245112c0-69bb-498b-80fe-cb254339da56",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 449,
+  "text_preview": "The finance department is working on developing new financial models and forecasting \ntools. This wi..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk d37ea54b-1596-431e-a67d-c6d0be5a8735
+DATA: {
+  "chunk_id": "d37ea54b-1596-431e-a67d-c6d0be5a8735",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 426,
+  "text_preview": "This is a major undertaking, involving significant investment in \ntechnology and expertise. We are c..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 9004e071-620e-4f02-abc1-c41b1f7fb60f
+DATA: {
+  "chunk_id": "9004e071-620e-4f02-abc1-c41b1f7fb60f",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 257,
+  "text_preview": "We are committed to continuous improvement in all areas of our business. This is a \ncore value, and ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 1e3ab1a0-d426-43b4-b31e-7ede8b0bbef0
+DATA: {
+  "chunk_id": "1e3ab1a0-d426-43b4-b31e-7ede8b0bbef0",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 431,
+  "text_preview": "soliciting feedback from our employees, customers, and other stakeholders, and using \nthat feedback ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 5ef96ae6-bdf3-4458-b2d9-5cf92d598e55
+DATA: {
+  "chunk_id": "5ef96ae6-bdf3-4458-b2d9-5cf92d598e55",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 505,
+  "text_preview": "This involves a willingness to challenge the status quo and to embrace new ideas \nand approaches. We..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 0482905e-1081-4e24-9f92-e4fb4206ccaa
+DATA: {
+  "chunk_id": "0482905e-1081-4e24-9f92-e4fb4206ccaa",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 20,
+  "text_preview": "was a major victory."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk e67bfe68-8f4b-46a2-acd9-191981a3f6d3
+DATA: {
+  "chunk_id": "e67bfe68-8f4b-46a2-acd9-191981a3f6d3",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 410,
+  "text_preview": "However, the work doesn't stop there. The ongoing \noptimization of our entire supply chain remains a..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 09954f61-e8d0-4e36-a439-ed04d910f245
+DATA: {
+  "chunk_id": "09954f61-e8d0-4e36-a439-ed04d910f245",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 411,
+  "text_preview": "This is a complex and challenging undertaking, but it is essential for \nensuring that we can deliver..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 3d20c043-a1ed-4525-a642-623f49ce353e
+DATA: {
+  "chunk_id": "3d20c043-a1ed-4525-a642-623f49ce353e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 453,
+  "text_preview": "A Note on Regional Performance (Asia-Pacific) \nThe Asia-Pacific region continues to be a key growth ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 11fe21be-160b-4da2-9647-91475abb4136
+DATA: {
+  "chunk_id": "11fe21be-160b-4da2-9647-91475abb4136",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 404,
+  "text_preview": "We are also \nexploring new partnerships and joint ventures to expand our presence in the region. Thi..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 5d191f3a-c6bb-48fd-838d-e2fcc477d1ba
+DATA: {
+  "chunk_id": "5d191f3a-c6bb-48fd-838d-e2fcc477d1ba",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 139,
+  "text_preview": "We are learning valuable lessons about navigating \ncomplex regulatory environments. 2.3 Human Resour..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 0420a9cc-153d-4282-b166-e9255d5c30e9
+DATA: {
+  "chunk_id": "0420a9cc-153d-4282-b166-e9255d5c30e9",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 222,
+  "text_preview": "Attracting and retaining top talent remains a critical challenge, particularly in the highly \ncompet..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 56a93b06-c237-4d12-ba45-85110e39e6bb
+DATA: {
+  "chunk_id": "56a93b06-c237-4d12-ba45-85110e39e6bb",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 59,
+  "text_preview": "\u2022 \nOffering competitive compensation and benefits packages."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk a3fa9b90-705e-405d-97ab-67411b6f3705
+DATA: {
+  "chunk_id": "a3fa9b90-705e-405d-97ab-67411b6f3705",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 67,
+  "text_preview": "\u2022 \nProviding opportunities for professional development and growth."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 3ba4fd30-7288-4ec1-b5a7-fe2e5b761729
+DATA: {
+  "chunk_id": "3ba4fd30-7288-4ec1-b5a7-fe2e5b761729",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 54,
+  "text_preview": "\u2022 \nCreating a positive and inclusive work environment."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk d51a2e04-0a01-43f6-ad74-d1ace35ff5a1
+DATA: {
+  "chunk_id": "d51a2e04-0a01-43f6-ad74-d1ace35ff5a1",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 55,
+  "text_preview": "\u2022 \nFostering a culture of innovation and collaboration."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 4d07b7c2-77b8-4b02-8d24-e2afa10889ec
+DATA: {
+  "chunk_id": "4d07b7c2-77b8-4b02-8d24-e2afa10889ec",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 505,
+  "text_preview": "\u2022 \nStrengthening partnerships with Leading Universities. We believe that these initiatives will help..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 6da61b0d-1866-4092-9467-c69178ab3ebe
+DATA: {
+  "chunk_id": "6da61b0d-1866-4092-9467-c69178ab3ebe",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 348,
+  "text_preview": "We are also exploring new ways to leverage technology to improve our recruiting and \nhiring processe..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk a7aaca94-d1ef-48c6-9e11-08ed60e83406
+DATA: {
+  "chunk_id": "a7aaca94-d1ef-48c6-9e11-08ed60e83406",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 170,
+  "text_preview": "This requires a proactive approach, including internal training \nprograms, partnerships with educati..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 7e9e0b52-836b-4333-a61f-85865649bf91
+DATA: {
+  "chunk_id": "7e9e0b52-836b-4333-a61f-85865649bf91",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 464,
+  "text_preview": "We are committed to providing our employees with the skills and \nknowledge they need to succeed in t..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk d071a5e1-8422-4b62-b47d-bf57da92147e
+DATA: {
+  "chunk_id": "d071a5e1-8422-4b62-b47d-bf57da92147e",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 294,
+  "text_preview": "3. Financial Overview and Outlook \n3.1 Strong Financial Performance \nDespite the challenging macroec..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 097d8eb1-347e-413e-be3e-885337233d59
+DATA: {
+  "chunk_id": "097d8eb1-347e-413e-be3e-885337233d59",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 355,
+  "text_preview": "We are well-positioned to \ncontinue to deliver strong financial performance in the future. Our balan..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 1d5d667f-2231-4814-a9c8-f79df5a35d35
+DATA: {
+  "chunk_id": "1d5d667f-2231-4814-a9c8-f79df5a35d35",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 501,
+  "text_preview": "shareholders. We are also committed to returning capital to our shareholders through \ndividends and ..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk 215951b5-bfc0-4b07-8ad4-52783a6a8694
+DATA: {
+  "chunk_id": "215951b5-bfc0-4b07-8ad4-52783a6a8694",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 399,
+  "text_preview": "This framework is regularly reviewed and updated to ensure \nthat it is effective in addressing the e..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk ae2a22c7-fdf9-4fce-a84c-d74514c4bb3c
+DATA: {
+  "chunk_id": "ae2a22c7-fdf9-4fce-a84c-d74514c4bb3c",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 496,
+  "text_preview": "Its for testing only. Our CFO, Jane Doe, recently stated in an interview, \"We are dedicated to deliv..."
+}
+
+[2025-03-31 12:43:20] INFO - Queued chunk d4e4a439-4c9d-42f2-b538-a223726669a0
+DATA: {
+  "chunk_id": "d4e4a439-4c9d-42f2-b538-a223726669a0",
+  "document_id": "fffb1a75-66aa-49b3-a89e-faa02fd6a20d",
+  "file_name": "The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf",
+  "is_visual": false,
+  "text_length": 445,
+  "text_preview": "The ongoing due diligence related to potential future merger and acquisition activities \nwith smalle..."
+}
+
+[2025-03-31 12:43:20] INFO - Added 77 chunks. Processing now.
+
+[2025-03-31 12:43:20] INFO - Processing all 77 chunks at once
+
+[2025-03-31 12:43:20] INFO - Split into 77 text chunks and 0 visual chunks
+
+[2025-03-31 12:43:20] INFO - Processing 77 text chunks in a single batch
+
+[2025-03-31 12:43:20] ERROR - Error processing text chunks batch: 'EntityExtractor' object has no attribute '_create_extraction_prompt'
+
+[2025-03-31 12:43:20] INFO - Traceback:
+DATA: "Traceback (most recent call last):\n  File \"/home/t/lm_rag/src/core/extraction/entity_extractor.py\", line 513, in _process_text_chunks_batch\n    prompt = self._create_extraction_prompt(chunk_text)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EntityExtractor' object has no attribute '_create_extraction_prompt'\n"
+
+[2025-03-31 12:43:20] ERROR - Error processing chunks: 'EntityExtractor' object has no attribute '_add_empty_modified_chunk'
+
+[2025-03-31 12:43:20] INFO - Traceback:
+DATA: "Traceback (most recent call last):\n  File \"/home/t/lm_rag/src/core/extraction/entity_extractor.py\", line 513, in _process_text_chunks_batch\n    prompt = self._create_extraction_prompt(chunk_text)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EntityExtractor' object has no attribute '_create_extraction_prompt'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/t/lm_rag/src/core/extraction/entity_extractor.py\", line 449, in process_all_chunks\n    self._process_text_chunks_batch(text_chunks)\n  File \"/home/t/lm_rag/src/core/extraction/entity_extractor.py\", line 591, in _process_text_chunks_batch\n    self._add_empty_modified_chunk(chunk)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'EntityExtractor' object has no attribute '_add_empty_modified_chunk'\n"
+

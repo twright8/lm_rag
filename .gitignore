@@ -1,0 +1,23 @@
+# Virtual environment
+data/
+qdrant_storage/
+temp/
+venv/
+.env/
+.env*/
+*.env
+ENV/
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Jupyter/IDE files
+.ipynb_checkpoints/
+.idea/
+.vscode/

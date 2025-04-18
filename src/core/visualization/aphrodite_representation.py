@@ -1,13 +1,15 @@
 import pandas as pd
 from tqdm import tqdm
 from scipy.sparse import csr_matrix
-from typing import Mapping, List, Tuple, Any, Union, Callable
+from typing import Mapping, List, Tuple, Any, Union, Callable, Dict
 from bertopic.representation._base import BaseRepresentation
 from bertopic.representation._utils import truncate_document, validate_truncate_document_parameters
 import logging
 import sys
 import os
 from pathlib import Path
+from transformers import AutoTokenizer
+import traceback # For better error logging
 
 # Add project root to path
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
@@ -123,11 +125,12 @@ class AphroditeRepresentation(BaseRepresentation):
             diversity: float = None,
             doc_length: int = None,
             tokenizer: Union[str, Callable] = None,
-            direct_load: bool = False,  # Keep original parameter name for compatibility
-            always_direct_load: bool = False,  # Add new parameter but don't use it directly
+            # Keep tokenizer param for doc length, but load HF tokenizer separately
+            direct_load: bool = False,
+            always_direct_load: bool = False,
     ):
         self.model_name = model_name
-        self.prompt = prompt if prompt is not None else DEFAULT_PROMPT
+        self.prompt_template = prompt if prompt is not None else DEFAULT_PROMPT  # Store the template
         self.system_prompt = system_prompt if system_prompt is not None else DEFAULT_SYSTEM_PROMPT
         self.default_prompt_ = DEFAULT_PROMPT
         self.default_system_prompt_ = DEFAULT_SYSTEM_PROMPT
@@ -135,21 +138,31 @@ class AphroditeRepresentation(BaseRepresentation):
         self.nr_docs = nr_docs
         self.diversity = diversity
         self.doc_length = doc_length
-        self.tokenizer = tokenizer
-        # Use direct_load for backward compatibility
+        self.doc_length_tokenizer = tokenizer  # Keep the original tokenizer param specifically for doc length calculation
         self.always_direct_load = direct_load or always_direct_load
-        validate_truncate_document_parameters(self.tokenizer, self.doc_length)
+        validate_truncate_document_parameters(self.doc_length_tokenizer, self.doc_length)
 
-        # Track generated prompts for analysis
         self.prompts_ = []
-
-        # Service and model state
         self.service = None
         self.direct_model = None
         self.using_service = False
 
-        # Initialize (but don't load models yet - defer until needed)
-        self._initialize()
+        # --- NEW: Load HF Tokenizer for Chat Templating ---
+        self.hf_tokenizer = None
+        try:
+            logger.info(f"[AphroditeRepresentation] Loading HF tokenizer for: {self.model_name}")
+            self.hf_tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
+            if self.hf_tokenizer.chat_template is None:
+                logger.warning(
+                    f"[AphroditeRepresentation] Tokenizer for {self.model_name} has no chat_template. Manual formatting may be needed or fail.")
+            else:
+                logger.info(f"[AphroditeRepresentation] HF tokenizer loaded successfully with chat template.")
+        except Exception as e:
+            logger.error(f"[AphroditeRepresentation] Failed to load HF tokenizer for {self.model_name}: {e}",
+                         exc_info=True)
+            # Proceeding without a tokenizer will cause errors later
+
+        self._initialize()  # Keep initialization logic
 
     def _initialize(self):
         """Initialize the representation model by checking service status."""
@@ -229,7 +242,6 @@ class AphroditeRepresentation(BaseRepresentation):
             logger.info(f"Loading Aphrodite model directly: {self.model_name}")
 
             # Get quantization setting from config if possible
-            quantization = "fp8"  # Default
             try:
                 import yaml
                 config_path = ROOT_DIR / "config.yaml"
@@ -269,156 +281,178 @@ class AphroditeRepresentation(BaseRepresentation):
             c_tf_idf: csr_matrix,
             topics: Mapping[str, List[Tuple[str, float]]],
     ) -> Mapping[str, List[Tuple[str, float]]]:
-        """Extract topic representations and return a single label for each topic.
-
-        Arguments:
-            topic_model: A BERTopic model
-            documents: Not used
-            c_tf_idf: Not used
-            topics: The candidate topics as calculated with c-TF-IDF
-
-        Returns:
-            updated_topics: Updated topic representations
-        """
-        # Extract the top representative documents per topic
+        """Extract topic representations and return a single label for each topic."""
         repr_docs_mappings, _, _, _ = topic_model._extract_representative_docs(
             c_tf_idf, documents, topics, 500, self.nr_docs, self.diversity
         )
 
-        # Ensure a model is available for generation
         if not self._ensure_model_available():
-            logger.error("Cannot proceed with topic extraction - no Aphrodite model available")
-            # Return empty topics as fallback
-            updated_topics = {}
-            for topic in topics:
-                updated_topics[topic] = [("", 0) for _ in range(10)]
+            logger.error("[AphroditeRepresentation] Cannot proceed - no Aphrodite model available")
+            updated_topics = {topic: [("", 0)] * 10 for topic in topics}
             return updated_topics
 
-        # Process all topics at once
+        if not self.hf_tokenizer or self.hf_tokenizer.chat_template is None:
+             logger.error("[AphroditeRepresentation] HF Tokenizer or chat template not available. Cannot format prompts.")
+             updated_topics = {topic: [("", 0)] * 10 for topic in topics}
+             return updated_topics
+
         all_topics = []
-        all_prompts = []
-        all_chat_prompts = []
+        all_formatted_prompts = [] # Store the final strings for the service/model
+        self.prompts_ = [] # Store the structured messages for potential debugging
 
-        logger.info(f"Preparing prompts for {len(repr_docs_mappings)} topics")
+        logger.info(f"[AphroditeRepresentation] Preparing and formatting prompts for {len(repr_docs_mappings)} topics")
 
-        # Create all prompts first
         for topic, docs in tqdm(repr_docs_mappings.items(), disable=not topic_model.verbose):
-            # Prepare prompt
-            truncated_docs = [truncate_document(topic_model, self.doc_length, self.tokenizer, doc) for doc in docs]
-            prompt = self._create_prompt(truncated_docs, topic, topics)
-            self.prompts_.append(prompt)
+            # 1. Truncate documents (using the BERTopic tokenizer setting)
+            truncated_docs = [truncate_document(topic_model, self.doc_length, self.doc_length_tokenizer, doc) for doc in docs]
 
-            # Format as ChatML
-            chat_prompt = f"""<|im_start|>system
-{self.system_prompt}<|im_end|>
-<|im_start|>user
-{prompt}<|im_end|>
-<|im_start|>assistant
-"""
+            # 2. Create structured messages
+            messages = self._create_prompt(truncated_docs, topic, topics)
+            self.prompts_.append(messages) # Store the structured version
 
-            # Store the topic, original prompt, and chat prompt
-            all_topics.append(topic)
-            all_prompts.append(prompt)
-            all_chat_prompts.append(chat_prompt)
+            # 3. Apply chat template using the HF tokenizer
+            try:
+                final_prompt_string = self.hf_tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True # Add assistant prompt marker
+                )
+                all_topics.append(topic)
+                all_formatted_prompts.append(final_prompt_string)
+            except Exception as template_err:
+                logger.error(f"[AphroditeRepresentation] Error applying chat template for topic {topic}: {template_err}", exc_info=True)
+                # Optionally add a placeholder error prompt or skip this topic
+                # Skipping for now:
+                # all_topics.append(topic)
+                # all_formatted_prompts.append("Error: Could not format prompt")
 
-        # Generate all labels at once
-        logger.info(f"Generating labels for {len(all_chat_prompts)} topics at once")
-        all_labels = self._generate_topic_labels_batch(all_chat_prompts)
 
-        # Create the results dictionary
+        if not all_formatted_prompts:
+             logger.warning("[AphroditeRepresentation] No prompts were successfully formatted.")
+             updated_topics = {topic: [("", 0)] * 10 for topic in topics}
+             return updated_topics
+
+        logger.info(f"[AphroditeRepresentation] Generating labels for {len(all_formatted_prompts)} topics at once")
+        # Pass the already formatted strings to the generation method
+        all_labels = self._generate_topic_labels_batch(all_formatted_prompts)
+
         updated_topics = {}
-        for topic, label in zip(all_topics, all_labels):
-            updated_topics[topic] = [(label, 1)] + [("", 0) for _ in range(9)]
+        label_idx = 0
+        # Iterate through the topics we *attempted* to format
+        for topic in repr_docs_mappings.keys():
+             # Check if this topic's prompt was successfully formatted and sent
+             if topic in all_topics:
+                 if label_idx < len(all_labels):
+                      label = all_labels[label_idx]
+                      updated_topics[topic] = [(label, 1)] + [("", 0)] * 9
+                      label_idx += 1
+                 else:
+                      # Mismatch, should not happen if logic is correct
+                      logger.error(f"Label index out of bounds for topic {topic}")
+                      updated_topics[topic] = [("Error", 1)] + [("", 0)] * 9
+             else:
+                 # Prompt formatting failed for this topic
+                 logger.warning(f"Skipping topic {topic} due to earlier formatting error.")
+                 updated_topics[topic] = [("Formatting Error", 1)] + [("", 0)] * 9
+
 
         return updated_topics
 
-    def _generate_topic_labels_batch(self, chat_prompts):
-        """Generate topic labels for all prompts at once.
+    def _generate_topic_labels_batch(self, formatted_prompts: List[str]):
+        """Generate topic labels for all pre-formatted prompts at once.
 
         Args:
-            chat_prompts: List of ChatML-formatted prompts
+            formatted_prompts: List of fully formatted prompt strings ready for the LLM.
 
         Returns:
             List of generated labels
         """
         try:
-            # Use service if available and we've confirmed it has a model loaded
+            # Use service if available
             if self.using_service and APHRODITE_SERVICE_AVAILABLE and self.service and self.service.is_running():
-                logger.info(f"Sending batch of {len(chat_prompts)} prompts to Aphrodite service")
-
-                # Check if extract_entities can be used (it's designed for batch processing)
+                logger.info(f"[AphroditeRepresentation] Sending batch of {len(formatted_prompts)} prompts to Aphrodite service")
                 try:
-                    # The extract_entities method in the service can handle batches
-                    response = self.service.extract_entities(prompts=chat_prompts)
-
+                    # Use extract_entities as it seems to handle batching in the service
+                    response = self.service.extract_entities(prompts=formatted_prompts)
                     if response.get("status") == "success":
-                        # Extract the results
                         results = response.get("results", [])
-                        logger.info(f"Received {len(results)} results from service")
-
-                        # Validate results count
-                        if len(results) != len(chat_prompts):
-                            logger.warning(f"Expected {len(chat_prompts)} results but got {len(results)}")
-                            # Pad with error messages if needed
-                            while len(results) < len(chat_prompts):
-                                results.append("Topic Extraction Error")
-
-                        return results
+                        logger.info(f"[AphroditeRepresentation] Received {len(results)} results from service")
+                        if len(results) != len(formatted_prompts):
+                            logger.warning(f"Expected {len(formatted_prompts)} results but got {len(results)}")
+                            while len(results) < len(formatted_prompts): results.append("Topic Extraction Error")
+                        # Clean up results (remove potential extra quotes, newlines)
+                        cleaned_results = [str(res).strip().strip('"').strip("'").split('\n')[0] for res in results]
+                        return cleaned_results
                     else:
                         error_msg = response.get("error", "Unknown error")
                         logger.error(f"Error from Aphrodite service batch processing: {error_msg}")
-
-                        # Try with direct model as fallback if available
                         if self.direct_model is not None:
                             logger.info("Falling back to direct model after service error")
                             self.using_service = False
-                            return self._generate_with_direct_model_batch(chat_prompts)
-
-                        # Return error messages for all prompts
-                        return ["Topic Extraction Error" for _ in chat_prompts]
-
+                            return self._generate_with_direct_model_batch(formatted_prompts)
+                        return ["Topic Extraction Error" for _ in formatted_prompts]
                 except Exception as batch_error:
                     logger.error(f"Error using extract_entities for batch processing: {batch_error}")
-                    logger.info("Falling back to sequential processing")
-
-                    # Fall back to processing one by one
+                    logger.info("Falling back to sequential processing via generate_chat")
                     results = []
-                    for i, chat_prompt in enumerate(chat_prompts):
-                        logger.info(f"Processing prompt {i + 1}/{len(chat_prompts)}")
-                        response = self.service.generate_chat(prompt=chat_prompt)
-
+                    for i, prompt_str in enumerate(formatted_prompts):
+                        logger.info(f"Processing prompt {i + 1}/{len(formatted_prompts)} sequentially")
+                        response = self.service.generate_chat(prompt=prompt_str) # generate_chat takes the formatted string
                         if response.get("status") == "success":
-                            results.append(response.get("result", "").strip())
+                            label = response.get("result", "").strip().strip('"').strip("'").split('\n')[0]
+                            results.append(label)
                         else:
                             results.append("Topic Extraction Error")
-
                     return results
 
             # Use direct model
             elif self.direct_model is not None:
-                return self._generate_with_direct_model_batch(chat_prompts)
-
+                return self._generate_with_direct_model_batch(formatted_prompts)
             else:
-                logger.error("No model available for topic label generation")
-                return ["Topic Extraction Error" for _ in chat_prompts]
+                logger.error("[AphroditeRepresentation] No model available for topic label generation")
+                return ["Topic Extraction Error" for _ in formatted_prompts]
 
         except Exception as e:
-            logger.error(f"Error generating topic labels: {e}")
-            return ["Topic Extraction Error" for _ in chat_prompts]
+            logger.error(f"[AphroditeRepresentation] Error generating topic labels: {e}", exc_info=True)
+            return ["Topic Extraction Error" for _ in formatted_prompts]
 
-    def _generate_topic_label(self, prompt):
-        """Generate a single topic label (for backward compatibility).
-
-        This method is kept for backward compatibility but internally
-        calls the batch method with a single prompt.
+    def _generate_topic_label(self, prompt: str) -> str:
         """
-        # Format the prompt in ChatML format
-        chat_prompt = f"""<|im_start|>system
-{self.system_prompt}<|im_end|>
-<|im_start|>user
-{prompt}<|im_end|>
-<|im_start|>assistant
-"""
+        Generate a single topic label using the correct chat templating.
+        (Updated for consistency with dynamic templating).
+
+        Args:
+            prompt: The user content part of the prompt (e.g., the part containing keywords/docs).
+
+        Returns:
+            The generated topic label string or an error message.
+        """
+        if not self.hf_tokenizer or self.hf_tokenizer.chat_template is None:
+            logger.error("[AphroditeRepresentation] HF Tokenizer or chat template not available in _generate_topic_label.")
+            return "Topic Extraction Error: Tokenizer Missing"
+
+        # 1. Create structured messages
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": prompt} # Assume input 'prompt' is the user content
+        ]
+
+        # 2. Apply chat template
+        try:
+            final_prompt_string = self.hf_tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True # Add assistant prompt marker
+            )
+        except Exception as template_err:
+            logger.error(f"[AphroditeRepresentation] Error applying chat template in _generate_topic_label: {template_err}", exc_info=True)
+            return "Topic Extraction Error: Template Failed"
+
+        # 3. Call the batch method with the single *correctly formatted* prompt
+        results = self._generate_topic_labels_batch([final_prompt_string])
+
+        # 4. Return the result
+        return results[0] if results else "Topic Extraction Error: Generation Failed"
 
         # Call the batch method with a single prompt
         results = self._generate_topic_labels_batch([chat_prompt])
@@ -467,25 +501,39 @@ class AphroditeRepresentation(BaseRepresentation):
         results = self._generate_with_direct_model_batch([chat_prompt])
         return results[0] if results else "Topic Extraction Error"
 
-    def _create_prompt(self, docs, topic, topics):
-        """Create a prompt for the topic using keywords and documents."""
+    def _create_prompt(self, docs, topic, topics) -> List[Dict[str, str]]:
+        """
+        Creates the structured message list for the topic extraction task.
+
+        Args:
+            docs: List of representative documents for the topic.
+            topic: The topic ID.
+            topics: Dictionary mapping topic IDs to lists of (keyword, score) tuples.
+
+        Returns:
+            A list of dictionaries representing the conversation structure.
+        """
         keywords = list(zip(*topics[topic]))[0]
+        keyword_str = ", ".join(keywords)
 
-        # Use the Default Chat Prompt
-        if self.prompt == DEFAULT_PROMPT:
-            prompt = self.prompt.replace("[KEYWORDS]", ", ".join(keywords))
-            prompt = self._replace_documents(prompt, docs)
+        # Prepare document string
+        doc_str = ""
+        for doc in docs:
+            doc_str += f"- {doc}\n"
 
-        # Use a custom prompt that leverages keywords, documents or both using
-        # custom tags, namely [KEYWORDS] and [DOCUMENTS] respectively
-        else:
-            prompt = self.prompt
-            if "[KEYWORDS]" in prompt:
-                prompt = prompt.replace("[KEYWORDS]", ", ".join(keywords))
-            if "[DOCUMENTS]" in prompt:
-                prompt = self._replace_documents(prompt, docs)
+        # Populate the user prompt using the stored template
+        user_prompt = self.prompt_template # Use the template stored in __init__
+        if "[KEYWORDS]" in user_prompt:
+            user_prompt = user_prompt.replace("[KEYWORDS]", keyword_str)
+        if "[DOCUMENTS]" in user_prompt:
+            user_prompt = user_prompt.replace("[DOCUMENTS]", doc_str)
 
-        return prompt
+        # Return structured messages
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        return messages
 
     @staticmethod
     def _replace_documents(prompt, docs):

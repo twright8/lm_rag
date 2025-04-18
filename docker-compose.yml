@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest # Consider pinning a specific version
+    ports:
+      - "6333:6333" # gRPC port used by client
+      - "6334:6334" # REST port (optional, for UI/debug)
+    volumes:
+      - qdrant_data:/qdrant/storage # Persistent storage using a named volume
+    networks:
+      - rag_network # Define a network for potential future service additions
+
+volumes:
+  qdrant_data:
+
+networks:
+  rag_network:
+    driver: bridge
