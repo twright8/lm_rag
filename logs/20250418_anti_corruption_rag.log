@@ -1,0 +1,225 @@
+2025-04-18 14:24:48,879 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:24:48,917 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:24:48,922 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:24:48,923 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:24:48,932 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:24:48,935 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:24:46,669 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:24:46,671 - src.core.query_system.query_engine - ERROR - Failed to initialize backend 'gemini': Missing OpenRouter API Key
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 139, in __init__
+    self.gemini_client = GeminiClient(CONFIG) # Pass full config
+                         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/src/utils/gemini_client.py", line 227, in __init__
+    raise ValueError("Missing OpenRouter API Key")
+ValueError: Missing OpenRouter API Key
+2025-04-18 14:28:13,664 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:28:13,698 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:28:13,702 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:28:13,704 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:28:13,711 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:28:13,714 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:28:13,716 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:28:13,717 - src.core.query_system.query_engine - ERROR - Failed to initialize backend 'gemini': Missing OpenRouter API Key
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 139, in __init__
+    self.gemini_client = GeminiClient(CONFIG) # Pass full config
+                         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/src/utils/gemini_client.py", line 227, in __init__
+    raise ValueError("Missing OpenRouter API Key")
+ValueError: Missing OpenRouter API Key
+2025-04-18 14:29:11,542 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:29:11,578 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:29:11,582 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:29:11,583 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:29:11,585 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:29:11,587 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:29:11,588 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:29:11,674 - src.core.query_system.query_engine - INFO - Using Gemini backend for generation with model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:29:11,675 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-18 14:29:11,676 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-18 14:29:11,677 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-18 14:29:11,678 - src.core.query_system.query_engine - INFO -   - Generation Backend: gemini
+2025-04-18 14:29:11,678 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:29:11,679 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-18 14:29:11,680 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-18 14:29:11,681 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-18 14:29:11,682 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.33 GB, VMS: 37.55 GB
+2025-04-18 14:29:11,849 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-18 14:29:11,851 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:29:11,851 - src.core.query_system.query_engine - ERROR - Failed to load chat tokenizer for google/gemini-2.5-pro-exp-03-25:free: Incorrect path_or_model_id: 'google/gemini-2.5-pro-exp-03-25:free'. Please provide either the path to a local folder or the repo_id of a model on the Hub.
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 160, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must use alphanumeric chars or '-', '_', '.', '--' and '..' are forbidden, '-' and '.' cannot start or end the name, max length is 96: 'google/gemini-2.5-pro-exp-03-25:free'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 183, in _load_chat_tokenizer
+    self.chat_tokenizer = AutoTokenizer.from_pretrained(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 844, in from_pretrained
+    tokenizer_config = get_tokenizer_config(pretrained_model_name_or_path, **kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 676, in get_tokenizer_config
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 469, in cached_file
+    raise EnvironmentError(
+OSError: Incorrect path_or_model_id: 'google/gemini-2.5-pro-exp-03-25:free'. Please provide either the path to a local folder or the repo_id of a model on the Hub.
+2025-04-18 14:47:22,400 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:47:22,435 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:47:22,440 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:47:22,441 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:47:22,449 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:47:22,452 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:47:22,453 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:47:22,527 - src.core.query_system.query_engine - INFO - Using Gemini backend for generation with model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:47:22,528 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-18 14:47:22,529 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-18 14:47:22,530 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-18 14:47:22,531 - src.core.query_system.query_engine - INFO -   - Generation Backend: gemini
+2025-04-18 14:47:22,531 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:47:22,532 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-18 14:47:22,534 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-18 14:47:22,535 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-18 14:47:22,536 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.34 GB, VMS: 37.55 GB
+2025-04-18 14:47:22,630 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-18 14:47:22,632 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:47:22,632 - src.core.query_system.query_engine - ERROR - Failed to load chat tokenizer for google/gemini-2.5-pro-exp-03-25:free: Incorrect path_or_model_id: 'google/gemini-2.5-pro-exp-03-25:free'. Please provide either the path to a local folder or the repo_id of a model on the Hub.
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 160, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must use alphanumeric chars or '-', '_', '.', '--' and '..' are forbidden, '-' and '.' cannot start or end the name, max length is 96: 'google/gemini-2.5-pro-exp-03-25:free'.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 183, in _load_chat_tokenizer
+    self.chat_tokenizer = AutoTokenizer.from_pretrained(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 844, in from_pretrained
+    tokenizer_config = get_tokenizer_config(pretrained_model_name_or_path, **kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 676, in get_tokenizer_config
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 469, in cached_file
+    raise EnvironmentError(
+OSError: Incorrect path_or_model_id: 'google/gemini-2.5-pro-exp-03-25:free'. Please provide either the path to a local folder or the repo_id of a model on the Hub.
+2025-04-18 14:54:42,092 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:54:42,128 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:54:42,132 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:54:42,134 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:54:42,142 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:54:42,145 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:54:42,146 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:54:42,148 - src.core.query_system.query_engine - ERROR - `models.chat_tokenizer_name` not found in config. This is required for prompt formatting.
+2025-04-18 14:55:39,291 - __main__ - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-18 14:55:39,326 - __main__ - INFO - Initializing ConversationStore...
+2025-04-18 14:55:39,330 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-18 14:55:39,331 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-18 14:55:39,339 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-18 14:55:39,342 - __main__ - INFO - Creating new QueryEngine instance.
+2025-04-18 14:55:39,343 - src.core.query_system.query_engine - INFO - RAG Query Generation Backend selected: gemini
+2025-04-18 14:55:39,344 - src.core.query_system.query_engine - INFO - Using 'mistralai/Mistral-7B-Instruct-v0.1' as the prompt formatting tokenizer.
+2025-04-18 14:55:39,422 - src.core.query_system.query_engine - INFO - Using Gemini backend. API Model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:55:39,423 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-18 14:55:39,424 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-18 14:55:39,425 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-18 14:55:39,426 - src.core.query_system.query_engine - INFO -   - Generation Backend: gemini
+2025-04-18 14:55:39,427 - src.core.query_system.query_engine - INFO -   - LLM API/Load Model: google/gemini-2.5-pro-exp-03-25:free
+2025-04-18 14:55:39,428 - src.core.query_system.query_engine - INFO -   - Prompt Formatting Tokenizer: mistralai/Mistral-7B-Instruct-v0.1
+2025-04-18 14:55:39,429 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-18 14:55:39,429 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-18 14:55:39,430 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-18 14:55:39,431 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.33 GB, VMS: 37.56 GB
+2025-04-18 14:55:39,524 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-18 14:55:39,525 - src.core.query_system.query_engine - INFO - Loading prompt formatting tokenizer from Hugging Face Hub: mistralai/Mistral-7B-Instruct-v0.1
+2025-04-18 14:55:39,885 - src.core.query_system.query_engine - ERROR - OSError loading formatting tokenizer 'mistralai/Mistral-7B-Instruct-v0.1': You are trying to access a gated repo.
+Make sure to have access to it at https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1.
+401 Client Error. (Request ID: Root=1-680259da-3ab6e4ed1197453675f145b6;83fd6b7b-d94b-4dc4-8669-6ccd5abbd845)
+
+Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json.
+Access to model mistralai/Mistral-7B-Instruct-v0.1 is restricted. You must have access to it and be authenticated to access it. Please log in.. Is it a valid Hugging Face Hub ID or local path?
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 409, in hf_raise_for_status
+    response.raise_for_status()
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 403, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 862, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 969, in _hf_hub_download_to_cache_dir
+    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 1486, in _raise_on_head_call_error
+    raise head_call_error
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 1376, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 1296, in get_hf_file_metadata
+    r = _request_wrapper(
+        ^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 280, in _request_wrapper
+    response = _request_wrapper(
+               ^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/file_download.py", line 304, in _request_wrapper
+    hf_raise_for_status(response)
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 426, in hf_raise_for_status
+    raise _format(GatedRepoError, message, response) from e
+huggingface_hub.errors.GatedRepoError: 401 Client Error. (Request ID: Root=1-680259da-3ab6e4ed1197453675f145b6;83fd6b7b-d94b-4dc4-8669-6ccd5abbd845)
+
+Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json.
+Access to model mistralai/Mistral-7B-Instruct-v0.1 is restricted. You must have access to it and be authenticated to access it. Please log in.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/core/query_system/query_engine.py", line 202, in _load_formatting_tokenizer
+    self.chat_tokenizer = AutoTokenizer.from_pretrained(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/tokenization_auto.py", line 864, in from_pretrained
+    config = AutoConfig.from_pretrained(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/models/auto/configuration_auto.py", line 1006, in from_pretrained
+    config_dict, unused_kwargs = PretrainedConfig.get_config_dict(pretrained_model_name_or_path, **kwargs)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/configuration_utils.py", line 570, in get_config_dict
+    config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/configuration_utils.py", line 629, in _get_config_dict
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/transformers/utils/hub.py", line 421, in cached_file
+    raise EnvironmentError(
+OSError: You are trying to access a gated repo.
+Make sure to have access to it at https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1.
+401 Client Error. (Request ID: Root=1-680259da-3ab6e4ed1197453675f145b6;83fd6b7b-d94b-4dc4-8669-6ccd5abbd845)
+
+Cannot access gated repo for url https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json.
+Access to model mistralai/Mistral-7B-Instruct-v0.1 is restricted. You must have access to it and be authenticated to access it. Please log in.

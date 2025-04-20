@@ -16,6 +16,8 @@ models:
     text_large: microsoft/phi-4
     visual_language: Qwen/Qwen-VL-Chat
   chat_model: Qwen/Qwen2.5-3B-Instruct
+  chat_tokenizer_name: "mistralai/Mistral-7B-Instruct-v0.1" # Example: Use Mistral tokenizer
+
 aphrodite:
   max_model_len: 4096
   quantization: fp5
@@ -35,7 +37,10 @@ aphrodite:
   top_p: 0.9
   classification_temperature: 0.1
   classification_max_tokens: 512
-  request_timeout: 900
+  info_extraction_temperature: 0.2
+  info_extraction_max_tokens: 2048
+  default_chat_model: "mistralai/Mistral-7B-Instruct-v0.1" # Example
+
 qdrant:
   host: localhost
   port: 6333
@@ -59,7 +64,6 @@ extraction:
   deduplication_threshold: 85
   data_path: data/extracted
   schema_version: '1.0'
-  batch_size: 128
   information_extraction:
     batch_size: 1024
     max_chunks: 10000
@@ -156,21 +160,7 @@ indexing: # Add this section if it doesn't exist
   processing_batch_size: 128 # How many chunks to embed/prep in memory at once (adjust based on RAM)
   fallback_to_bm25_only: true # Existing setting
   auto_recreate_collection: false # Existing safety setting
-# NEW: Configure LLM backends for different tasks
 llm_backends:
-  entity_extraction: aphrodite       # Options: aphrodite, gemini
-  information_extraction: aphrodite  # Options: aphrodite, gemini
-  rag_query_generation: aphrodite    # Options: aphrodite, deepseek, gemini
-  # classification: aphrodite        # Uncomment and configure if you add classification later
-
-# NEW: Gemini configuration (uses OPENROUTER_API_KEY from environment)
-gemini:
-  model: "google/gemini-2.5-pro-exp-03-25:free" # Or specify another compatible model
-  base_url: "https://openrouter.ai/api/v1"
-  # Optional headers for OpenRouter ranking
-  site_url: "<YOUR_SITE_URL>" # Optional, replace or remove
-  site_name: "<YOUR_SITE_NAME>" # Optional, replace or remove
-  request_timeout: 120 # Timeout for API calls in seconds
-
-
-
+  entity_extraction: gemini       # Options: aphrodite, gemini
+  information_extraction: gemini  # Options: aphrodite, gemini
+  rag_query_generation: gemini    # Options: aphrodite, deepseek, gemini
