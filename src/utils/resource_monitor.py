@@ -56,17 +56,19 @@ def get_gpu_info() -> Optional[Dict[str, Any]]:
         print(f"Error getting GPU info: {e}")
         return None
 
-def log_memory_usage(logger) -> None:
+def log_memory_usage(logger, unused_string: str = None) -> None:
     """
     Log memory usage.
-    
+
     Args:
-        logger: Logger instance
+        logger: Logger instance.
+        unused_string (str, optional): An optional string argument that is not used
+                                       by the function. Defaults to None.
     """
     # Log process memory
     process_memory = get_process_memory()
     logger.info(f"Process memory - RSS: {process_memory['rss']:.2f} GB, VMS: {process_memory['vms']:.2f} GB")
-    
+
     # Log GPU memory if available
     gpu_info = get_gpu_info()
     if gpu_info:

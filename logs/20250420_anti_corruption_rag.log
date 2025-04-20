@@ -1,0 +1,120 @@
+2025-04-20 13:44:09,292 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:44:09,292 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:44:09,540 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:46:29,960 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:46:29,961 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:46:30,171 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:46:47,342 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:46:47,342 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:46:47,484 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:47:05,748 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:47:05,752 - app_setup - INFO - Initializing ConversationStore...
+2025-04-20 13:47:05,753 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-20 13:47:05,754 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-20 13:47:05,765 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-20 13:47:05,768 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-20 13:47:05,769 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-20 13:47:05,770 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-20 13:47:05,771 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-20 13:47:05,772 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:05,773 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-20 13:47:05,774 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-20 13:47:05,774 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-20 13:47:05,776 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.35 GB, VMS: 37.63 GB
+2025-04-20 13:47:05,933 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:47:05,935 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:04,329 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-20 13:47:04,331 - app_setup - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:04,473 - app_setup - ERROR - Unhandled error in main application loop: log_memory_usage() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/ui/app.py", line 127, in <module>
+    main()
+  File "/home/t/lm_rag/src/ui/app.py", line 64, in main
+    initialize_app_state()
+  File "/home/t/lm_rag/src/ui/app_setup.py", line 198, in initialize_app_state
+    log_memory_usage(logger, "Memory usage after state initialization")
+TypeError: log_memory_usage() takes 1 positional argument but 2 were given
+2025-04-20 13:47:18,136 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:47:18,136 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:47:18,281 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:47:31,465 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:47:31,472 - app_setup - INFO - Initializing ConversationStore...
+2025-04-20 13:47:31,473 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-20 13:47:31,474 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-20 13:47:31,477 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-20 13:47:31,480 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-20 13:47:31,481 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-20 13:47:31,482 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-20 13:47:31,483 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-20 13:47:31,484 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:31,485 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-20 13:47:31,486 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-20 13:47:31,487 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-20 13:47:31,488 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.35 GB, VMS: 37.63 GB
+2025-04-20 13:47:31,570 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:47:31,571 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:32,168 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-20 13:47:32,171 - app_setup - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:47:32,262 - app_setup - ERROR - Unhandled error in main application loop: log_memory_usage() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/ui/app.py", line 127, in <module>
+    main()
+  File "/home/t/lm_rag/src/ui/app.py", line 64, in main
+    initialize_app_state()
+  File "/home/t/lm_rag/src/ui/app_setup.py", line 198, in initialize_app_state
+    log_memory_usage(logger, "Memory usage after state initialization")
+TypeError: log_memory_usage() takes 1 positional argument but 2 were given
+2025-04-20 13:47:53,448 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:47:53,448 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:47:53,592 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:48:04,619 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:48:04,623 - app_setup - INFO - Initializing ConversationStore...
+2025-04-20 13:48:04,625 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-20 13:48:04,625 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-20 13:48:04,628 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-20 13:48:04,630 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-20 13:48:04,631 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-20 13:48:04,632 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-20 13:48:04,633 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-20 13:48:04,634 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:48:04,635 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-20 13:48:04,636 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-20 13:48:04,636 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-20 13:48:04,637 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.35 GB, VMS: 37.63 GB
+2025-04-20 13:48:04,716 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:48:04,717 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:48:05,245 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-20 13:48:05,248 - app_setup - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:48:05,327 - app_setup - INFO - Process memory - RSS: 1.42 GB, VMS: 37.65 GB
+2025-04-20 13:48:05,328 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:49:34,234 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 13:49:34,234 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 13:49:34,388 - app_setup - INFO - Aphrodite service modules imported.
+2025-04-20 13:49:43,592 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:49:43,596 - app_setup - INFO - Initializing ConversationStore...
+2025-04-20 13:49:43,597 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-20 13:49:43,598 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-20 13:49:43,601 - src.utils.conversation_store - INFO - Successfully loaded 13 conversations into memory.
+2025-04-20 13:49:43,603 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-20 13:49:43,604 - src.core.query_system.query_engine - INFO - Initializing QueryEngine:
+2025-04-20 13:49:43,605 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode (Dense+Sparse))
+2025-04-20 13:49:43,605 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3
+2025-04-20 13:49:43,606 - src.core.query_system.query_engine - INFO -   - LLM (Chat) Model: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:49:43,607 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-20 13:49:43,608 - src.core.query_system.query_engine - INFO -   - Cross-Encoder Reranking Enabled: True
+2025-04-20 13:49:43,609 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-20 13:49:43,610 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.35 GB, VMS: 37.63 GB
+2025-04-20 13:49:43,684 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:49:43,686 - src.core.query_system.query_engine - INFO - Loading chat tokenizer for LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:49:44,240 - src.core.query_system.query_engine - INFO - Chat tokenizer for Qwen/Qwen2.5-3B-Instruct loaded successfully.
+2025-04-20 13:49:44,243 - app_setup - INFO - QueryEngine created, using default LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 13:49:44,320 - app_setup - INFO - Process memory - RSS: 1.42 GB, VMS: 37.65 GB
+2025-04-20 13:49:44,321 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:49:57,467 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:49:57,524 - app_setup - INFO - Process memory - RSS: 1.43 GB, VMS: 37.65 GB
+2025-04-20 13:49:57,525 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 13:49:57,659 - src.core.query_system.query_engine - WARNING - Collection anticorruption_rag_e5_instruct does not exist
+2025-04-20 13:49:57,729 - src.core.query_system.query_engine - WARNING - Collection anticorruption_rag_e5_instruct does not exist
+2025-04-20 13:49:58,974 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 13:49:59,029 - app_setup - INFO - Process memory - RSS: 1.43 GB, VMS: 37.65 GB
+2025-04-20 13:49:59,030 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
