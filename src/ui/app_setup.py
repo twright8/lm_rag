@@ -1,4 +1,3 @@
-# app_setup.py
 import sys
 from pathlib import Path
 import yaml
@@ -6,25 +5,19 @@ import streamlit as st
 import gc
 import torch
 import traceback
+import logging # Use standard logging here
 
 # --- Core Paths and Configuration ---
 try:
-    # This assumes app_setup.py is in the same directory as the original app.py
-    # which is likely ROOT_DIR/streamlit_app/app.py
-    # Adjust if your structure is different (e.g., ROOT_DIR/app.py)
+    # Assume app_setup.py is in ROOT_DIR/src/ui/
     CURRENT_DIR = Path(__file__).resolve().parent
-    # Go up three levels from streamlit_app/app/ -> project root
-    ROOT_DIR = CURRENT_DIR # Adjust this if app_setup.py is not in ROOT_DIR/streamlit_app/app
+    # Go up two levels from src/ui/ -> project root
+    ROOT_DIR = CURRENT_DIR.parent.parent
     if not (ROOT_DIR / "config.yaml").exists():
-        # Try alternative common structure: ROOT_DIR/app.py
+        # Try alternative common structure: ROOT_DIR/app.py (go up one level)
         ROOT_DIR = CURRENT_DIR.parent
         if not (ROOT_DIR / "config.yaml").exists():
-             # Try another level up if needed
-             ROOT_DIR = CURRENT_DIR.parent.parent
-             if not (ROOT_DIR / "config.yaml").exists():
-                  ROOT_DIR = CURRENT_DIR.parent.parent.parent # Original assumption
-                  if not (ROOT_DIR / "config.yaml").exists():
-                       raise FileNotFoundError("Could not locate project root directory containing config.yaml")
+            raise FileNotFoundError("Could not locate project root directory containing config.yaml")
 
     sys.path.append(str(ROOT_DIR))
 
@@ -47,34 +40,72 @@ except Exception as e:
 # Import logger setup function AFTER potentially adding ROOT_DIR to path
 try:
     from src.utils.logger import setup_logger
-    logger = setup_logger(__name__)
+    logger = setup_logger(__name__) # Use standard logger setup
     logger.info(f"Project Root Directory set to: {ROOT_DIR}")
     logger.info("Configuration loaded successfully.")
 except ImportError as e:
      # Fallback basic logging if setup_logger fails
-     import logging
      logging.basicConfig(level=logging.INFO)
      logger = logging.getLogger(__name__)
      logger.error(f"Failed to import setup_logger: {e}. Using basic logging.")
      logger.info(f"Project Root Directory set to: {ROOT_DIR}")
 except Exception as e:
-     import logging
      logging.basicConfig(level=logging.INFO)
      logger = logging.getLogger(__name__)
      logger.error(f"Error setting up logger: {e}. Using basic logging.")
      logger.info(f"Project Root Directory set to: {ROOT_DIR}")
 
 
+# --- LLM Backend Selection and Initialization ---
+LLM_BACKEND = CONFIG.get("llm_backend", "aphrodite").lower() # Default to aphrodite
+IS_OPENROUTER_ACTIVE = (LLM_BACKEND == "openrouter")
+IS_GEMINI_ACTIVE = (LLM_BACKEND == "gemini") # Add Gemini flag
+logger.info(f"Selected LLM Backend: {LLM_BACKEND.upper()}")
+
 # --- Conditional Aphrodite Service Import ---
-try:
-    from src.utils.aphrodite_service import get_service, AphroditeService
-    APHRODITE_SERVICE_AVAILABLE = True
-    logger.info("Aphrodite service modules imported.")
-except ImportError as e:
-    APHRODITE_SERVICE_AVAILABLE = False
-    get_service = None # Placeholder
-    AphroditeService = None # Placeholder
-    logger.error(f"Failed to import AphroditeService: {e}. LLM service features will be disabled.")
+APHRODITE_SERVICE_AVAILABLE = False
+AphroditeService = None
+get_service = None
+if LLM_BACKEND == "aphrodite": # Check specific backend
+    try:
+        from src.utils.aphrodite_service import get_service, AphroditeService
+        APHRODITE_SERVICE_AVAILABLE = True
+        logger.info("Aphrodite service modules imported (backend is Aphrodite).")
+    except ImportError as e:
+        logger.error(f"Failed to import AphroditeService: {e}. Local LLM features will be disabled.")
+        LLM_BACKEND = "none" # Indicate failure
+else:
+    logger.info(f"Aphrodite service modules not imported (backend is {LLM_BACKEND.upper()}).")
+
+# --- Conditional OpenRouter Manager Import ---
+OPENROUTER_MANAGER_AVAILABLE = False
+OpenRouterManager = None
+if IS_OPENROUTER_ACTIVE:
+    try:
+        from src.utils.openrouter_manager import OpenRouterManager
+        OPENROUTER_MANAGER_AVAILABLE = True
+        logger.info("OpenRouterManager module imported (backend is OpenRouter).")
+    except ImportError as e:
+        logger.error(f"Failed to import OpenRouterManager: {e}. OpenRouter features will be disabled.")
+        IS_OPENROUTER_ACTIVE = False # Disable if import fails
+        LLM_BACKEND = "none" # Indicate no backend available
+else:
+    logger.info(f"OpenRouterManager module not imported (backend is {LLM_BACKEND.upper()}).")
+
+# --- Conditional Gemini Manager Import ---
+GEMINI_MANAGER_AVAILABLE = False
+GeminiManager = None
+if IS_GEMINI_ACTIVE:
+    try:
+        from src.utils.gemini_manager import GeminiManager
+        GEMINI_MANAGER_AVAILABLE = True
+        logger.info("GeminiManager module imported (backend is Gemini).")
+    except ImportError as e:
+        logger.error(f"Failed to import GeminiManager: {e}. Gemini features will be disabled.")
+        IS_GEMINI_ACTIVE = False # Disable if import fails
+        LLM_BACKEND = "none" # Indicate no backend available
+else:
+    logger.info(f"GeminiManager module not imported (backend is {LLM_BACKEND.upper()}).")
 
 
 # --- Core Module Imports (AFTER PATH SETUP) ---
@@ -88,25 +119,104 @@ except ImportError as e:
      st.stop()
 
 
+# --- Active LLM Manager Initialization ---
+def initialize_active_llm_manager():
+    """Initializes and stores the active LLM manager instance based on config."""
+    if "active_llm_manager" in st.session_state and st.session_state.active_llm_manager is not None:
+        logger.debug("Active LLM manager already initialized.")
+        return st.session_state.active_llm_manager
+
+    manager = None
+    if IS_OPENROUTER_ACTIVE:
+        if OPENROUTER_MANAGER_AVAILABLE:
+            logger.info("Initializing OpenRouterManager...")
+            try:
+                if not CONFIG.get("openrouter", {}).get("api_key"):
+                    logger.error("OpenRouter API key is missing in config.yaml.")
+                    st.error("OpenRouter API key is missing. Please add it in config.yaml.")
+                    manager = None
+                else:
+                    manager = OpenRouterManager(CONFIG["openrouter"])
+                    if not manager.client:
+                        logger.error("OpenRouterManager client initialization failed.")
+                        st.error("Failed to initialize OpenRouter client. Check API key and connection.")
+                        manager = None
+                    else:
+                        logger.info("OpenRouterManager initialized successfully.")
+            except Exception as e:
+                logger.error(f"Failed to initialize OpenRouterManager: {e}", exc_info=True)
+                st.error(f"Error initializing OpenRouter: {e}")
+                manager = None
+        else:
+            logger.error("OpenRouter backend selected, but manager module failed to import.")
+            st.error("OpenRouter backend selected, but manager failed to load.")
+            manager = None
+    elif IS_GEMINI_ACTIVE: # Add Gemini case
+        if GEMINI_MANAGER_AVAILABLE:
+            logger.info("Initializing GeminiManager...")
+            try:
+                if not CONFIG.get("gemini", {}).get("api_key"):
+                    logger.error("Gemini API key is missing in config.yaml.")
+                    st.error("Gemini API key is missing. Please add it in config.yaml.")
+                    manager = None
+                else:
+                    manager = GeminiManager(CONFIG["gemini"])
+                    if not manager.client: # Check if client initialization failed
+                        logger.error("GeminiManager client initialization failed.")
+                        st.error("Failed to initialize Gemini client. Check API key and connection.")
+                        manager = None
+                    else:
+                        logger.info("GeminiManager initialized successfully.")
+            except Exception as e:
+                logger.error(f"Failed to initialize GeminiManager: {e}", exc_info=True)
+                st.error(f"Error initializing Gemini: {e}")
+                manager = None
+        else:
+            logger.error("Gemini backend selected, but manager module failed to import.")
+            st.error("Gemini backend selected, but manager failed to load.")
+            manager = None
+    elif LLM_BACKEND == "aphrodite": # Check specific backend name
+        if APHRODITE_SERVICE_AVAILABLE:
+            logger.info("Initializing AphroditeService instance...")
+            manager = get_service() # Get the singleton Aphrodite service instance
+            logger.info("Using AphroditeService instance.")
+        else:
+            logger.error("Aphrodite backend selected, but service module failed to import.")
+            st.error("Aphrodite backend selected, but service failed to load.")
+            manager = None
+    else:
+        logger.error(f"No valid LLM backend configured or available: {LLM_BACKEND}. Check config.yaml.")
+        st.error(f"No LLM backend ({LLM_BACKEND}) is available. Please check configuration and installations.")
+        manager = None
+
+    st.session_state.active_llm_manager = manager
+    return manager
+
+def get_active_llm_manager():
+    """Retrieves the initialized active LLM manager instance."""
+    if "active_llm_manager" not in st.session_state:
+        logger.warning("Attempted to get LLM manager before initialization.")
+        return initialize_active_llm_manager() # Attempt initialization if not found
+    return st.session_state.active_llm_manager
+
+
 # --- Application State Initialization ---
 def initialize_app_state():
     """
     Initialize the Streamlit application state.
-    Checks for existing Aphrodite process belonging to the current session
-    and avoids terminating it during script reruns.
-    Sets default session state values.
+    Handles backend-specific state initialization.
     """
-    # Set page config early (moved from original initialize_app to main app.py)
-    # st.set_page_config(...)
+    global IS_OPENROUTER_ACTIVE, IS_GEMINI_ACTIVE # Ensure global flags are accessible
 
+    # Initialize the active LLM manager first
+    initialize_active_llm_manager()
+
+    # --- Aphrodite Status Sync (Only if Aphrodite is the backend) ---
     aphrodite_service_restored = False
     llm_model_restored = False
-    service_instance = None
-
-    # --- Aphrodite Status Sync ---
-    if APHRODITE_SERVICE_AVAILABLE:
+    if LLM_BACKEND == "aphrodite" and APHRODITE_SERVICE_AVAILABLE: # Check specific backend
         try:
-            service = get_service()
+            service = get_service() # Should return the singleton instance
             is_service_actually_running = service.is_running()
 
             if is_service_actually_running:
@@ -138,6 +248,7 @@ def initialize_app_state():
                     aphrodite_service_restored = True # Mark as restored based on sync
                     llm_model_restored = current_model_loaded # Mark as restored based on sync
             else:
+                # If service isn't running, clear related state
                 if (st.session_state.get("aphrodite_service_running") is True or
                     st.session_state.get("llm_model_loaded") is True or
                     st.session_state.get("aphrodite_process_info") is not None):
@@ -156,16 +267,14 @@ def initialize_app_state():
     st.session_state.setdefault("processing", False)
     st.session_state.setdefault("processing_status", "")
     st.session_state.setdefault("processing_progress", 0.0)
-    st.session_state.setdefault("documents", []) # Still needed? Maybe remove if not used directly
     st.session_state.setdefault("query_engine", None)
-    st.session_state.setdefault("chat_history", []) # Legacy? ConversationStore handles history now
-    st.session_state.setdefault("selected_llm_model_name", None)
     st.session_state.setdefault("collection_info", {"exists": False, "points_count": 0}) # Init collection info
+    st.session_state.setdefault("selected_llm_model_name", None) # Tracks model selected during upload/processing
 
-    # Set/Reset Aphrodite states based on checks above or default if service unavailable
-    st.session_state.setdefault("aphrodite_service_running", aphrodite_service_restored)
-    st.session_state.setdefault("llm_model_loaded", llm_model_restored)
-    st.session_state.setdefault("aphrodite_process_info", None if not aphrodite_service_restored else st.session_state.get("aphrodite_process_info"))
+    # Set/Reset Aphrodite states based on checks above or default if service unavailable/not active
+    st.session_state.setdefault("aphrodite_service_running", aphrodite_service_restored if LLM_BACKEND == "aphrodite" else False)
+    st.session_state.setdefault("llm_model_loaded", llm_model_restored if LLM_BACKEND == "aphrodite" else False) # API backends don't "load" models locally
+    st.session_state.setdefault("aphrodite_process_info", None if LLM_BACKEND != "aphrodite" or not aphrodite_service_restored else st.session_state.get("aphrodite_process_info"))
 
     # --- Initialize ConversationStore Singleton ---
     if "conversation_store" not in st.session_state:
@@ -191,9 +300,10 @@ def initialize_app_state():
 
     # Log final initial state
     logger.debug(
-        f"Initialized session state: service_running={st.session_state.aphrodite_service_running}, "
-        f"llm_model_loaded={st.session_state.llm_model_loaded}, "
-        f"collection_exists={st.session_state.collection_info.get('exists')}"
+        f"Initialized session state: Backend={LLM_BACKEND.upper()}, "
+        f"Aphrodite Running={st.session_state.aphrodite_service_running}, "
+        f"Aphrodite Model Loaded={st.session_state.llm_model_loaded}, "
+        f"Collection Exists={st.session_state.collection_info.get('exists')}"
     )
     log_memory_usage(logger, "Memory usage after state initialization")
 
@@ -204,25 +314,42 @@ def get_or_create_query_engine():
     Get existing query engine or create a new one.
     Sets the engine's model based on session state if available.
     Updates collection info in session state.
+    Injects the active LLM manager.
     """
     if "query_engine" not in st.session_state or st.session_state.query_engine is None:
         logger.info("Creating new QueryEngine instance.")
         try:
-            st.session_state.query_engine = QueryEngine()
-            # On creation, set its model based on session state (if processing ran) or config default
-            selected_model = st.session_state.get("selected_llm_model_name")
-            if selected_model:
-                st.session_state.query_engine.llm_model_name = selected_model
-                logger.info(f"QueryEngine created, using session LLM: {selected_model}")
+            # Pass config and root_dir to constructor
+            st.session_state.query_engine = QueryEngine(config=CONFIG, root_dir=ROOT_DIR)
+
+            # Set the LLM model name *used by the active backend* (for display/logging)
+            llm_name_to_set = None
+            if IS_OPENROUTER_ACTIVE:
+                llm_name_to_set = CONFIG.get("openrouter", {}).get("chat_model")
+                logger.info(f"QueryEngine created, using OpenRouter backend (Chat Model: {llm_name_to_set})")
+            elif IS_GEMINI_ACTIVE: # Add Gemini case
+                llm_name_to_set = CONFIG.get("gemini", {}).get("chat_model")
+                logger.info(f"QueryEngine created, using Gemini backend (Chat Model: {llm_name_to_set})")
+            else: # Aphrodite backend
+                selected_model = st.session_state.get("selected_llm_model_name")
+                if selected_model:
+                    llm_name_to_set = selected_model
+                    logger.info(f"QueryEngine created, using Aphrodite backend (Session LLM: {llm_name_to_set})")
+                else:
+                    llm_name_to_set = CONFIG["models"]["chat_model"] # Fallback to Aphrodite default
+                    logger.info(f"QueryEngine created, using Aphrodite backend (Default LLM: {llm_name_to_set})")
+
+            # Store the determined LLM name in the query engine instance
+            if llm_name_to_set:
+                st.session_state.query_engine.llm_model_name = llm_name_to_set
             else:
-                # Falls back to the default chat_model defined in QueryEngine.__init__
-                logger.info(f"QueryEngine created, using default LLM: {st.session_state.query_engine.llm_model_name}")
+                 logger.warning("Could not determine LLM model name for QueryEngine.")
+
         except Exception as e:
              logger.error(f"Failed to create QueryEngine: {e}", exc_info=True)
              st.error(f"Failed to initialize the query system: {e}")
              st.session_state.query_engine = None
              return None # Return None on failure
-
     # Update collection info if query engine exists
     if st.session_state.query_engine:
         try:
@@ -235,9 +362,8 @@ def get_or_create_query_engine():
         # Ensure collection info reflects no engine
         st.session_state.collection_info = {"exists": False, "points_count": 0, "error": "Query engine not available"}
 
-
-    # Sync Aphrodite status (redundant if called after initialize_app_state, but safe)
-    if APHRODITE_SERVICE_AVAILABLE:
+    # Sync Aphrodite status (only if Aphrodite is active)
+    if LLM_BACKEND == "aphrodite" and APHRODITE_SERVICE_AVAILABLE: # Check specific backend
         try:
             service = get_service()
             is_service_actually_running = service.is_running()
@@ -268,7 +394,6 @@ def get_or_create_query_engine():
         except Exception as e:
              logger.warning(f"Query Engine check: Error syncing Aphrodite status: {e}")
 
-
     return st.session_state.query_engine
 
 # --- Helper to get ConversationStore instance ---
@@ -278,3 +403,5 @@ def get_conversation_store() -> ConversationStore | None:
     if not store:
         logger.error("ConversationStore not found in session state.")
     return store
+
+# --- END OF MODIFIED app_setup.py ---

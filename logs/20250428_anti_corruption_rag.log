@@ -1,0 +1,209 @@
+2025-04-28 14:47:20,972 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-28 14:47:20,972 - app_setup - INFO - Configuration loaded successfully.
+2025-04-28 14:47:20,972 - app_setup - INFO - Selected LLM Backend: OPENROUTER
+2025-04-28 14:47:20,972 - app_setup - INFO - Aphrodite service modules not imported (backend is OPENROUTER).
+2025-04-28 14:47:22,757 - app_setup - INFO - OpenRouterManager module imported (backend is OpenRouter).
+2025-04-28 14:47:22,757 - app_setup - INFO - GeminiManager module not imported (backend is OPENROUTER).
+2025-04-28 14:47:36,774 - app_setup - INFO - OpenRouter backend active for chat.
+2025-04-28 14:47:42,215 - src.ui.app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-28 14:47:42,217 - src.ui.app_setup - INFO - Configuration loaded successfully.
+2025-04-28 14:47:42,219 - src.ui.app_setup - INFO - Selected LLM Backend: OPENROUTER
+2025-04-28 14:47:42,221 - src.ui.app_setup - INFO - Aphrodite service modules not imported (backend is OPENROUTER).
+2025-04-28 14:47:42,222 - src.ui.app_setup - INFO - OpenRouterManager module imported (backend is OpenRouter).
+2025-04-28 14:47:42,223 - src.ui.app_setup - INFO - GeminiManager module not imported (backend is OPENROUTER).
+2025-04-28 14:47:42,552 - app_setup - INFO - Imported OPENROUTER chat handler.
+2025-04-28 14:48:10,786 - src.ui.app_setup - INFO - BERTopic: OpenRouter backend active for topic labeling.
+2025-04-28 14:48:12,830 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:48:12,832 - app_setup - INFO - Initializing OpenRouterManager...
+2025-04-28 14:48:12,833 - src.utils.openrouter_manager - INFO - Initializing OpenRouterManager...
+2025-04-28 14:48:12,834 - src.utils.openrouter_manager - INFO - Default max_tokens set to: 5024
+2025-04-28 14:48:12,836 - src.utils.openrouter_manager - INFO - OpenRouter API Key found (masked: sk-or-v...0877)
+2025-04-28 14:48:13,084 - src.utils.openrouter_manager - INFO - OpenRouter manager initialized. Base URL: https://openrouter.ai/api/v1. OpenAI client created successfully.
+2025-04-28 14:48:13,085 - app_setup - INFO - OpenRouterManager initialized successfully.
+2025-04-28 14:48:13,089 - app_setup - INFO - Initializing ConversationStore...
+2025-04-28 14:48:13,091 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-28 14:48:13,092 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-28 14:48:13,171 - src.utils.conversation_store - INFO - Successfully loaded 15 conversations into memory.
+2025-04-28 14:48:13,175 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-28 14:48:13,176 - src.core.query_system.query_engine - INFO - Initializing QueryEngine...
+2025-04-28 14:48:13,179 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-28 14:48:13,181 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3 (Enabled: True)
+2025-04-28 14:48:13,181 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-28 14:48:13,182 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-28 14:48:13,184 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.35 GB, VMS: 37.65 GB
+2025-04-28 14:48:13,783 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:48:13,787 - app_setup - INFO - QueryEngine created, using OpenRouter backend (Chat Model: google/gemini-2.5-pro-exp-03-25:free)
+2025-04-28 14:48:13,866 - app_setup - INFO - Process memory - RSS: 1.37 GB, VMS: 37.67 GB
+2025-04-28 14:48:13,869 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:48:34,033 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:48:34,034 - app_setup - INFO - Initializing OpenRouterManager...
+2025-04-28 14:48:34,036 - src.utils.openrouter_manager - INFO - Initializing OpenRouterManager...
+2025-04-28 14:48:34,037 - src.utils.openrouter_manager - INFO - Default max_tokens set to: 5024
+2025-04-28 14:48:34,039 - src.utils.openrouter_manager - INFO - OpenRouter API Key found (masked: sk-or-v...0877)
+2025-04-28 14:48:34,065 - src.utils.openrouter_manager - INFO - OpenRouter manager initialized. Base URL: https://openrouter.ai/api/v1. OpenAI client created successfully.
+2025-04-28 14:48:34,066 - app_setup - INFO - OpenRouterManager initialized successfully.
+2025-04-28 14:48:34,068 - app_setup - INFO - Initializing ConversationStore...
+2025-04-28 14:48:34,069 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-28 14:48:34,071 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-28 14:48:34,074 - src.utils.conversation_store - INFO - Successfully loaded 15 conversations into memory.
+2025-04-28 14:48:34,076 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-28 14:48:34,077 - src.core.query_system.query_engine - INFO - Initializing QueryEngine...
+2025-04-28 14:48:34,079 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-28 14:48:34,080 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3 (Enabled: True)
+2025-04-28 14:48:34,082 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-28 14:48:34,083 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-28 14:48:34,084 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.37 GB, VMS: 37.67 GB
+2025-04-28 14:48:34,086 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:48:34,087 - app_setup - INFO - QueryEngine created, using OpenRouter backend (Chat Model: google/gemini-2.5-pro-exp-03-25:free)
+2025-04-28 14:48:34,217 - app_setup - INFO - Process memory - RSS: 1.37 GB, VMS: 37.67 GB
+2025-04-28 14:48:34,219 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:48:40,483 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:48:40,542 - app_setup - INFO - Process memory - RSS: 1.37 GB, VMS: 37.67 GB
+2025-04-28 14:48:40,543 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:48:40,833 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:48:40,905 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:48:41,197 - app_setup - INFO - Building NetworkX multi-graphs for analysis...
+2025-04-28 14:48:41,201 - app_setup - INFO - Created entity lookup with 800 valid entities.
+2025-04-28 14:48:41,224 - app_setup - INFO - Analysis graphs built: Directed (800N, 629E), Undirected (800N, 629E). Skipped 0 edges.
+2025-04-28 14:48:41,259 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:50:54,094 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:50:54,150 - app_setup - INFO - Process memory - RSS: 1.39 GB, VMS: 38.07 GB
+2025-04-28 14:50:54,151 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:50:54,328 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:50:54,405 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:50:54,658 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:50:55,556 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:50:55,615 - app_setup - INFO - Process memory - RSS: 1.39 GB, VMS: 38.19 GB
+2025-04-28 14:50:55,617 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:50:55,835 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:50:55,926 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:50:56,226 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:51:01,755 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:51:01,814 - app_setup - INFO - Process memory - RSS: 1.39 GB, VMS: 38.19 GB
+2025-04-28 14:51:01,816 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:51:02,034 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:51:02,144 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:51:02,421 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:51:06,324 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:51:06,378 - app_setup - INFO - Process memory - RSS: 1.39 GB, VMS: 38.19 GB
+2025-04-28 14:51:06,379 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:51:06,547 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:51:06,622 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:51:06,875 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:51:07,467 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:51:07,600 - app_setup - INFO - Process memory - RSS: 1.40 GB, VMS: 38.19 GB
+2025-04-28 14:51:07,602 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:51:07,787 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:51:07,853 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:51:08,208 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:52:51,786 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:52:51,857 - app_setup - INFO - Process memory - RSS: 1.40 GB, VMS: 38.26 GB
+2025-04-28 14:52:51,859 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:52:52,071 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:52:52,152 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:52:52,408 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:53:38,119 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:53:38,175 - app_setup - INFO - Process memory - RSS: 1.40 GB, VMS: 38.26 GB
+2025-04-28 14:53:38,176 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:53:38,346 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:53:38,419 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:53:38,693 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:53:39,293 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:53:39,397 - app_setup - INFO - Process memory - RSS: 1.40 GB, VMS: 38.26 GB
+2025-04-28 14:53:39,398 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:53:39,608 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:53:39,686 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:53:39,971 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.
+2025-04-28 14:56:10,657 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:56:10,739 - app_setup - INFO - Process memory - RSS: 1.48 GB, VMS: 38.30 GB
+2025-04-28 14:56:10,741 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:56:13,731 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:56:13,786 - app_setup - INFO - Process memory - RSS: 1.47 GB, VMS: 38.29 GB
+2025-04-28 14:56:13,788 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:56:13,863 - src.utils.conversation_store - INFO - Created and saved new conversation 36c5c15c-9b55-4dd0-b6d2-a3c49f63cf4e with title 'New Conversation'
+2025-04-28 14:56:14,350 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:56:14,423 - app_setup - INFO - Process memory - RSS: 1.44 GB, VMS: 38.28 GB
+2025-04-28 14:56:14,426 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:56:25,342 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:56:25,395 - app_setup - INFO - Process memory - RSS: 1.43 GB, VMS: 38.28 GB
+2025-04-28 14:56:25,396 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-28 14:56:25,479 - app_setup - INFO - Handling chat message: 'Tell me about links to cyprus...'
+2025-04-28 14:56:25,537 - app_setup - INFO - Retrieval decision for this turn: ENABLED.
+2025-04-28 14:56:25,538 - app_setup - INFO - Performing RAG retrieval...
+2025-04-28 14:56:25,592 - src.core.query_system.query_engine - INFO - Loading embedding/reranking models for retrieval...
+2025-04-28 14:56:25,594 - src.core.query_system.query_engine - INFO - ===== LOADING EMBEDDING/RERANKING MODELS =====
+2025-04-28 14:56:25,595 - src.core.query_system.query_engine - INFO - Loading embedding model: BAAI/bge-m3 on cuda
+2025-04-28 14:56:28,262 - src.core.query_system.query_engine - INFO - Loaded BGE-M3 model using FlagEmbedding.
+2025-04-28 14:56:28,264 - src.core.query_system.query_engine - INFO - Loading reranking model: BAAI/bge-reranker-v2-m3 on cuda
+2025-04-28 14:56:36,816 - src.core.query_system.query_engine - INFO - Loaded Reranker model using BatchedInference.
+2025-04-28 14:56:36,817 - src.core.query_system.query_engine - INFO - Embedding/Reranking model loading completed in 11.22 seconds
+2025-04-28 14:56:36,818 - src.core.query_system.query_engine - INFO - Process memory - RSS: 2.36 GB, VMS: 42.76 GB
+2025-04-28 14:56:36,820 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 1.06 GB, Reserved: 2.88 GB, Total: 8.00 GB
+2025-04-28 14:56:36,821 - src.core.query_system.query_engine - INFO - Performing BGE-M3 retrieval (Dense + Sparse)...
+2025-04-28 14:56:36,882 - src.core.query_system.query_engine - INFO - Generating BGE-M3 query embeddings (dense, sparse)...
+2025-04-28 14:56:43,636 - src.core.query_system.query_engine - INFO - Performing Qdrant BGE-M3 dense search (limit: 100)...
+2025-04-28 14:56:43,664 - src.core.query_system.query_engine - INFO - Dense search returned 100 results.
+2025-04-28 14:56:43,665 - src.core.query_system.query_engine - INFO - Performing Qdrant BGE-M3 sparse search (limit: 100)...
+2025-04-28 14:56:43,680 - src.core.query_system.query_engine - INFO - Sparse search returned 100 results.
+2025-04-28 14:56:43,682 - src.core.query_system.query_engine - INFO - Fusing BGE-M3 dense and sparse results using RRF...
+2025-04-28 14:56:43,684 - src.core.query_system.query_engine - INFO - RRF Fusion returned 50 results
+2025-04-28 14:56:43,685 - src.core.query_system.query_engine - INFO - BGE-M3 RRF Fusion returned 50 results
+2025-04-28 14:56:43,686 - src.core.query_system.query_engine - INFO - BGE-M3 RRF fusion returned 50 candidates.
+2025-04-28 14:56:43,687 - src.core.query_system.query_engine - INFO - Applying cross-encoder reranking...
+2025-04-28 14:56:43,688 - src.core.query_system.query_engine - INFO - Reranking 50 results using: BAAI/bge-reranker-v2-m3
+2025-04-28 14:56:44,118 - src.core.query_system.query_engine - INFO - Cross-encoder reranking completed. Returning 3 results.
+2025-04-28 14:56:44,119 - src.core.query_system.query_engine - INFO - Retrieval completed in 18.53s. Returning 3 final results.
+2025-04-28 14:56:44,121 - app_setup - INFO - Retrieved 3 relevant source(s).
+2025-04-28 14:56:44,721 - app_setup - INFO - Initiating LLM response generation...
+2025-04-28 14:56:44,723 - app_setup - INFO - Providing 3 context sources to LLM.
+2025-04-28 14:56:44,725 - app_setup - INFO - Using OpenRouter model: google/gemini-2.5-pro-exp-03-25:free. Constructing messages list.
+2025-04-28 14:56:44,727 - app_setup - INFO - Using OpenRouterManager - initiating streaming generation.
+2025-04-28 14:56:44,729 - src.utils.openrouter_manager - INFO - Generating chat with OpenRouter model: google/gemini-2.5-pro-exp-03-25:free (Streaming: True)
+2025-04-28 14:56:45,616 - src.utils.openrouter_manager - ERROR - Exception during OpenRouter chat generation API call: NotFoundError
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/utils/openrouter_manager.py", line 185, in generate_chat
+    stream = self.client.chat.completions.create(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 279, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 914, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 919, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 1023, in _request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemini-2.5-pro-exp-03-25:free.', 'code': 404}, 'user_id': 'user_2vu6Zo2uOLWAGi70msaIqw5yYY3'}
+2025-04-28 14:56:45,628 - src.utils.openrouter_manager - ERROR - OpenRouter chat generation error (NotFoundError): Error code: 404 - {'error': {'message': 'No endpoints found for google/gemini-2.5-pro-exp-03-25:free.', 'code': 404}, 'user_id': 'user_2vu6Zo2uOLWAGi70msaIqw5yYY3'}
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/utils/openrouter_manager.py", line 185, in generate_chat
+    stream = self.client.chat.completions.create(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_utils/_utils.py", line 279, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 914, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 919, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/home/t/lm_rag/venv/lib/python3.12/site-packages/openai/_base_client.py", line 1023, in _request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemini-2.5-pro-exp-03-25:free.', 'code': 404}, 'user_id': 'user_2vu6Zo2uOLWAGi70msaIqw5yYY3'}
+2025-04-28 14:56:45,632 - app_setup - INFO - LLM generation process finished. Final Answer length: 0. Error: OpenRouter API error: Error code: 404 - {'error': {'message': 'No endpoints found for google/gemini-2.5-pro-exp-03-25:free.', 'code': 404}, 'user_id': 'user_2vu6Zo2uOLWAGi70msaIqw5yYY3'}
+2025-04-28 14:56:45,637 - app_setup - INFO - Finished handling chat message cycle.
+2025-04-28 14:56:54,127 - app_setup - INFO - Skipping multiprocessing start method check (Aphrodite service not available).
+2025-04-28 14:56:54,192 - app_setup - INFO - Process memory - RSS: 3.00 GB, VMS: 41.98 GB
+2025-04-28 14:56:54,193 - app_setup - INFO - GPU memory - Allocated: 2.13 GB, Reserved: 2.88 GB, Total: 8.00 GB
+2025-04-28 14:56:54,419 - src.core.query_system.query_engine - INFO - Retrieved 672 chunks for exploration.
+2025-04-28 14:56:54,502 - src.core.query_system.query_engine - INFO - Retrieved 100 chunks for exploration.
+2025-04-28 14:56:54,796 - app_setup - WARNING - Eigenvector centrality failed: `eigenvector_centrality_numpy` does not give consistent results for disconnected graphs. Assigning 0.

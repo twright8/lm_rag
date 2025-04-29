@@ -1,3 +1,26 @@
+# --- START OF UPDATED config.yaml ---
+
+# NEW: Select the primary LLM backend ('aphrodite' or 'openrouter')
+llm_backend: openrouter
+
+# NEW: OpenRouter Configuration (only used if llm_backend is 'openrouter')
+openrouter:
+  api_key: "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" # <-- USER MUST FILL THIS IN FOR OPENROUTER
+  base_url: "https://openrouter.ai/api/v1"
+  site_url: "" # Optional: e.g., https://your-app.com
+  site_title: "Anti-Corruption Tool" # Optional
+  # Specify models for different tasks
+  chat_model: "google/gemini-2.5-pro-exp-03-25:free"
+  extraction_model: "deepseek/deepseek-chat-v3-0324:free"
+  info_extraction_model: "google/gemini-2.5-flash-preview"
+  classification_model: "google/gemini-2.5-flash-preview"
+  topic_labeling_model: "google/gemini-2.5-flash-preview"
+  # Default generation parameters
+  temperature: 0.4
+  max_tokens: 5024 # Default, can be overridden per task
+
+# --- Existing Configuration Below (Unchanged unless specified) ---
+
 document_processing:
   chunk_size: 512
   chunk_overlap: 100
@@ -8,18 +31,17 @@ document_processing:
 models:
   chunking_model: intfloat/multilingual-e5-small
   embedding_model: BAAI/bge-m3
-  # embedding_model: intfloat/multilingual-e5-large-instruct
+  # embedding_model: intfloat/multilingual-e5-large-instruct # Example alternative
   reranking_model: BAAI/bge-reranker-v2-m3
   extraction_models:
     text_small: Qwen/Qwen2.5-3B-Instruct
     text_standard: Qwen/Qwen2.5-7B-Instruct
     text_large: microsoft/phi-4
-    visual_language: Qwen/Qwen-VL-Chat
-  chat_model: Qwen/Qwen2.5-3B-Instruct
-  chat_tokenizer_name: "mistralai/Mistral-7B-Instruct-v0.1" # Example: Use Mistral tokenizer
-
-aphrodite:
-  max_model_len: 4096
+  visual_language: Qwen/Qwen-VL-Chat
+  chat_model: Qwen/Qwen2.5-3B-Instruct # Used by Aphrodite backend
+  # chat_tokenizer_name: "mistralai/Mistral-7B-Instruct-v0.1" # Example: Use Mistral tokenizer (Keep if needed by Aphrodite path)
+aphrodite: # Settings for the 'aphrodite' backend
+  max_model_len: 14096
   quantization: fp5
   enforce_eager: true
   use_flash_attention: true
@@ -31,7 +53,7 @@ aphrodite:
   enable_chunked_prefill: true
   enable_prefix_caching: false
   extraction_temperature: 0.1
-  extraction_max_new_tokens: 3048
+  extraction_max_new_tokens: 13048
   chat_temperature: 0.7
   chat_max_new_tokens: 1024
   top_p: 0.9
@@ -39,14 +61,24 @@ aphrodite:
   classification_max_tokens: 512
   info_extraction_temperature: 0.2
   info_extraction_max_tokens: 2048
-  default_chat_model: "mistralai/Mistral-7B-Instruct-v0.1" # Example
-
+  # default_chat_model: "mistralai/Mistral-7B-Instruct-v0.1" # Example (Keep if needed by Aphrodite path)
+gemini:
+  api_key: "AIzaSyA5F9NStSyzorJPLHukWSPxVFUaYkX5kas" # <-- PASTE YOUR GEMINI API KEY HERE
+  # Model names - Use the specific model requested
+  chat_model: "gemini-2.5-pro-preview-03-25"
+  extraction_model: "gemini-2.0-flash"
+  info_extraction_model: "gemini-2.5-pro-exp-03-25"
+  classification_model: "gemini-2.5-pro-exp-03-25"
+  topic_labeling_model: "gemini-2.5-pro-exp-03-25" # Flash is suitable for labeling
+  # Optional: Default generation parameters for Gemini
+  temperature: 0.3
+  max_tokens: 8192 # Default max output tokens
 qdrant:
   host: localhost
   port: 6333
-  collection_name: anticorruption_rag_e5_instruct
-  vector_size: 1024
-  upsert_batch_size: 128  # How many points to send to Qdrant in one client request (adjust based on Qdrant performance/network)
+  collection_name: anticorruption_rag_e5_instruct # Consider making this dynamic based on embedding model
+  vector_size: 1024 # Should match embedding model output size
+  upsert_batch_size: 128
   sparse_on_disk: false
   timeout: 90000
 retrieval:
@@ -58,17 +90,17 @@ retrieval:
   bm25_weight: 0.3
   use_reranking: true
   minimum_score_threshold: 0.01
-  bge_m3_prefetch_limit: 100
-
+  bge_m3_prefetch_limit: 100 # Keep if BGE-M3 is used
 extraction:
   deduplication_threshold: 85
   data_path: data/extracted
   schema_version: '1.0'
   information_extraction:
-    batch_size: 1024
+    batch_size: 1024 # Aphrodite batch size, OpenRouter might be sequential
     max_chunks: 10000
     max_results: 10000
-    default_model: text_small
+    default_model: text_small # Used by Aphrodite path
+    max_chunks_for_listing: 1000 # Used in UI
 storage:
   bm25_index_path: data/bm25/index.pkl
   extracted_data_path: data/extracted
@@ -82,9 +114,9 @@ ui:
   accent_color: '#A3BE8C'
   show_advanced_settings: true
   default_page: Upload & Process
-  topic_filter:
-    default_results: 1000
-    max_results: 10000
+topic_filter:
+  default_results: 1000
+  max_results: 10000
 clustering:
   umap:
     n_neighbors: 8
@@ -102,11 +134,11 @@ clustering:
       min_dist: 0.7
       spread: 1.5
       metric: cosine
-  vectorizer:
-    stop_words: english
-    ngram_range:
-    - 1
-    - 2
+    vectorizer:
+      stop_words: english
+      ngram_range:
+        - 1
+        - 2
   topics:
     nr_topics: auto
     seed_topic_list: []
@@ -138,14 +170,14 @@ clustering:
     color_label_arrows: true
     title: Static Document Cluster Map
     figsize:
-    - 12
-    - 12
+      - 12
+      - 12
 classification:
   max_chunks_for_listing: 10000
-  batch_size: 1024
-deepseek:
-  use_api: true
-  api_key: sk-3987fd2bb67c452b9ed6d6344063cb76
+  batch_size: 1024 # Aphrodite batch size
+deepseek: # Keep for now, but OpenRouter is the primary API alternative
+  use_api: false # Default to false if OpenRouter is primary
+  api_key: "" # sk-3987fd2bb67c452b9ed6d6344063cb76 # Example, clear if not used
   api_url: https://api.deepseek.com/v1
   use_reasoner: true
   chat_model: deepseek-chat
@@ -156,11 +188,63 @@ conversation:
   max_history_turns: 5
   persist_retrieved_context: true
   auto_save_on_turn: true
-indexing: # Add this section if it doesn't exist
-  processing_batch_size: 128 # How many chunks to embed/prep in memory at once (adjust based on RAM)
-  fallback_to_bm25_only: true # Existing setting
-  auto_recreate_collection: false # Existing safety setting
-llm_backends:
-  entity_extraction: gemini       # Options: aphrodite, gemini
-  information_extraction: gemini  # Options: aphrodite, gemini
-  rag_query_generation: gemini    # Options: aphrodite, deepseek, gemini
+indexing:
+  processing_batch_size: 128
+  fallback_to_bm25_only: true
+  auto_recreate_collection: false
+# llm_backends: # Removed, using top-level llm_backend now
+#   entity_extraction: gemini
+#   information_extraction: gemini
+#   rag_query_generation: gemini
+
+deduplication: # Keep existing deduplication config
+  normalization_rules:
+    PERSON:
+      lowercase: true
+      remove_titles: ["mr", "mrs", "ms", "miss", "dr", "prof", "sir", "madam", "lord", "lady", "rev", "hon", "president", "governor", "mayor"]
+      remove_suffixes: ["jr", "sr", "i", "ii", "iii", "iv", "v", "md", "phd", "esq", "dds"]
+      remove_punctuation: "[.,'\"`’]"
+      normalize_hyphens: true
+      strip_whitespace: true
+    ORGANIZATION:
+      lowercase: true
+      remove_legal_suffixes: ["ltd", "inc", "corp", "llc", "plc", "gmbh", "ag", "bv", "spa", "sarl", "sas", "pte", "co", "corp", "limited", "incorporated", "corporation", "company", "associates", "foundation", "trust", "partners", "group", "holding", "holdings", "bank", "consulting", "services", "solutions", "international", "global", "ventures", "capital", "industries", "systems", "technologies", "enterprises", "trading"]
+      remove_punctuation: "[.,'&()\"`’]"
+      strip_whitespace: true
+    LOCATION:
+      lowercase: true
+      remove_punctuation: "[.,'\"`’]"
+      strip_whitespace: true
+    POSITION:
+      lowercase: true
+      remove_punctuation: "[.,'\"`’]"
+      strip_whitespace: true
+    DEFAULT:
+      lowercase: true
+      remove_punctuation: "[.,'\"`’]"
+      strip_whitespace: true
+  similarity_thresholds:
+    PERSON:
+      token_set_ratio: 88
+      jaro_winkler: 0.85
+      initial_match_bonus: true
+      blocking_window: 7
+    ORGANIZATION:
+      token_set_ratio: 92
+      jaro_winkler: 0.88
+      blocking_window: 5
+    LOCATION:
+      token_set_ratio: 95
+      jaro_winkler: 0.92
+      blocking_window: 3
+    POSITION:
+      token_set_ratio: 90
+      jaro_winkler: 0.88
+      blocking_window: 5
+    DEFAULT:
+      token_set_ratio: 90
+      jaro_winkler: 0.85
+      blocking_window: 5
+
+# --- END OF UPDATED config.yaml ---
+#

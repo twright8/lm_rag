@@ -1,24 +1,47 @@
-# app_chat.py
 import streamlit as st
 import time
 import gc
 import torch
 import traceback
-from typing import List, Dict, Any, Union, Optional
+import json # For parsing potential JSON strings
+from typing import List, Dict, Any, Union, Optional, Callable
 
 # Import necessary functions/variables from other modules
-from app_setup import ROOT_DIR, CONFIG, logger, APHRODITE_SERVICE_AVAILABLE, get_service, get_or_create_query_engine, get_conversation_store
+from app_setup import (
+    ROOT_DIR, CONFIG, logger, APHRODITE_SERVICE_AVAILABLE,
+    get_or_create_query_engine, get_conversation_store,
+    get_active_llm_manager, IS_OPENROUTER_ACTIVE, IS_GEMINI_ACTIVE # Import new flags
+)
 from src.utils.resource_monitor import log_memory_usage
 
-# Import LLM-related modules conditionally
-if APHRODITE_SERVICE_AVAILABLE:
-    from transformers import AutoTokenizer
-    from src.utils.aphrodite_service import AphroditeService # For type hinting if needed
-else:
-    AutoTokenizer = None # Placeholder
+# Import LLM-related modules conditionally based on backend
+if IS_OPENROUTER_ACTIVE:
+    from src.utils.openrouter_manager import OpenRouterManager
+    AutoTokenizer = None # Not needed for OpenRouter prompt formatting
     AphroditeService = None # Placeholder
+    GeminiManager = None # Placeholder
+    logger.info("OpenRouter backend active for chat.")
+elif IS_GEMINI_ACTIVE: # Add Gemini case
+    from src.utils.gemini_manager import GeminiManager
+    AutoTokenizer = None # Not needed for Gemini prompt formatting
+    AphroditeService = None # Placeholder
+    OpenRouterManager = None # Placeholder
+    logger.info("Gemini backend active for chat.")
+elif APHRODITE_SERVICE_AVAILABLE:
+    from src.utils.aphrodite_service import AphroditeService, get_service
+    from transformers import AutoTokenizer # Needed for Aphrodite templating
+    OpenRouterManager = None # Placeholder
+    GeminiManager = None # Placeholder
+    logger.info("Aphrodite backend active for chat.")
+else:
+    # No backend available
+    AutoTokenizer = None
+    AphroditeService = None
+    OpenRouterManager = None
+    GeminiManager = None
+    logger.warning("No LLM backend (Aphrodite, OpenRouter, or Gemini) available for chat.")
 
-# Import DeepSeek manager if configured
+# Import DeepSeek manager if configured (kept for potential future use, but OpenRouter is primary API)
 if CONFIG.get("deepseek", {}).get("use_api", False):
     try:
         from src.utils.deepseek_manager import DeepSeekManager
@@ -29,46 +52,36 @@ else:
     DeepSeekManager = None # Placeholder
 
 
-# --- LLM Service Management (Aphrodite) ---
+# --- LLM Service Management (Aphrodite - Keep for sidebar control) ---
+# These functions are now primarily called from app_ui_core.py (sidebar)
 
 def start_aphrodite_service():
-    """
-    Start the Aphrodite service process.
-    """
+    """ Start the Aphrodite service process. """
+    if IS_OPENROUTER_ACTIVE or IS_GEMINI_ACTIVE: # Check both API backends
+         st.error("Cannot start Aphrodite service when an API backend (OpenRouter/Gemini) is active.")
+         logger.error("Attempted to start Aphrodite service while an API backend is active.")
+         return False
     if not APHRODITE_SERVICE_AVAILABLE:
          st.error("Aphrodite service module not available.")
          logger.error("Attempted to start Aphrodite service, but module is not available.")
          return False
     try:
-        service = get_service()
+        service = get_service() # Get the singleton instance
         if service.is_running():
              logger.info("Aphrodite service is already running.")
-             # Ensure state reflects reality
              st.session_state.aphrodite_service_running = True
-             # Optionally sync model state here too if needed
              return True
 
         logger.info("Attempting to start Aphrodite service...")
-        # Start the service without loading a model yet
         if service.start():
             logger.info("Aphrodite service started successfully via start()")
             st.session_state.aphrodite_service_running = True
-
-            # Give it a moment to initialize fully before getting PID
-            time.sleep(2)
+            time.sleep(2) # Allow time for PID registration
             pid = service.process.pid if service.process else None
-
-            # Save process info (PID only needed now)
             process_info = {"pid": pid}
-            if process_info["pid"]:
-                st.session_state.aphrodite_process_info = process_info
-                logger.info(f"Saved Aphrodite process info: PID={process_info.get('pid')}")
-            else:
-                 st.session_state.aphrodite_process_info = None
-                 logger.warning("Aphrodite service started but failed to get PID.")
-
-            # Don't set llm_model_loaded here, it happens on demand during processing/querying
-            st.session_state.llm_model_loaded = False
+            if pid: st.session_state.aphrodite_process_info = process_info
+            else: logger.warning("Aphrodite service started but failed to get PID.")
+            st.session_state.llm_model_loaded = False # Model loads on demand
             log_memory_usage(logger, "Memory usage after starting LLM service")
             return True
         else:
@@ -85,9 +98,11 @@ def start_aphrodite_service():
         return False
 
 def terminate_aphrodite_service():
-    """
-    Terminate the Aphrodite service process.
-    """
+    """ Terminate the Aphrodite service process. """
+    if IS_OPENROUTER_ACTIVE or IS_GEMINI_ACTIVE: # Check both API backends
+         st.error("Cannot terminate Aphrodite service when an API backend (OpenRouter/Gemini) is active.")
+         logger.error("Attempted to terminate Aphrodite service while an API backend is active.")
+         return False
     if not APHRODITE_SERVICE_AVAILABLE:
          st.error("Aphrodite service module not available.")
          logger.error("Attempted to terminate Aphrodite service, but module is not available.")
@@ -97,36 +112,25 @@ def terminate_aphrodite_service():
         service = get_service()
         if not service.is_running():
              logger.info("Aphrodite service is not running, termination request ignored.")
-             # Ensure state is correct
              st.session_state.aphrodite_service_running = False
              st.session_state.llm_model_loaded = False
              st.session_state.aphrodite_process_info = None
-             return True # Considered successful as it's already stopped
+             return True
 
         success = service.shutdown()
+        if success: logger.info("Aphrodite service successfully terminated via shutdown()")
+        else: logger.warning("Aphrodite service shutdown command did not report full success.")
 
-        if success:
-            logger.info("Aphrodite service successfully terminated via shutdown()")
-        else:
-            # This might happen if the process ended unexpectedly or shutdown timed out
-            logger.warning("Aphrodite service shutdown command did not report full success. Process might already be gone or unresponsive.")
-
-        # Update states regardless of success to avoid stuck state
+        # Update states regardless
         st.session_state.llm_model_loaded = False
         st.session_state.aphrodite_service_running = False
         st.session_state.aphrodite_process_info = None
-
-        # Force garbage collection and clear CUDA cache
         gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            logger.info("Cleared CUDA cache after LLM service termination.")
+        if torch.cuda.is_available(): torch.cuda.empty_cache(); logger.info("Cleared CUDA cache.")
         log_memory_usage(logger, "Memory usage after terminating LLM service")
-
-        return success # Return the reported success status
+        return success
     except Exception as e:
         logger.error(f"Error terminating Aphrodite service: {e}", exc_info=True)
-        # Update states even on error to prevent inconsistent UI
         st.session_state.llm_model_loaded = False
         st.session_state.aphrodite_service_running = False
         st.session_state.aphrodite_process_info = None
@@ -143,11 +147,8 @@ def save_current_conversation():
 
     if conv_id and conv_data and store:
         logger.debug(f"Attempting to save conversation {conv_id}...")
-        # Ensure messages are up-to-date before saving (though they should be)
-        # conv_data["messages"] = st.session_state.ui_chat_display # Or use active_conversation_data directly
         success = store.save_conversation(conv_id, conv_data)
-        if success:
-            logger.debug(f"Conversation {conv_id} saved successfully.")
+        if success: logger.debug(f"Conversation {conv_id} saved successfully.")
         else:
             logger.error(f"Failed to save conversation {conv_id}.")
             st.toast(f"Error: Failed to save conversation '{conv_data.get('title', conv_id)}'.", icon="❌")
@@ -158,8 +159,8 @@ def save_current_conversation():
 # --- LLM Response Generation ---
 
 def generate_llm_response(
-    llm_manager: Union[AphroditeService, DeepSeekManager, None], # Accept potential None
-    query_engine, # Pass QueryEngine instance if needed (e.g., for context verification - currently unused here)
+    active_llm_manager: Union[AphroditeService, OpenRouterManager, GeminiManager, None], # Add Gemini
+    query_engine, # Pass QueryEngine instance (currently unused here)
     conversation_history: List[Dict[str, Any]],
     current_prompt: str,
     context_sources: List[Dict[str, Any]],
@@ -167,14 +168,16 @@ def generate_llm_response(
     thinking_placeholder # Streamlit placeholder for the thinking process
     ) -> Dict[str, Any]:
     """
-    Generates response using the LLM (Aphrodite/DeepSeek).
-    Handles formatting input appropriately: uses chat templates for Aphrodite via local tokenizer,
-    constructs a raw prompt string for DeepSeek API.
-    Manages streaming updates to UI placeholders for DeepSeek.
+    Generates response using the active LLM backend (Aphrodite/OpenRouter/Gemini).
+    Handles formatting input appropriately:
+    - Aphrodite: Uses chat templates via local tokenizer.
+    - OpenRouter: Constructs OpenAI messages list.
+    - Gemini: Constructs single prompt string (or list for streaming).
+    Manages streaming updates to UI placeholders for OpenRouter/Gemini.
 
     Args:
-        llm_manager: Instance of AphroditeService or DeepSeekManager, or None if unavailable.
-        query_engine: Instance of QueryEngine (passed but currently unused in this function).
+        active_llm_manager: Instance of AphroditeService, OpenRouterManager, or GeminiManager, or None.
+        query_engine: Instance of QueryEngine (passed but currently unused).
         conversation_history: List of previous message dicts [{'role': ..., 'content': ...}].
         current_prompt: The user's latest prompt string.
         context_sources: List of source dicts from RAG (can be empty).
@@ -183,76 +186,97 @@ def generate_llm_response(
 
     Returns:
         Dictionary containing the *final* state after generation:
-        - 'final_answer': The complete generated response string after streaming.
-        - 'final_thinking': The complete reasoning string (if any).
+        - 'final_answer': The complete generated response string.
+        - 'final_thinking': The complete reasoning string (None for OpenRouter/Aphrodite/Gemini).
         - 'error': Error message string if generation failed.
     """
     logger.info("Initiating LLM response generation...")
-    final_data = {"final_answer": "", "final_thinking": "", "error": None}
+    final_data = {"final_answer": "", "final_thinking": None, "error": None} # Thinking not supported by default
     tokenizer = None
     model_name = None
-    full_prompt_for_llm = None
-    messages_for_template = None
+    full_prompt_for_llm = None # Used by Aphrodite/Gemini (non-streaming)
+    messages_for_llm = None # Used by OpenRouter
+    contents_for_gemini_stream = None # Used by Gemini (streaming)
 
-    if llm_manager is None:
-        final_data['error'] = "Error: No LLM manager available (Aphrodite or DeepSeek)."
+    if active_llm_manager is None:
+        final_data['error'] = "Error: No active LLM manager available."
         message_placeholder.error(final_data['error'])
-        logger.error("generate_llm_response called with no llm_manager.")
+        logger.error("generate_llm_response called with no active_llm_manager.")
         return final_data
 
-    # --- Determine LLM Type and Prepare Input ---
-    # Check if it's DeepSeek by checking the type/class name or specific attributes
-    is_deepseek = DeepSeekManager is not None and isinstance(llm_manager, DeepSeekManager)
+    # --- Determine LLM Backend Type ---
+    is_openrouter = isinstance(active_llm_manager, OpenRouterManager) if OpenRouterManager else False
+    is_aphrodite = isinstance(active_llm_manager, AphroditeService) if AphroditeService else False
+    is_gemini = isinstance(active_llm_manager, GeminiManager) if GeminiManager else False # Add Gemini check
 
     try:
         # --- Prepare Context and History (Common Logic) ---
         max_turns = CONFIG.get("conversation", {}).get("max_history_turns", 5)
-        # Ensure history is a list of dicts with 'role' and 'content'
         valid_history = [msg for msg in conversation_history if isinstance(msg, dict) and "role" in msg and "content" in msg]
         history_subset = valid_history[-(max_turns * 2):] # Get last N turns (user + assistant)
 
         context_str = ""
         if context_sources:
             logger.info(f"Providing {len(context_sources)} context sources to LLM.")
-            # Ensure context sources are dicts and have text
             valid_sources = [src for src in context_sources if isinstance(src, dict)]
+            # Use original_text for context if available
             context_texts = [src.get('original_text', src.get('text', '')) for src in valid_sources]
             context_str = "## Context Documents:\n" + "\n\n".join([f"[{i + 1}] {text}" for i, text in enumerate(context_texts)])
         else:
             logger.info("No context provided to LLM for this turn.")
             context_str = "## Context Documents:\nNo context documents were retrieved or provided for this query."
 
-        # --- Input Formatting: DeepSeek vs Aphrodite ---
-        if is_deepseek:
-            # --- DeepSeek Path: Construct Raw Prompt String ---
-            use_reasoner = CONFIG.get("deepseek", {}).get("use_reasoner", False)
-            model_name = CONFIG["deepseek"]["reasoning_model"] if use_reasoner else CONFIG["deepseek"]["chat_model"]
-            logger.info(f"Using DeepSeek model: {model_name}. Constructing raw prompt.")
+        # Define system prompt (consistent across backends)
+        system_content = """You are an expert assistant specializing in anti-corruption investigations and analysis. Your responses should be detailed, factual, and based ONLY on the provided context if available. If the answer is not found in the context or conversation history, state that clearly. Do not make assumptions or use external knowledge. Cite sources using [index] notation where applicable based on the provided context."""
 
-            system_block = f"""System: You are an expert assistant specializing in anti-corruption investigations and analysis. Your responses should be detailed, factual, and based ONLY on the provided context if available. If the answer is not found in the context or conversation history, state that clearly. Do not make assumptions or use external knowledge. Cite sources using [index] notation where applicable based on the provided context."""
+        # --- Input Formatting: OpenRouter vs Aphrodite vs Gemini ---
+        if is_openrouter:
+            # --- OpenRouter Path: Construct OpenAI Messages List ---
+            model_name = active_llm_manager.models.get("chat", "Default OpenRouter Chat")
+            logger.info(f"Using OpenRouter model: {model_name}. Constructing messages list.")
 
-            history_block = "## Conversation History:\n"
-            if history_subset:
-                 history_block += "\n".join([f"{msg['role'].capitalize()}: {msg['content']}" for msg in history_subset])
-            else:
-                 history_block += "No previous conversation history."
-
-            user_query_block = f"""{context_str}
+            user_content = f"""{context_str}
 
 Based on the conversation history and the context provided above (if any), answer the following question:
 Question: {current_prompt}"""
 
-            full_prompt_for_llm = f"{system_block}\n\n{history_block}\n\n{user_query_block}\n\nAssistant:"
-            logger.debug(f"Constructed Raw Prompt for DeepSeek (sample):\n{full_prompt_for_llm[:500]}...")
+            messages_for_llm = [{"role": "system", "content": system_content}]
+            messages_for_llm.extend(history_subset) # Add validated history
+            messages_for_llm.append({"role": "user", "content": user_content})
 
-        elif APHRODITE_SERVICE_AVAILABLE and isinstance(llm_manager, AphroditeService):
+            logger.debug(f"Constructed Messages for OpenRouter (sample):\n{messages_for_llm}")
+
+        elif is_gemini:
+            # --- Gemini Path: Construct Prompt String(s) ---
+            model_name = active_llm_manager.models.get("chat", "gemini-1.5-flash-latest")
+            logger.info(f"Using Gemini model: {model_name}. Constructing prompt string(s).")
+
+            # Format history and context into a single string for the prompt
+            # Simple alternating format for history
+            history_str = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in history_subset])
+            user_content_for_prompt = f"""{context_str}
+
+## Conversation History:
+{history_str}
+
+## Current Question:
+{current_prompt}
+
+## Your Answer:"""
+
+            # Combine system and user content for the final prompt string
+            # (Gemini's generate_content takes a single string or list)
+            full_prompt_for_llm = f"System: {system_content}\n\n{user_content_for_prompt}"
+            # For streaming, Gemini expects a list, use the same content
+            contents_for_gemini_stream = [full_prompt_for_llm]
+
+            logger.debug(f"Constructed Prompt String for Gemini (start): {full_prompt_for_llm[:300]}...")
+            logger.debug(f"Constructed Contents List for Gemini Stream (start): {contents_for_gemini_stream[0][:300]}...")
+
+
+        elif is_aphrodite:
             # --- Aphrodite Path: Prepare Structured Messages & Load Tokenizer ---
-            if not hasattr(llm_manager, 'get_status'):
-                 final_data['error'] = "Error: Invalid LLM manager provided (not DeepSeek or Aphrodite)."
-                 message_placeholder.error(final_data['error'])
-                 return final_data
-
-            status = llm_manager.get_status()
+            status = active_llm_manager.get_status()
             model_name = status.get("current_model")
             if not model_name:
                  final_data['error'] = "Error: Aphrodite service has no model loaded."
@@ -262,22 +286,18 @@ Question: {current_prompt}"""
 
             # Load tokenizer for the Aphrodite model
             try:
-                 # Ensure AutoTokenizer is available
-                 if AutoTokenizer is None:
-                      raise ImportError("Transformers AutoTokenizer not available.")
+                 if AutoTokenizer is None: raise ImportError("Transformers AutoTokenizer not available.")
                  tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
                  if tokenizer.chat_template is None:
                       logger.error(f"Tokenizer for {model_name} lacks a chat template. Cannot format prompt.")
-                      # Attempt fallback to basic concatenation if template missing
                       logger.warning("Attempting basic prompt concatenation as fallback.")
-                      system_content = "System: You are an expert assistant..." # Keep system prompt simple
-                      user_content = f"{context_str}\n\nHistory:\n" + "\n".join([f"{m['role']}: {m['content']}" for m in history_subset]) + f"\n\nUser: {current_prompt}\nAssistant:"
-                      full_prompt_for_llm = system_content + "\n" + user_content
+                      history_str = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in history_subset])
+                      user_content = f"{context_str}\n\nHistory:\n{history_str}\n\nUser: {current_prompt}\nAssistant:"
+                      full_prompt_for_llm = f"System: {system_content}\n{user_content}"
                       logger.debug(f"Using fallback concatenation for {model_name}. Length: {len(full_prompt_for_llm)}")
-
                  else:
                       # Prepare structured messages for the template
-                      system_content = """You are an expert assistant specializing in anti-corruption investigations and analysis. Your responses should be detailed, factual, and based ONLY on the provided context if available. If the answer is not found in the context or conversation history, state that clearly. Do not make assumptions or use external knowledge. Cite sources using [index] notation where applicable based on the provided context."""
                       user_content = f"""{context_str}
 
 Based on the conversation history and the context provided above (if any), answer the following question:
@@ -312,12 +332,10 @@ Question: {current_prompt}"""
                  message_placeholder.error(final_data['error'])
                  return final_data
         else:
-             # This case handles if llm_manager is neither DeepSeek nor Aphrodite, or Aphrodite is unavailable
              final_data['error'] = "Error: Unsupported or unavailable LLM manager type."
              message_placeholder.error(final_data['error'])
-             logger.error(f"Unsupported llm_manager type: {type(llm_manager)}")
+             logger.error(f"Unsupported llm_manager type: {type(active_llm_manager)}")
              return final_data
-
 
     except Exception as e:
         logger.error(f"Error during input preparation: {e}", exc_info=True)
@@ -328,105 +346,118 @@ Question: {current_prompt}"""
     # --- 3. Initiate LLM Call & Handle Streaming/Response ---
     llm_called = False
     try:
-        if full_prompt_for_llm is None:
-             final_data['error'] = "Error: Final prompt string for LLM was not generated."
-             message_placeholder.error(final_data['error'])
-             logger.error("LLM call aborted because full_prompt_for_llm is None.")
-             return final_data
+        # --- OpenRouter Streaming Path ---
+        if is_openrouter:
+            if messages_for_llm is None:
+                 final_data['error'] = "Error: Messages list for OpenRouter was not generated."
+                 message_placeholder.error(final_data['error']); return final_data
 
-        # --- DeepSeek Streaming Path ---
-        if is_deepseek:
             llm_called = True
-            logger.info("Using DeepSeekManager - initiating streaming generation with raw prompt.")
+            logger.info("Using OpenRouterManager - initiating streaming generation.")
+            thinking_placeholder.empty() # Clear thinking placeholder (not supported)
 
             full_response_buffer = ""
-            full_thinking_buffer = ""
-            thinking_displayed = False
-            def deepseek_stream_callback(token_or_thinking):
-                nonlocal full_response_buffer, full_thinking_buffer, thinking_displayed
+            def openrouter_stream_callback(token):
+                nonlocal full_response_buffer
                 try:
-                    if isinstance(token_or_thinking, dict) and token_or_thinking.get("type") == "thinking":
-                        thinking_chunk = token_or_thinking.get("content", "")
-                        if thinking_chunk:
-                            full_thinking_buffer += thinking_chunk
-                            # Update thinking placeholder only if content changes significantly
-                            if not thinking_displayed and thinking_chunk.strip(): thinking_displayed = True
-                            if thinking_displayed:
-                                with thinking_placeholder.container():
-                                    st.markdown('<div class="thinking-title">💭 Reasoning Process (Live):</div>', unsafe_allow_html=True)
-                                    st.markdown(f'<div class="thinking-box">{full_thinking_buffer}▌</div>', unsafe_allow_html=True)
-                    elif isinstance(token_or_thinking, str):
-                        full_response_buffer += token_or_thinking
+                    if isinstance(token, str):
+                        full_response_buffer += token
                         message_placeholder.markdown(full_response_buffer + "▌")
                 except Exception as callback_e:
-                     logger.error(f"Error in deepseek_stream_callback: {callback_e}", exc_info=True)
-                     # Avoid crashing the main thread due to UI errors in callback
+                     logger.error(f"Error in openrouter_stream_callback: {callback_e}", exc_info=True)
                      st.toast(f"UI Update Error: {callback_e}", icon="⚠️")
 
-
-            # Pass the raw prompt string to DeepSeekManager's generate method
-            aggregated_answer = llm_manager.generate(
-                prompt=full_prompt_for_llm, # Pass the raw string
-                stream_callback=deepseek_stream_callback
+            # Call OpenRouterManager's generate method with the messages list
+            response = active_llm_manager.generate_chat(
+                messages=messages_for_llm,
+                stream_callback=openrouter_stream_callback
             )
 
             # Final update after streaming finishes
-            if isinstance(aggregated_answer, str) and aggregated_answer.startswith("Error:"):
-                 final_data['error'] = aggregated_answer
-                 message_placeholder.error(aggregated_answer)
-            else:
-                 final_data['final_answer'] = aggregated_answer if isinstance(aggregated_answer, str) else str(aggregated_answer)
-                 final_data['final_thinking'] = full_thinking_buffer
+            if response.get("status") == "success":
+                 final_data['final_answer'] = response.get("result", "")
                  message_placeholder.markdown(final_data['final_answer']) # Final answer without cursor
-                 if thinking_displayed:
-                     with thinking_placeholder.container(): # Replace live thinking with expander
-                          with st.expander("💭 Reasoning Process", expanded=False):
-                              st.markdown(f'<div class="thinking-box">{final_data["final_thinking"]}</div>', unsafe_allow_html=True)
-                 else:
-                      thinking_placeholder.empty() # Clear if no thinking was displayed
+            else:
+                 final_data['error'] = response.get("error", "Unknown OpenRouter error")
+                 message_placeholder.error(f"Error: {final_data['error']}")
+
+        # --- Gemini Streaming Path ---
+        elif is_gemini:
+            if contents_for_gemini_stream is None:
+                 final_data['error'] = "Error: Contents list for Gemini stream was not generated."
+                 message_placeholder.error(final_data['error']); return final_data
+
+            llm_called = True
+            logger.info("Using GeminiManager - initiating streaming generation.")
+            thinking_placeholder.empty() # Clear thinking placeholder
+
+            full_response_buffer = ""
+            def gemini_stream_callback(token):
+                nonlocal full_response_buffer
+                try:
+                    if isinstance(token, str):
+                        full_response_buffer += token
+                        message_placeholder.markdown(full_response_buffer + "▌")
+                except Exception as callback_e:
+                     logger.error(f"Error in gemini_stream_callback: {callback_e}", exc_info=True)
+                     st.toast(f"UI Update Error: {callback_e}", icon="⚠️")
+
+            # Call GeminiManager's generate method with the prompt string
+            # Pass the callback for streaming
+            response = active_llm_manager.generate_chat(
+                prompt=contents_for_gemini_stream[0], # Pass the single prompt string from the list
+                stream_callback=gemini_stream_callback,
+                model_name=model_name # Pass model name if needed
+            )
+
+            # Final update after streaming finishes
+            if response.get("status") == "success":
+                 final_data['final_answer'] = response.get("result", "")
+                 message_placeholder.markdown(final_data['final_answer']) # Final answer without cursor
+            else:
+                 final_data['error'] = response.get("error", "Unknown Gemini error")
+                 message_placeholder.error(f"Error: {final_data['error']}")
 
 
         # --- Aphrodite Non-Streaming Path ---
-        elif APHRODITE_SERVICE_AVAILABLE and isinstance(llm_manager, AphroditeService):
+        elif is_aphrodite:
+            if full_prompt_for_llm is None:
+                 final_data['error'] = "Error: Final prompt string for Aphrodite was not generated."
+                 message_placeholder.error(final_data['error']); return final_data
+
             llm_called = True
-            logger.info("Using AphroditeService - initiating non-streaming generation with formatted prompt.")
+            logger.info("Using AphroditeService - initiating non-streaming generation.")
+            thinking_placeholder.empty() # Clear thinking placeholder
+
             # Pass the fully formatted prompt string to generate_chat
-            aphrodite_response = llm_manager.generate_chat(prompt=full_prompt_for_llm) # Uses generate_chat
+            aphrodite_response = active_llm_manager.generate_chat(prompt=full_prompt_for_llm)
 
             if isinstance(aphrodite_response, dict) and aphrodite_response.get("status") == "success":
                 final_data['final_answer'] = aphrodite_response.get("result", "").strip()
                 message_placeholder.markdown(final_data['final_answer'])
-                final_data['final_thinking'] = None # Aphrodite generate_chat doesn't provide thinking stream
-                thinking_placeholder.empty() # Clear thinking placeholder
             else:
                 error_msg = "Unknown error from Aphrodite service"
-                if isinstance(aphrodite_response, dict):
-                    error_msg = aphrodite_response.get("error", error_msg)
-                elif isinstance(aphrodite_response, str):
-                     error_msg = aphrodite_response # Handle case where service returns error string directly
+                if isinstance(aphrodite_response, dict): error_msg = aphrodite_response.get("error", error_msg)
+                elif isinstance(aphrodite_response, str): error_msg = aphrodite_response # Handle error string
                 final_data['error'] = error_msg
                 message_placeholder.error(f"Error: {final_data['error']}")
-                thinking_placeholder.empty() # Clear thinking placeholder
         else:
-             # Should not be reached if initial checks are correct
+             # Should not be reached
              final_data['error'] = "Error: LLM Manager configuration issue."
              message_placeholder.error(final_data['error'])
              logger.error("Reached unexpected state in LLM call logic.")
 
-
         # Final validation
         if not final_data['final_answer'] and not final_data['error'] and llm_called:
             final_data['error'] = "Error: LLM returned no answer content."
-            message_placeholder.warning(final_data['error']) # Use warning for empty content
+            message_placeholder.warning(final_data['error'])
 
     except Exception as e:
         logger.error(f"Critical error during LLM generation coordination: {e}", exc_info=True)
         final_data['error'] = f"LLM Generation System Error: {str(e)}"
-        # Avoid overwriting potentially useful partial answer if error happens late
-        if not final_data['final_answer']:
-             final_data['final_answer'] = f"Sorry, a critical error occurred: {str(e)}"
+        if not final_data['final_answer']: final_data['final_answer'] = f"Sorry, a critical error occurred: {str(e)}"
         message_placeholder.error(f"Error: {final_data['error']}")
-        thinking_placeholder.empty() # Clear thinking on critical error
+        thinking_placeholder.empty()
 
     logger.info(f"LLM generation process finished. Final Answer length: {len(final_data.get('final_answer', ''))}. Error: {final_data.get('error')}")
     return final_data
@@ -436,8 +467,8 @@ Question: {current_prompt}"""
 
 def handle_chat_message(prompt: str):
     """
-    Orchestrates processing a user's chat message. Handles retrieval based on user
-    toggle state AT THE TIME OF SUBMISSION, calls the LLM, updates state, and saves.
+    Orchestrates processing a user's chat message using the active LLM backend.
+    Handles retrieval, calls the LLM, updates state, and saves.
 
     Args:
         prompt: The user's input string.
@@ -448,120 +479,104 @@ def handle_chat_message(prompt: str):
     query_engine = get_or_create_query_engine()
     conversation_store = get_conversation_store()
     active_conv_data = st.session_state.get("active_conversation_data")
+    llm_manager = get_active_llm_manager() # Get the initialized manager
 
     if not query_engine or not conversation_store or not active_conv_data:
         logger.error("handle_chat_message called without necessary components (engine, store, or active conversation).")
         st.error("Cannot process message. Please ensure system is initialized and a conversation is active.")
         return
 
-    # Determine which LLM manager to use
-    use_deepseek = CONFIG.get("deepseek", {}).get("use_api", False)
-    llm_manager = None
-    if use_deepseek:
-        if DeepSeekManager:
-            # Initialize DeepSeek manager if needed (or get existing instance)
-            # This assumes DeepSeekManager handles its own singleton or state management if needed
-            deepseek_manager = DeepSeekManager(CONFIG) # Re-creating might be inefficient, consider singleton pattern
-            if not deepseek_manager.client:
-                st.warning("DeepSeek API not properly configured. Check settings.")
-                return
-            llm_manager = deepseek_manager
+    # Check if the LLM manager is ready
+    llm_ready = False
+    llm_status_message = ""
+    if isinstance(llm_manager, OpenRouterManager):
+        if llm_manager.client:
+            llm_ready = True
+            llm_status_message = f"OpenRouter ready (Model: {llm_manager.models.get('chat')})."
         else:
-             st.error("DeepSeek API is enabled but the manager failed to load.")
-             return
-    elif APHRODITE_SERVICE_AVAILABLE:
-        service = get_service()
-        if service.is_running() and st.session_state.get("llm_model_loaded"):
-            llm_manager = service
+            llm_status_message = "OpenRouter manager initialized but client failed (check API key?)."
+    elif isinstance(llm_manager, GeminiManager): # Add Gemini check
+        if llm_manager.client:
+            llm_ready = True
+            llm_status_message = f"Gemini ready (Model: {llm_manager.models.get('chat')})."
         else:
-            st.warning("Local LLM service is not ready (running and model loaded). Cannot generate response.")
-            return # Don't proceed if local LLM isn't ready
+            llm_status_message = "Gemini manager initialized but client failed (check API key?)."
+    elif isinstance(llm_manager, AphroditeService):
+        if llm_manager.is_running() and st.session_state.get("llm_model_loaded"):
+            llm_ready = True
+            model_name = st.session_state.get("aphrodite_process_info", {}).get("model_name", "Unknown")
+            llm_status_message = f"Local LLM service ready (Model: {model_name})."
+        elif llm_manager.is_running():
+            llm_status_message = "Local LLM service running, but no model loaded."
+        else:
+            llm_status_message = "Local LLM service not running."
     else:
-        st.error("No valid LLM service is available or configured.")
-        return
+        llm_status_message = "No valid LLM manager found."
+
+    if not llm_ready:
+        st.warning(f"LLM not ready: {llm_status_message}")
+        # Optionally add buttons to start service etc.
+        if LLM_BACKEND == "aphrodite" and APHRODITE_SERVICE_AVAILABLE and not st.session_state.get("aphrodite_service_running"):
+             if st.button("Start LLM Service Now"): start_aphrodite_service(); st.rerun()
+        return # Don't proceed if LLM isn't ready
 
     # --- 2. Get Current Conversation State ---
     try:
-        # Work directly with session state dictionary
-        conversation_history_for_llm = active_conv_data.get("messages", [])[:] # Shallow copy for passing to LLM
+        conversation_history_for_llm = active_conv_data.get("messages", [])[:] # Shallow copy
     except Exception as e:
          logger.error(f"Failed to access active conversation data: {e}", exc_info=True)
-         st.error("Internal error: Could not access conversation data.")
-         return
+         st.error("Internal error: Could not access conversation data."); return
 
-    # --- 3. Determine Retrieval Need for THIS turn ---
-    retrieve_now = st.session_state.get("retrieval_enabled_for_next_turn", False) # Default to False if key missing
-    logger.info(f"Retrieval decision for this turn: {'ENABLED' if retrieve_now else 'DISABLED'} (based on checkbox state when prompt was submitted).")
-    # The state variable 'retrieval_enabled_for_next_turn' is managed by the checkbox key directly.
-    # It will reflect the user's choice at the time of submission. It naturally resets on rerun unless checked again.
+    # --- 3. Determine Retrieval Need ---
+    retrieve_now = st.session_state.get("retrieval_enabled_for_next_turn", False)
+    logger.info(f"Retrieval decision for this turn: {'ENABLED' if retrieve_now else 'DISABLED'}.")
 
-    # --- 4. Add User Message to History (Internal State and UI Display) ---
+    # --- 4. Add User Message ---
     user_message_id = f"msg_user_{len(active_conv_data.get('messages', [])) + 1}"
-    user_message = {
-        "role": "user",
-        "content": prompt,
-        "timestamp": time.time(),
-        "id": user_message_id
-    }
-    # Append to the *actual* session state list
+    user_message = {"role": "user", "content": prompt, "timestamp": time.time(), "id": user_message_id}
     st.session_state.active_conversation_data["messages"].append(user_message)
-    # Also update the list used for immediate UI rendering
     st.session_state.ui_chat_display.append({"role": "user", "content": prompt})
-    # Render the user message instantly - This happens naturally on rerun after chat_input
+    # User message renders on rerun after chat_input
 
     # --- 5. Perform Retrieval (Conditional) ---
     sources = []
     retrieval_info_msg = "Retrieval skipped (toggle was off)."
-    retrieval_status_placeholder = st.empty() # Placeholder for status messages
+    retrieval_status_placeholder = st.empty()
 
     if retrieve_now:
         retrieval_info_msg = "Performing RAG retrieval..."
         logger.info(retrieval_info_msg)
-        with retrieval_status_placeholder.status("Retrieving context...", expanded=False): # Use status context manager
+        with retrieval_status_placeholder.status("Retrieving context...", expanded=False):
             try:
                 st.write("Searching relevant documents...")
-                sources = query_engine.retrieve(prompt) # Assumes retrieve returns list of dicts
+                sources = query_engine.retrieve(prompt)
                 retrieval_info_msg = f"Retrieved {len(sources)} relevant source(s)."
                 st.write(retrieval_info_msg)
                 logger.info(retrieval_info_msg)
             except Exception as e:
                 logger.error(f"Error during retrieval: {e}", exc_info=True)
                 retrieval_info_msg = f"Error during retrieval: {e}"
-                st.error(retrieval_info_msg) # Show error within status
-                sources = []
-        # Status context manager automatically closes, no need to empty manually unless error
-        if "Error" in retrieval_info_msg:
-             pass # Keep error message displayed by status context
-        else:
-             time.sleep(0.5) # Brief pause before clearing success message
-             retrieval_status_placeholder.empty()
-
+                st.error(retrieval_info_msg); sources = []
+        if "Error" not in retrieval_info_msg:
+             time.sleep(0.5); retrieval_status_placeholder.empty()
     else:
         logger.info(retrieval_info_msg)
-        # Display caption only if skipping, otherwise status handles it
-        retrieval_status_placeholder.caption(retrieval_info_msg) # Show skipped message briefly
+        retrieval_status_placeholder.caption(retrieval_info_msg)
 
     # --- 6. Initiate LLM Response Generation ---
-    # Create placeholders *before* the assistant message context
-    # These will be passed *into* the chat_message context
     message_placeholder_container = st.empty()
     thinking_placeholder_container = st.empty()
-    sources_placeholder_container = st.empty() # For the sources expander
+    sources_placeholder_container = st.empty()
 
-    # Generate response within the assistant's chat message context
     with st.chat_message("assistant"):
-        # Re-scope placeholders inside chat_message context for direct updates
         message_placeholder = st.empty()
-        thinking_placeholder = st.empty()
-        # sources_placeholder = st.empty() # Expander created later if needed
+        thinking_placeholder = st.empty() # Will likely remain empty
 
         with st.spinner("Assistant is thinking..."):
-            # Pass the necessary placeholders to the generation function
             final_result = generate_llm_response(
-                llm_manager=llm_manager,
+                active_llm_manager=llm_manager, # Pass the active manager
                 query_engine=query_engine,
-                # Pass the history *including* the user message just added
-                conversation_history=st.session_state.active_conversation_data["messages"],
+                conversation_history=st.session_state.active_conversation_data["messages"], # Includes user msg
                 current_prompt=prompt,
                 context_sources=sources,
                 message_placeholder=message_placeholder,
@@ -570,60 +585,49 @@ def handle_chat_message(prompt: str):
 
     # --- Generation Complete ---
     final_answer = final_result.get("final_answer", "")
-    final_thinking = final_result.get("final_thinking")
+    final_thinking = final_result.get("final_thinking") # Likely None
     error = final_result.get("error")
+    retrieval_status_placeholder.empty() # Clear status message
 
-    # Clear the temporary status message placeholder now that generation is done
-    retrieval_status_placeholder.empty()
-
-    # Populate sources expander if needed (outside chat_message context)
+    # Populate sources expander
     if not error and sources and CONFIG.get("conversation", {}).get("persist_retrieved_context", True):
          with sources_placeholder_container.expander("View Sources Used", expanded=False):
              for i, source in enumerate(sources):
-                 # Ensure source is a dict before accessing keys
                  if isinstance(source, dict):
                      score = source.get('score', 0.0)
-                     text = source.get('original_text', source.get('text', ''))
+                     text = source.get('original_text', source.get('text', '')) # Prefer original
                      meta = source.get('metadata', {})
                      st.markdown(f"**Source {i + 1} (Score: {score:.2f}):**")
                      st.markdown(f"> {text}")
                      st.caption(f"Doc: {meta.get('file_name', 'N/A')} | Page: {meta.get('page_num', 'N/A')} | Chunk: {meta.get('chunk_id', 'N/A')}")
                      st.markdown("---")
-                 else:
-                      st.warning(f"Source {i+1} has unexpected format: {type(source)}")
+                 else: st.warning(f"Source {i+1} has unexpected format: {type(source)}")
 
-    # --- 7. Add Final Assistant Message to Conversation History ---
-    assistant_message_id = f"msg_asst_{len(active_conv_data['messages'])}" # ID relates to the turn
+    # --- 7. Add Final Assistant Message to History ---
+    assistant_message_id = f"msg_asst_{len(active_conv_data['messages'])}"
     assistant_message = {
         "role": "assistant",
         "content": final_answer if not error else f"Error generating response: {error}",
         "timestamp": time.time(),
         "id": assistant_message_id
     }
-    # Persist context and thinking if available and configured
     persist_context = CONFIG.get("conversation", {}).get("persist_retrieved_context", True)
     if sources and not error and persist_context:
-        # Store structured context used
         assistant_message["used_context"] = [
-            {"text": s.get('original_text', s.get('text', '')),
-             "metadata": s.get('metadata', {}),
-             "score": s.get('score', 0.0),
-             "source_index": i+1}
-            for i, s in enumerate(sources) if isinstance(s, dict) # Ensure s is dict
+            {"text": s.get('original_text', s.get('text', '')), # Store original text used
+             "metadata": s.get('metadata', {}), "score": s.get('score', 0.0), "source_index": i+1}
+            for i, s in enumerate(sources) if isinstance(s, dict)
         ]
-    if final_thinking:
-        assistant_message["thinking_process"] = final_thinking
+    # No thinking process to store for OpenRouter/Aphrodite/Gemini
 
-    # Append the final assistant message to the *actual* session state data
     st.session_state.active_conversation_data["messages"].append(assistant_message)
 
     # --- 8. Update UI Display List ---
-    # Add the complete assistant message info for rendering in the next cycle
     st.session_state.ui_chat_display.append({
         "role": "assistant",
         "content": assistant_message["content"],
-        "thinking": final_thinking,
-        "sources": assistant_message.get("used_context") # Use context stored in the message
+        "thinking": None, # No thinking
+        "sources": assistant_message.get("used_context")
     })
 
     # --- 9. Auto-Save Conversation ---
@@ -633,7 +637,6 @@ def handle_chat_message(prompt: str):
     logger.info("Finished handling chat message cycle.")
 
     # --- 10. Trigger Rerun ---
-    # A rerun is needed to display the assistant's message, thinking, and sources expander correctly.
-    # Streamlit's natural rerun after state updates might be sufficient, but an explicit
-    # rerun ensures the UI reflects the final state immediately after processing.
-    st.rerun()
+    # Only rerun if the message wasn't an error display
+    if not error:
+        st.rerun()

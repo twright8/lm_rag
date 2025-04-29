@@ -398,7 +398,7 @@ def load_aphrodite_model(model_name: str, attempt=0):
             # Updated schema with new fields and Literal types
             class EntityRelationshipItem(BaseModel):
                 from_entity_type: Optional[Literal[
-                    "PERSON", "NGO", "GOVERNMENT_BODY", "COMMERCIAL_COMPANY", "LOCATION", "POSITION", "MONETARY_AMOUNT", "ASSET", "EVENT"]] = None
+                    "PERSON", "NGO", "GOVERNMENT_BODY", "COMMERCIAL_COMPANY", "LOCATION", "POSITION", "MONEY", "ASSET", "EVENT"]] = None
                 from_entity_name: Optional[str] = None
                 relationship_type: Optional[
                     Literal["WORKS_FOR", "OWNS", "LOCATED_IN", "CONNECTED_TO", "MET_WITH"]] = None

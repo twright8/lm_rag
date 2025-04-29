@@ -1,3 +1,5 @@
+# --- START OF REWRITTEN app_processing.py ---
+
 # app_processing.py
 import streamlit as st
 import pandas as pd
@@ -7,7 +9,9 @@ import traceback
 import time
 
 # Import necessary functions/variables from other modules
-from app_setup import ROOT_DIR, CONFIG, logger, APHRODITE_SERVICE_AVAILABLE, get_service, get_or_create_query_engine
+# --- Added LLM_BACKEND import ---
+from app_setup import ROOT_DIR, CONFIG, logger, APHRODITE_SERVICE_AVAILABLE, get_service, get_or_create_query_engine, LLM_BACKEND, IS_GEMINI_ACTIVE, IS_OPENROUTER_ACTIVE # Import backend flags
+# --- End Added LLM_BACKEND import ---
 from app_chat import start_aphrodite_service # To start service if needed for processing
 from src.utils.resource_monitor import log_memory_usage
 
@@ -49,28 +53,46 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
         return
 
     try:
-        # Ensure Aphrodite service is running
-        if not APHRODITE_SERVICE_AVAILABLE:
-            st.error("Aphrodite service module not available. Cannot process.")
-            st.session_state.processing = False
-            return
-
-        logger.info(f"Starting document processing. Files: {[f.name for f in uploaded_files]}. LLM: {selected_llm_name}")
-        log_memory_usage(logger, "Memory usage at start of processing")
-
-        service = get_service()
-        if not service.is_running():
-            logger.info("Starting Aphrodite service for document processing")
-            if not start_aphrodite_service(): # Function from app_chat
-                st.session_state.processing_status = "Failed to start LLM service. Processing aborted."
+        # --- MODIFIED CHECK: Handle Aphrodite, OpenRouter, and Gemini ---
+        if LLM_BACKEND == "aphrodite":
+            if not APHRODITE_SERVICE_AVAILABLE:
+                st.error("Aphrodite backend selected, but service module not available. Cannot process.")
+                logger.error("Aphrodite backend selected but APHRODITE_SERVICE_AVAILABLE is False.")
                 st.session_state.processing = False
                 return
-            # Give service a moment to start fully
-            time.sleep(5)
-            if not service.is_running(): # Double check
-                 st.session_state.processing_status = "LLM service failed to stay running. Processing aborted."
-                 st.session_state.processing = False
-                 return
+
+            logger.info("Aphrodite backend selected. Checking service status...")
+            service = get_service()
+            if not service.is_running():
+                logger.info("Starting Aphrodite service for document processing")
+                if not start_aphrodite_service(): # Function from app_chat
+                    st.session_state.processing_status = "Failed to start LLM service. Processing aborted."
+                    st.session_state.processing = False
+                    return
+                # Give service a moment to start fully
+                time.sleep(5)
+                if not service.is_running(): # Double check
+                     st.session_state.processing_status = "LLM service failed to stay running. Processing aborted."
+                     st.session_state.processing = False
+                     return
+            else:
+                 logger.info("Aphrodite service already running.")
+        elif LLM_BACKEND == "openrouter":
+            logger.info("OpenRouter backend selected. Skipping Aphrodite service checks.")
+            # No service start needed for OpenRouter
+        elif LLM_BACKEND == "gemini": # Add Gemini check
+            logger.info("Gemini backend selected. Skipping Aphrodite service checks.")
+            # No service start needed for Gemini
+        else: # Handle unknown backend
+             st.error(f"Unknown LLM backend configured: {LLM_BACKEND}. Cannot process.")
+             logger.error(f"Unknown LLM_BACKEND '{LLM_BACKEND}' encountered during processing.")
+             st.session_state.processing = False
+             return
+        # --- END MODIFIED CHECK ---
+
+        # Now the processing can continue for OpenRouter/Gemini/Aphrodite
+        logger.info(f"Starting document processing. Files: {[f.name for f in uploaded_files]}. LLM: {selected_llm_name} (Backend: {LLM_BACKEND.upper()})") # Added backend info
+        log_memory_usage(logger, "Memory usage at start of processing")
 
         # --- Document Loading ---
         st.session_state.processing_status = "Loading documents..."
@@ -181,8 +203,11 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
         # --- Entity Extraction ---
         st.session_state.processing_status = "Preparing entity extraction..."
         st.session_state.processing_progress = 0.40
-        logger.info(f"Creating entity extractor with model {selected_llm_name}")
+        # --- Added backend info to log ---
+        logger.info(f"Creating entity extractor with model {selected_llm_name} (Backend: {LLM_BACKEND.upper()})")
+        # EntityExtractor init uses get_active_llm_manager() which respects LLM_BACKEND
         entity_extractor = EntityExtractor(model_name=selected_llm_name, debug=True)
+        # --- End added backend info ---
 
         st.session_state.processing_status = "Extracting entities..."
         st.session_state.processing_progress = 0.50
@@ -198,9 +223,9 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
 
         logger.info(f"Starting entity extraction on {len(all_chunks)} chunks ({len(visual_chunk_ids)} visual chunks)")
 
-        # Process chunks (this ensures the selected_llm_name is loaded in the service)
-        # This might take a while and involves LLM calls
-        entity_extractor.process_chunks(all_chunks, visual_chunk_ids) # This handles loading model in service
+        # Process chunks (this ensures the selected_llm_name is loaded/used by the backend)
+        # This might take a while and involves LLM calls (API for OpenRouter/Gemini, local for Aphrodite)
+        entity_extractor.process_chunks(all_chunks, visual_chunk_ids) # This handles loading model in service OR using API
 
         st.session_state.processing_progress = 0.75
         st.session_state.processing_status = "Saving extraction results..."
@@ -214,12 +239,13 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
 
 
         # --- IMPORTANT: Update QueryEngine to use the same model ---
+        # This stores the model name intended for *chat*, regardless of backend used for extraction
         try:
             query_engine = get_or_create_query_engine() # Function from app_setup
             if query_engine:
                 query_engine.llm_model_name = selected_llm_name # Set the model for subsequent queries
                 st.session_state.selected_llm_model_name = selected_llm_name # Update session state backup
-                logger.info(f"QueryEngine LLM model updated to: {selected_llm_name}")
+                logger.info(f"QueryEngine LLM model name (for chat) updated to: {selected_llm_name}")
             else:
                  logger.error("Query engine not available, cannot update LLM model name.")
                  st.warning("Query engine unavailable. Queries might fail or use incorrect model.")
@@ -227,23 +253,32 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
             logger.error(f"Failed to update QueryEngine model name: {e}", exc_info=True)
             st.warning("Could not set the query model. Queries might use the default chat model.")
 
-        # Update process info state to reflect the model loaded during extraction
-        st.session_state.llm_model_loaded = True
-        try:
-            status = service.get_status()
-            process_info = {
-                "pid": service.process.pid if service.process else None,
-                "model_name": status.get("current_model") # Should match selected_llm_name
-            }
-            if process_info["pid"] and process_info["model_name"]:
-                st.session_state.aphrodite_process_info = process_info
-                # Verify model consistency
-                if process_info["model_name"] != selected_llm_name:
-                    logger.warning(f"Model mismatch after extraction! Expected {selected_llm_name}, Service reports {process_info['model_name']}")
-            else:
-                logger.warning("Failed to update process info after extraction.")
-        except Exception as e:
-            logger.warning(f"Error updating Aphrodite process info after extraction: {e}")
+        # --- Update process info state (Aphrodite specific) ---
+        # --- MODIFIED: Skip if not Aphrodite ---
+        if LLM_BACKEND == "aphrodite":
+            st.session_state.llm_model_loaded = True
+            try:
+                service = get_service() # Get service again if needed
+                status = service.get_status()
+                process_info = {
+                    "pid": service.process.pid if service.process else None,
+                    "model_name": status.get("current_model") # Should match selected_llm_name
+                }
+                if process_info["pid"] and process_info["model_name"]:
+                    st.session_state.aphrodite_process_info = process_info
+                    # Verify model consistency
+                    if process_info["model_name"] != selected_llm_name:
+                        logger.warning(f"Model mismatch after extraction! Expected {selected_llm_name}, Service reports {process_info['model_name']}")
+                else:
+                    logger.warning("Failed to update process info after extraction.")
+            except Exception as e:
+                logger.warning(f"Error updating Aphrodite process info after extraction: {e}")
+        else:
+             # For OpenRouter/Gemini, there's no separate process info to track here
+             st.session_state.llm_model_loaded = True # Mark as loaded conceptually
+             st.session_state.aphrodite_process_info = None # Clear any old Aphrodite info
+             logger.info(f"{LLM_BACKEND.upper()} backend: Skipping Aphrodite process info update.")
+        # --- END MODIFIED ---
 
         # --- Indexing ---
         st.session_state.processing_status = "Indexing documents..."
@@ -253,6 +288,7 @@ def process_documents_with_spreadsheet_options(uploaded_files, selected_llm_name
         document_indexer.load_model()
 
         # Check if collection exists and clear if necessary (using query_engine)
+        query_engine = get_or_create_query_engine() # Get engine instance again
         if query_engine:
             try:
                 collection_info = query_engine.get_collection_info()
@@ -365,8 +401,10 @@ def clear_all_data():
             st.session_state.collection_info = {"exists": False, "points_count": 0, "error": "Failed to refresh after clear"}
 
         # Note: Aphrodite service remains running, model state is untouched by data clear.
-        if st.session_state.get("aphrodite_service_running"):
+        # --- MODIFIED: Check LLM_BACKEND before logging ---
+        if LLM_BACKEND == "aphrodite" and st.session_state.get("aphrodite_service_running"):
             logger.info("Aphrodite service remains running after data clear.")
+        # --- END MODIFIED ---
 
         # Force garbage collection
         gc.collect()
@@ -379,3 +417,5 @@ def clear_all_data():
         logger.error(f"Clear data failed: {traceback.format_exc()}")
         log_memory_usage(logger, "Memory usage after data clearing error")
         return False # Indicate failure
+
+# --- END OF REWRITTEN app_processing.py ---

@@ -118,3 +118,65 @@ TypeError: log_memory_usage() takes 1 positional argument but 2 were given
 2025-04-20 13:49:58,974 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
 2025-04-20 13:49:59,029 - app_setup - INFO - Process memory - RSS: 1.43 GB, VMS: 37.65 GB
 2025-04-20 13:49:59,030 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:51:22,997 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 18:51:22,998 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 18:51:22,998 - app_setup - INFO - Selected LLM Backend: APHRODITE
+2025-04-20 18:51:23,198 - app_setup - INFO - Aphrodite service modules imported (backend is Aphrodite).
+2025-04-20 18:51:23,199 - app_setup - INFO - Aphrodite backend selected, OpenRouterManager module not imported.
+2025-04-20 18:51:23,900 - src.ui.app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 18:51:23,901 - src.ui.app_setup - INFO - Configuration loaded successfully.
+2025-04-20 18:51:23,901 - src.ui.app_setup - INFO - Selected LLM Backend: APHRODITE
+2025-04-20 18:51:23,901 - src.ui.app_setup - INFO - Aphrodite service modules imported (backend is Aphrodite).
+2025-04-20 18:51:23,901 - src.ui.app_setup - INFO - Aphrodite backend selected, OpenRouterManager module not imported.
+2025-04-20 18:51:23,901 - src.ui.app_setup - ERROR - Failed to import core modules: cannot import name 'QueryEngine' from partially initialized module 'src.core.query_system.query_engine' (most likely due to a circular import) (/home/t/lm_rag/src/core/query_system/query_engine.py)
+Traceback (most recent call last):
+  File "/home/t/lm_rag/src/ui/app_setup.py", line 99, in <module>
+    from src.core.query_system.query_engine import QueryEngine
+ImportError: cannot import name 'QueryEngine' from partially initialized module 'src.core.query_system.query_engine' (most likely due to a circular import) (/home/t/lm_rag/src/core/query_system/query_engine.py)
+2025-04-20 18:56:05,587 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 18:56:05,587 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 18:56:05,587 - app_setup - INFO - Selected LLM Backend: APHRODITE
+2025-04-20 18:56:05,772 - app_setup - INFO - Aphrodite service modules imported (backend is Aphrodite).
+2025-04-20 18:56:05,772 - app_setup - INFO - Aphrodite backend selected, OpenRouterManager module not imported.
+2025-04-20 18:56:12,262 - app_setup - INFO - Aphrodite backend active for chat.
+2025-04-20 18:56:14,558 - src.ui.app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 18:56:14,560 - src.ui.app_setup - INFO - Configuration loaded successfully.
+2025-04-20 18:56:14,561 - src.ui.app_setup - INFO - Selected LLM Backend: APHRODITE
+2025-04-20 18:56:14,562 - src.ui.app_setup - INFO - Aphrodite service modules imported (backend is Aphrodite).
+2025-04-20 18:56:14,562 - src.ui.app_setup - INFO - Aphrodite backend selected, OpenRouterManager module not imported.
+2025-04-20 18:56:14,865 - app_setup - INFO - Imported Aphrodite chat handlers.
+2025-04-20 18:56:25,910 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 18:56:25,913 - app_setup - INFO - Initializing AphroditeService instance...
+2025-04-20 18:56:25,914 - app_setup - INFO - Using AphroditeService instance.
+2025-04-20 18:56:25,917 - app_setup - INFO - Initializing ConversationStore...
+2025-04-20 18:56:25,919 - src.utils.conversation_store - INFO - Conversation storage initialized at: /home/t/lm_rag/data/conversations
+2025-04-20 18:56:25,920 - src.utils.conversation_store - INFO - Loading conversations from: /home/t/lm_rag/data/conversations
+2025-04-20 18:56:25,929 - src.utils.conversation_store - INFO - Successfully loaded 14 conversations into memory.
+2025-04-20 18:56:25,931 - app_setup - INFO - Creating new QueryEngine instance.
+2025-04-20 18:56:25,932 - src.core.query_system.query_engine - INFO - Initializing QueryEngine...
+2025-04-20 18:56:25,933 - src.core.query_system.query_engine - INFO -   - Embedding Model: BAAI/bge-m3 (BGE-M3 Mode)
+2025-04-20 18:56:25,934 - src.core.query_system.query_engine - INFO -   - Reranking Model: BAAI/bge-reranker-v2-m3 (Enabled: True)
+2025-04-20 18:56:25,935 - src.core.query_system.query_engine - INFO -   - Qdrant: localhost:6333, Collection: anticorruption_rag_e5_instruct
+2025-04-20 18:56:25,935 - src.core.query_system.query_engine - INFO -   - Fusion Weights (Vec/BM25_or_Sparse): 0.7/0.3
+2025-04-20 18:56:25,937 - src.core.query_system.query_engine - INFO - Process memory - RSS: 1.34 GB, VMS: 37.63 GB
+2025-04-20 18:56:26,053 - src.core.query_system.query_engine - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:56:26,055 - app_setup - INFO - QueryEngine created, using Aphrodite backend (Default LLM: Qwen/Qwen2.5-3B-Instruct)
+2025-04-20 18:56:26,200 - app_setup - INFO - Process memory - RSS: 1.36 GB, VMS: 37.65 GB
+2025-04-20 18:56:26,201 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:57:01,073 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 18:57:01,143 - app_setup - INFO - Process memory - RSS: 1.36 GB, VMS: 37.65 GB
+2025-04-20 18:57:01,144 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:57:01,870 - app_setup - INFO - Multiprocessing start method already set to 'spawn'.
+2025-04-20 18:57:01,949 - app_setup - INFO - Process memory - RSS: 1.36 GB, VMS: 37.65 GB
+2025-04-20 18:57:01,950 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:57:01,963 - app_setup - INFO - Starting processing with LLM: Qwen/Qwen2.5-3B-Instruct (Backend: APHRODITE)
+2025-04-20 18:57:01,966 - app_setup - INFO - Starting document processing. Files: ['The annual report for the fiscal year ending 2023 presented a decidedly mixed bag.pdf']. LLM: Qwen/Qwen2.5-3B-Instruct
+2025-04-20 18:57:01,969 - app_setup - INFO - Process memory - RSS: 1.36 GB, VMS: 37.65 GB
+2025-04-20 18:57:01,972 - app_setup - INFO - GPU memory - Allocated: 0.00 GB, Reserved: 0.00 GB, Total: 8.00 GB
+2025-04-20 18:57:01,975 - app_setup - INFO - Starting Aphrodite service for document processing
+2025-04-20 18:57:01,977 - app_setup - INFO - Attempting to start Aphrodite service...
+2025-04-20 18:57:03,692 - app_setup - INFO - Project Root Directory set to: /home/t/lm_rag
+2025-04-20 18:57:03,693 - app_setup - INFO - Configuration loaded successfully.
+2025-04-20 18:57:03,693 - app_setup - INFO - Selected LLM Backend: APHRODITE
+2025-04-20 18:57:03,772 - app_setup - INFO - Aphrodite service modules imported (backend is Aphrodite).
+2025-04-20 18:57:03,772 - app_setup - INFO - Aphrodite backend selected, OpenRouterManager module not imported.

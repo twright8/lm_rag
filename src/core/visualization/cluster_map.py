@@ -384,7 +384,7 @@ def create_topic_model(embeddings, texts, metadata_list, config=None):
             logger.info("Reusing existing AphroditeRepresentation instance from global variable")
         else:
             # Create new representation model if not exists
-            from src.core.visualization.aphrodite_representation import AphroditeRepresentation
+            from src.core.visualization.llm_representation import AphroditeRepresentation
             logger.info("Creating new AphroditeRepresentation instance for topic refinement")
             representation_instance = AphroditeRepresentation(
                 model_name="Qwen/Qwen2.5-3B-Instruct",
